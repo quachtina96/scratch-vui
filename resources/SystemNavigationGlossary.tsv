@@ -1,0 +1,13 @@
+TriggerType	Start State	End State	Ideal Phrase	Other Examples
+NewProject	Home	Inside Project	"New project"	"Create a project", " Make a new project", " Make a project"
+EditProject	Play Project	Inside Project	"See inside"	"What's inside?" , "What are the steps?"
+FinishProject	Inside Project	Inside Project	"That's it."	“There are no next steps”
+InteractiveMode	--	Playground	"Be interactive"	"Let's try", "Let's mess around", "Start interactive mode"
+Play	Inside, home, debug mode	Play Project	"<PROJECT_NAME>"	"play the project", "test the project"
+PlayDebug	Play Project	Debug Mode	"go step by step" 	"start debug mode"
+StopDebug	Debug Mode	Play Project	"stop going step by step"	"stop debug mode"
+ReturnFromRecording	Record	Last State	"Save" or "Cancel"	"I'm done.", "Go back", "Quit", "Stop", "Exit"
+Return	--	Last State	"Stop"	"I'm done.", "Go back", "Quit", "Stop", "Exit"
+EditSound	--	Sound Editor	"Edit"	"Edit sounds", "Edit the <> sound"
+Redo	Record	Record	"Redo"	"Record again"
+Record	--	Record Sound	"Record"	"Record sound"
