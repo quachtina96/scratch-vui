@@ -11,17 +11,17 @@ var projects = []
 var fsm = new StateMachine({
     init: 'Home',
     transitions: [
-      { name: 'NewProject',     from: 'Home',  to: 'InsideProject' },
+      { name: 'newProject',     from: 'Home',  to: 'InsideProject' },
       // Return should take you back to the last state
-      { name: 'Return',   from: '*', to: function() {
+      { name: 'return',   from: '*', to: function() {
           return fsm.history[fsm.history.length - 2];
         }
-      },
-      { name: 'FinishProject', from: 'InsideProject', to: 'Home'},
-      { name: 'Play', from: 'Home', to: 'PlayProject'},
-      { name: 'PlayCurrentProject', from: 'InsideProject', to: 'PlayProject'},
-      { name: 'EditProject', from: 'PlayProject', to: 'InsideProject' },
-      // support fsm.goto(STATE_NAME);
+      }, {
+        name: 'finishProject', from: 'InsideProject', to: 'Home'},
+      { name: 'play', from: 'Home', to: 'PlayProject'},
+      { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
+      { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
+      // Support fsm.goto(STATE_NAME);
       { name: 'goto', from: '*', to: function(s) { return s } }
     ],
     data: {
@@ -33,28 +33,37 @@ var fsm = new StateMachine({
     ],
     methods: {
       onNewProject: function() {
-        fsm.say('What do you want to call it?');
-        console.log('What do you want to call it?')
+        fsm.say('Creating a new project');
+        console.log('Creating a new project');
       },
       onReturn: function() {
-        // Not sure the I should use
-        // fsm.history[fsm.history.length - 2]
-        // or
-        // fsm.state
-        // It depends on timing.
+        fsm.say('Returning to previous state: ' + fsm.state);
         console.log('Returning to previous state: ' + fsm.state);
       },
       onPlayProject: function() {
+        fsm.say('Playing project');
         console.log('Playing project');
       },
+      onFinishProject: function() {
+        fsm.say('Great! You can say the name of any project to play it');
+        console.log('Great! You can say the name of any project to play it');
+      },
       onEditProject: function() {
+        fsm.say('Opening project for editing');
         console.log('Opening project for editing');
       },
       onPlayCurrentProject: function() {
+        fsm.say('Playing current project');
         console.log('Playing current project');
       },
     }
   });
+
+fsm.observe('onAfterTransition', function() {
+  console.log('transitioning.....')
+  console.log(fsm.state)
+  document.getElementById("current_state").innerHTML = fsm.state;
+});
 
 fsm.say = function(whatToSay) {
   var whatToSay = new SpeechSynthesisUtterance(whatToSay);
@@ -65,7 +74,8 @@ fsm.removeFillerWords = function(utterance) {
   var filler_words = ["the", "a", "um", "uh", "er", "ah", "like"];
 
   var utterance = utterance.toLowerCase();
-  var tokens = utterance.match(/\b(\w+)\b/g);
+  var stripped = utterance.replace(/\b[-.,()&$#!\[\]{}"']+\B|\B[-.,()&$#!\[\]{}"']+\b/g, "");
+  var tokens = stripped.split(' ');
   var result = tokens.filter(token => filler_words.indexOf(token) == -1);
   return result.join(' ');
 }
@@ -75,21 +85,21 @@ fsm.getTriggerType = function (utterance) {
   // TODO: detect project names in utterance.
 
   var triggers = {
-    'NewProject': ["new project","create new project", "create project", "make new project", "make project"],
-    'EditProject': ["see inside"],
-    'FinishProject': ["that's it", "there are no next steps"],
-    'Play': fsm.projects.map((project) => project.name),
-    'PlayCurrentProject': ["play project", "start project"],
-    'Return': ["stop", "i'm done", "go back", "quit", "exit"]
+    'newProject': ["new project","create new project", "create project", "make new project", "make project"],
+    'editProject': ["see inside"],
+    'finishProject': ["i'm done", "i'm finished"],
+    'play': fsm.projects.map((project) => project.name),
+    'playCurrentProject': ["play project", "start project"],
+    'return': ["stop", "i'm done", "go back", "quit", "exit"]
   }
 
   // Filter utterance for filler words.
   var lowercase = utterance.toLowerCase();
-  var trigger = fsm.removeFillerWords(lowercase);
+  var trigger = fsm.removeFillerWords(lowercase).trim();
 
   for (var triggerType in triggers) {
-    matching_phrases = triggers[triggerType];
-    if (matching_phrases.indexOf(trigger) >= 0) {
+    var matching_phrases = triggers[triggerType];
+    if (matching_phrases.indexOf(trigger) >= 0 && fsm.can(triggerType)) {
       return triggerType;
     }
   }
@@ -100,10 +110,13 @@ fsm.getTriggerType = function (utterance) {
 fsm.handleUtterance = function(utterance) {
   var triggerType = fsm.getTriggerType(utterance);
   if (triggerType) {
-    fsm[triggerType.toLowerCase()]();
-    console.log('executing code on ' + fsm.state);
+    if (fsm.can(triggerType)) {
+      fsm[triggerType]();
+      console.log('executing code on ' + fsm.state);
+    } else {
+      console.log('could not make transition: ' + triggerType);
+    }
   }
-  document.getElementById("current_state").innerHTML = fsm.state;
 }
 
 showInfo('info_start');
