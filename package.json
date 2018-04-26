@@ -4,13 +4,22 @@
   "description": "voice user interface for scratch",
   "main": "hellonode.js",
   "scripts": {
+    "build": "webpack",
     "test": "tap test/unit/*.js"
+  },
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "javascript-state-machine": "^3.0.1",
+    "lapack": "^0.1.0",
+    "natural": "^0.5.6",
+    "wordnet-db": "^3.1.6"
   },
   "devDependencies": {
     "eslint": "^4.12.0",
     "eslint-plugin-promise": "^3.6.0",
-    "javascript-state-machine": "^3.0.1",
-    "tap": "^11.1.1"
+    "tap": "^11.1.1",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15"
   },
   "repository": {
     "type": "git",
