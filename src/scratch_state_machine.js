@@ -62,15 +62,12 @@ var ScratchStateMachine = new StateMachine.factory({
       onPlay: function() {
         return new Promise(function(resolve, reject) {
           var project = scratch.projectToPlay;
-          console.log('HELLO PLAYING PROJECT');
           scratch.say('Playing project ' + project.name);
           scratch.executeProgram(project.getScratchProgram());
           // TODO: cue the start and
           scratch.say('the end');
           resolve();
-        }).then(() => {
-          scratch.goto('Home');
-        });
+        })
       },
       onFinishProject: function() {
         return new Promise(function(resolve, reject) {
@@ -80,7 +77,8 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       onEditProject: function() {
         return new Promise(function(resolve, reject) {
-          scratch.say('Opening project for editing');
+          scratch.say('Opening project ' + scratch.currentProject.name + ' for editing');
+          // TODO: begin edit project flow.
           resolve();
         });
       },
@@ -123,6 +121,11 @@ var ScratchStateMachine = new StateMachine.factory({
           if (result == 'exit') {
             scratch.finishProject();
           }
+
+        } else if (utterance.toLowercase().indexOf('scratch') != -1) {
+          // TODO: integrate Scratch, Help!
+          console.log('found Scratch in failed utterance');
+          scratch.say("I don't know how to do that.");
         }
       },
       _getTriggerType: function(utterance) {
