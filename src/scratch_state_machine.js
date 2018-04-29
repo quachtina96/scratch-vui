@@ -122,7 +122,7 @@ var ScratchStateMachine = new StateMachine.factory({
             scratch.finishProject();
           }
 
-        } else if (utterance.toLowercase().indexOf('scratch') != -1) {
+        } else if (utterance.toLowerCase().indexOf('scratch') != -1) {
           // TODO: integrate Scratch, Help!
           console.log('found Scratch in failed utterance');
           scratch.say("I don't know how to do that.");

@@ -21,6 +21,7 @@ var ScratchProject = StateMachine.factory({
       name: null,
       instructions: [],
       // TODO: deal with 1 versus 0 based indexing.
+      // TODO: handle word forms of words in referencing steps.
       instructionPointer: null,
       editCommands: {
         _describeCurrentStep: function() {
@@ -172,6 +173,7 @@ var ScratchProject = StateMachine.factory({
      * command, execute the command.
      */
     _handleEditCommands: function(utterance) {
+      utterance = utterance.toLowerCase();
       var editCommands = {
         goToStep: /go to step (.*)/,
         nextStep: /go to next step|next step|what's next\?/,
@@ -190,9 +192,10 @@ var ScratchProject = StateMachine.factory({
       }
 
       for (var commandType in editCommands) {
-        var args = utterance.match(commandTemplates[commandType]);
+        var args = utterance.match(editCommands[commandType]);
         if (args) {
-          scratch.editCommands[commandType](args);
+          this.editCommands[commandType].bind(this)
+          this.editCommands[commandType](args);
           return true;
         }
       }
