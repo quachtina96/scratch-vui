@@ -11,6 +11,10 @@
 
 
 function text2num(numberWord) {
+  if (typeof numberWord == 'number') {
+    return numberWord;
+  }
+
     var a, n, g;
     a = numberWord.toString().split(/[\s-]+/);
     n = 0;
@@ -113,19 +117,29 @@ var ScratchProject = StateMachine.factory({
           this.scratch.say(this.instructions[this.instructionPointer-1].raw)
         },
         goToStep: (args) => {
-          this.instructionPointer = text2num(args[1])-1;
+          this.instructionPointer = text2num(args[1]);
           if (this.instructionPointer == null) {
-            this.instructionPointer = parseInt(args[1]-1);
+            this.instructionPointer = parseInt(args[1]);
           }
           this.editCommands._describeCurrentStep();
         },
-        nextStep: function() {
+        nextStep: () => {
           this.instructionPointer++;
-          this.editCommands._describeCurrentStep();
+          if (this.instructions.length == this.instructionPointer) {
+            this.editCommands._describeCurrentStep();
+          } else {
+            this.instructionPointer--;
+            this.scratch.say('No more steps');
+          }
         },
-        previousStep: function() {
+        previousStep: () => {
           this.instructionPointer--;
-          this.editCommands._describeCurrentStep();
+          if (instructionPointer == -1) {
+            this.editCommands._describeCurrentStep();
+          } else {
+            this.instructionPointer++;
+            this.scratch.say('No more steps');
+          }
         },
         playStep: function() {
           var steps = this.instructions[this.instructionPointer].getSteps();
@@ -195,11 +209,11 @@ var ScratchProject = StateMachine.factory({
     }
   },
   methods: {
-    onEmpty: function() {
+    onStartProjectCreation() {
       return new Promise(function(resolve, reject) {
         this.scratch.say('What do you want to call it?');
         resolve();
-      })
+      });
     },
     onNameProject: function() {
       return new Promise(function(resolve, reject) {
@@ -242,7 +256,11 @@ var ScratchProject = StateMachine.factory({
     handleUtterance: function(utterance) {
       // Name project
       if (this.state == 'create') {
-        this.startProjectCreation();
+        if (this.name) {
+          this.goto('named');
+        } else {
+          this.startProjectCreation();
+        }
       }
       if (this.state == 'empty') {
         this.name = this._getName(utterance);
