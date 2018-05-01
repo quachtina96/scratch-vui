@@ -15,6 +15,7 @@ var ScratchStateMachine = new StateMachine.factory({
         name: 'finishProject', from: 'InsideProject', to: 'Home'},
       { name: 'play', from: 'Home', to: 'PlayProject'},
       { name: 'play', from: 'PlayProject', to: 'PlayProject'},
+      { name: 'newProject',     from: 'PlayProject',  to: 'InsideProject' },
       { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
       { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
       // Support scratch.goto(STATE_NAME);
@@ -59,7 +60,8 @@ var ScratchStateMachine = new StateMachine.factory({
         return new Promise(function(resolve, reject) {
           scratch.currentProject = new ScratchProject(scratch);
           scratch.untitledCount++;
-          scratch.projects['Untitled-' + scratch.untitledCount] = scratch.currentProject
+          scratch.projects['Untitled-' + scratch.untitledCount] = scratch.currentProject;
+          scratch.currentProject.startProjectCreation();
           resolve();
         });
       },
@@ -119,8 +121,17 @@ var ScratchStateMachine = new StateMachine.factory({
         var triggerType = scratch._getTriggerType(utterance);
         if (triggerType) {
           if (scratch.can(triggerType) || triggerType.startsWith('get')) {
-            scratch[triggerType]();
+            scratch[triggerType].call(scratch);
             console.log('executing code on ' + scratch.state);
+          } else if (triggerType == 'play' && scratch.state == 'InsideProject') {
+            if (scratch.currentProject.state == 'empty') {
+              // User is trying to give a project the same name as a previous
+              // project.
+              scratch.say('You already have a project called that.')
+            } else {
+              // User is composing a Scratch program from other Scratch programs.
+              var result = scratch.currentProject.handleUtterance(utterance);
+            }
           } else {
             console.log('could not make transition: ' + triggerType);
           }
@@ -195,6 +206,7 @@ var ScratchStateMachine = new StateMachine.factory({
         var savedProjects = JSON.parse(window.localStorage.scratchProjects);
         for (var name in savedProjects) {
           scratch.projects[name] = new ScratchProject(scratch);
+          scratch.projects[name].name = name;
           scratch.projects[name].instructions = savedProjects[name];
         }
       }
