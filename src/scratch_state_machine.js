@@ -35,7 +35,9 @@ var ScratchStateMachine = new StateMachine.factory({
           'finishProject': ["i'm done", "i'm finished"],
           'play': [],
           'playCurrentProject': ["play project", "start project"],
-          'return': ["stop", "i'm done", "go back", "quit", "exit"]
+          'return': ["stop", "i'm done", "go back", "quit", "exit"],
+          'getProjectNames': ["what projects do i have", "what have i made so far"],
+          'getProjectCount': ["how many projects do i have", "how many projects have i made"]
         }
       }
     },
@@ -43,6 +45,16 @@ var ScratchStateMachine = new StateMachine.factory({
       new StateMachineHistory()     //  <-- plugin enabled here
     ],
     methods: {
+      getProjectNames: function() {
+        var whatToSay = Object.keys(scratch.projects);
+        whatToSay.splice(whatToSay.length-1, 0, 'and');
+        whatToSay.join(',')
+        scratch.say(whatToSay);
+      },
+      getProjectCount: function() {
+        var count = Object.keys(scratch.projects).length;
+        scratch.say('You have ' + count + ' projects');
+      },
       onNewProject: function() {
         return new Promise(function(resolve, reject) {
           scratch.currentProject = new ScratchProject(scratch);
@@ -92,8 +104,8 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       say: function(whatToSay) {
         var whatToSay = new SpeechSynthesisUtterance(whatToSay);
-          console.log('saying ' + whatToSay.text);
-          scratch.synth.speak(whatToSay);
+        console.log('saying ' + whatToSay.text);
+        scratch.synth.speak(whatToSay);
       },
       executeProgram: function(scratchProgram) {
         // Assuming that the project can only be made of 'say' instructions
@@ -106,7 +118,7 @@ var ScratchStateMachine = new StateMachine.factory({
         // Handle utterances that switch context.
         var triggerType = scratch._getTriggerType(utterance);
         if (triggerType) {
-          if (scratch.can(triggerType)) {
+          if (scratch.can(triggerType) || triggerType.startsWith('get')) {
             scratch[triggerType]();
             console.log('executing code on ' + scratch.state);
           } else {
@@ -141,7 +153,7 @@ var ScratchStateMachine = new StateMachine.factory({
 
           // TODO: implement flexibility by accepting a trigger to CONTAIN
           // the matching phrase.
-          if (matching_phrases.indexOf(trigger) >= 0 && scratch.can(triggerType)) {
+          if (matching_phrases.indexOf(trigger) >= 0) {
             if (triggerType == 'play') {
               var getName = function(string) {
                 var pattern = /scratch (.*)/;
