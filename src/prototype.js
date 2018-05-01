@@ -4,8 +4,12 @@
  * JavaScript for the Scratch Voice User Interface prototype.
  * @author Tina Quach (quacht@mit.edu)
  */
-
+if (!window.localStorage.scratchProjects) {
+  window.localStorage.scratchProjects = {};
+}
 var scratch = new ScratchStateMachine();
+scratch.loadFromLocalStorage();
+
 scratch.observe('onAfterTransition', function() {
   document.getElementById("current_state").innerHTML = scratch.state;
 });

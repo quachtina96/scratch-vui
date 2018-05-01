@@ -14,15 +14,15 @@ var ScratchStateMachine = new StateMachine.factory({
       }, {
         name: 'finishProject', from: 'InsideProject', to: 'Home'},
       { name: 'play', from: 'Home', to: 'PlayProject'},
+      { name: 'play', from: 'PlayProject', to: 'PlayProject'},
       { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
       { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
       // Support scratch.goto(STATE_NAME);
       { name: 'goto', from: '*', to: function(s) { return s } }
     ],
     data: function() {
-      // TODO: initialize projects based on data saved in browser.
       return {
-        projects: [],
+        projects: {},
         untitledCount: 0,
         // Project currently being edited
         projectToPlay: null,
@@ -62,16 +62,18 @@ var ScratchStateMachine = new StateMachine.factory({
       onPlay: function() {
         return new Promise(function(resolve, reject) {
           var project = scratch.projectToPlay;
-          scratch.say('Playing project ' + project.name);
+          scratch.currentProject = scratch.projectToPlay;
+          scratch.say('playing project');
           scratch.executeProgram(project.getScratchProgram());
           // TODO: cue the start and
-          scratch.say('the end');
+          scratch.say('done playing project');
           resolve();
         })
       },
       onFinishProject: function() {
         return new Promise(function(resolve, reject) {
-          scratch.say('We are no longer editing ' + scratch.currentProject.name);
+          // TODO: cue exiting project
+          // Save project.
           resolve();
         });
       },
@@ -156,6 +158,23 @@ var ScratchStateMachine = new StateMachine.factory({
         var tokens = stripped.split(' ');
         var result = tokens.filter(token => filler_words.indexOf(token) == -1);
         return result.join(' ');
+      },
+      saveToLocalStorage: function() {
+        if (!window.localStorage.scratchProjects) {
+          window.localStorage.scratchProjects = JSON.stringify({});
+        }
+        for (var projectName in scratch.projects) {
+          var savedProjects = JSON.parse(window.localStorage.scratchProjects);
+          savedProjects[projectName] = scratch.projects[projectName].instructions;
+          window.localStorage.scratchProjects = JSON.stringify(savedProjects);
+        }
+      },
+      loadFromLocalStorage: function() {
+        var savedProjects = JSON.parse(window.localStorage.scratchProjects);
+        for (var name in savedProjects) {
+          scratch.projects[name] = new ScratchProject(scratch);
+          scratch.projects[name].instructions = savedProjects[name];
+        }
       }
     }
   });

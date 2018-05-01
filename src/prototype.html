@@ -86,6 +86,7 @@
 <div id="state_info">
   <p> Current state: <span id="current_state">Home</span></p>
 </div>
+
 <div id="info">
   <p id="info_start">Click on the microphone icon and begin speaking.</p>
   <p id="info_speak_now">Speak now.</p>
@@ -119,3 +120,8 @@
   <script src='scratch_project.js'></script>
   <script src='scratch_state_machine.js'></script>
   <script src='prototype.js'></script>
+  <script>
+    if (!window.localStorage.scratchProjects) {
+       window.localStorage.scratchProjects = {};
+    }
+  </script>
