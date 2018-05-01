@@ -135,6 +135,14 @@ var ScratchStateMachine = new StateMachine.factory({
           } else {
             console.log('could not make transition: ' + triggerType);
           }
+        } else if (scratch.state == 'PlayProject') {
+          if (utterance == 'scratch stop') {
+            this.synth.cancel();
+          } else if (utterance == 'scratch pause') {
+            this.synth.pause();
+          } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
+            this.synth.resume();
+          }
         } else if (scratch.state == 'InsideProject') {
           // Handle utterances in the InsideProject context.
           var result = scratch.currentProject.handleUtterance(utterance);
