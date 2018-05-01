@@ -11,7 +11,8 @@
 
 
 function text2num(numberWord) {
-  if (typeof numberWord == 'number') {
+  var parseResult = parseInt(numberWord);
+  if (!isNaN(parseResult)) {
     return numberWord;
   }
 
@@ -113,8 +114,10 @@ var ScratchProject = StateMachine.factory({
         _describeCurrentStep: () => {
           // this does not refer to the state machine, but to the editCommands
           // object holding these functions.
-          this.scratch.say('Step ' + this.instructionPointer);
-          this.scratch.say(this.instructions[this.instructionPointer-1].raw)
+          if (0 < this.instructionPointer <= this.instructions.length) {
+            this.scratch.say('Step ' + this.instructionPointer);
+            this.scratch.say(this.instructions[this.instructionPointer-1].raw)
+          }
         },
         goToStep: (args) => {
           this.instructionPointer = text2num(args[1]);
@@ -134,15 +137,17 @@ var ScratchProject = StateMachine.factory({
         },
         previousStep: () => {
           this.instructionPointer--;
-          if (instructionPointer == -1) {
+          if (this.instructionPointer <= 0) {
             this.editCommands._describeCurrentStep();
           } else {
             this.instructionPointer++;
             this.scratch.say('No more steps');
           }
         },
+
+        // todo - test below
         playStep: function() {
-          var steps = this.instructions[this.instructionPointer].getSteps();
+          var steps = this.instructions[this.instructionPointer-1].getSteps();
           // Assuming that the project can only be made of 'say' instructions
           for (var i = 0; i < steps.length; i++) {
             scratch.say(steps[i][1]);
