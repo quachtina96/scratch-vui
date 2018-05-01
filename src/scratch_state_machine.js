@@ -107,11 +107,6 @@ var ScratchStateMachine = new StateMachine.factory({
         var triggerType = scratch._getTriggerType(utterance);
         if (triggerType) {
           if (scratch.can(triggerType)) {
-
-            if (triggerType == 'play') {
-              scratch.projectToPlay = scratch.projects[utterance];
-            }
-
             scratch[triggerType]();
             console.log('executing code on ' + scratch.state);
           } else {
@@ -123,7 +118,6 @@ var ScratchStateMachine = new StateMachine.factory({
           if (result == 'exit') {
             scratch.finishProject();
           }
-
         } else if (utterance.toLowerCase().indexOf('scratch') != -1) {
           // TODO: integrate Scratch, Help!
           console.log('found Scratch in failed utterance');
@@ -136,7 +130,11 @@ var ScratchStateMachine = new StateMachine.factory({
         var trigger = scratch._removeFillerWords(lowercase).trim();
 
         // Update list of projects that can be triggered.
-        this._triggers['play'] = Object.keys(scratch.projects).map((projectName) => scratch._removeFillerWords(projectName.trim()));
+        this._triggers['play'] = Object.keys(scratch.projects).map(
+            (projectName) => 'scratch ' + scratch._removeFillerWords(projectName.trim()));
+        this._triggers['play'] = this._triggers['play'].concat(
+          Object.keys(scratch.projects).map(
+            (projectName) => scratch._removeFillerWords(projectName.trim())));
 
         for (var triggerType in this._triggers) {
           var matching_phrases = this._triggers[triggerType];
@@ -144,6 +142,18 @@ var ScratchStateMachine = new StateMachine.factory({
           // TODO: implement flexibility by accepting a trigger to CONTAIN
           // the matching phrase.
           if (matching_phrases.indexOf(trigger) >= 0 && scratch.can(triggerType)) {
+            if (triggerType == 'play') {
+              var getName = function(string) {
+                var pattern = /scratch (.*)/;
+                var matches = utterance.match(pattern);
+                if (matches && matches.length > 0) {
+                  return matches[1].trim();
+                } else {
+                  return utterance.trim();
+                }
+              }
+              scratch.projectToPlay = scratch.projects[getName(utterance)];
+            }
             return triggerType;
           }
         }
