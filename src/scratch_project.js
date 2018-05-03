@@ -114,9 +114,13 @@ var ScratchProject = StateMachine.factory({
         _describeCurrentStep: () => {
           // this does not refer to the state machine, but to the editCommands
           // object holding these functions.
-          if (0 < this.instructionPointer <= this.instructions.length) {
+          if (0 < this.instructionPointer &&
+              this.instructionPointer <= this.instructions.length) {
             this.scratch.say('Step ' + this.instructionPointer);
             this.scratch.say(this.instructions[this.instructionPointer-1].raw)
+            return true;
+          } else {
+            return false;
           }
         },
         goToStep: (args) => {
@@ -124,11 +128,13 @@ var ScratchProject = StateMachine.factory({
           if (this.instructionPointer == null) {
             this.instructionPointer = parseInt(args[1]);
           }
-          this.editCommands._describeCurrentStep();
+          if (!this.editCommands._describeCurrentStep()) {
+            this.scratch.say('there is no step ' + this.instructionPointer);
+          }
         },
         nextStep: () => {
           this.instructionPointer++;
-          if (this.instructions.length == this.instructionPointer) {
+          if (this.instructionPointer <= this.instructions.length) {
             this.editCommands._describeCurrentStep();
           } else {
             this.instructionPointer--;
@@ -137,7 +143,7 @@ var ScratchProject = StateMachine.factory({
         },
         previousStep: () => {
           this.instructionPointer--;
-          if (this.instructionPointer <= 0) {
+          if (this.instructionPointer > 0) {
             this.editCommands._describeCurrentStep();
           } else {
             this.instructionPointer++;
@@ -303,7 +309,7 @@ var ScratchProject = StateMachine.factory({
     _handleEditCommands: function(utterance) {
       utterance = utterance.toLowerCase();
       var editCommands = {
-        goToStep: /go to step (.*)/,
+        goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
         nextStep: /go to next step|next step|what's next\?/,
         previousStep: /previous step|go back a step/,
         playStep: /play step|play current step|what does it do\?/,

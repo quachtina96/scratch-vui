@@ -6,7 +6,8 @@
 var ScratchStateMachine = new StateMachine.factory({
     init: 'Home',
     transitions: [
-      { name: 'newProject',     from: 'Home',  to: 'InsideProject' },
+      { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
+      { name: 'newProject', from: 'Home',  to: 'InsideProject' },
       // Return should take you back to the last state
       { name: 'return',   from: '*', to: function() {
           return scratch.history[scratch.history.length - 2];
@@ -15,11 +16,12 @@ var ScratchStateMachine = new StateMachine.factory({
         name: 'finishProject', from: 'InsideProject', to: 'Home'},
       { name: 'play', from: 'Home', to: 'PlayProject'},
       { name: 'play', from: 'PlayProject', to: 'PlayProject'},
-      { name: 'newProject',     from: 'PlayProject',  to: 'InsideProject' },
+      { name: 'newProject', from: 'PlayProject',  to: 'InsideProject' },
       { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
       { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
       // Support scratch.goto(STATE_NAME);
-      { name: 'goto', from: '*', to: function(s) { return s } }
+      { name: 'goto', from: '*', to: function(s) { return s } },
+      { name: 'stay', from: '*', to: function() { return this.state} }
     ],
     data: function() {
       return {
@@ -32,6 +34,7 @@ var ScratchStateMachine = new StateMachine.factory({
         recognition: new webkitSpeechRecognition(),
         _triggers: {
           'newProject': ["new project","create new project", "create project", "make new project", "make project"],
+          'editExistingProject': ["see inside"],
           'editProject': ["see inside"],
           'finishProject': ["i'm done", "i'm finished"],
           'play': [],
@@ -91,6 +94,13 @@ var ScratchStateMachine = new StateMachine.factory({
           resolve();
         });
       },
+      onEditExistingProject: function() {
+        return new Promise(function(resolve, reject) {
+          scratch.say('Opening project ' + scratch.currentProject.name + ' for editing');
+          // TODO: begin edit project flow.
+          resolve();
+        });
+      },
       onEditProject: function() {
         return new Promise(function(resolve, reject) {
           scratch.say('Opening project ' + scratch.currentProject.name + ' for editing');
@@ -115,12 +125,36 @@ var ScratchStateMachine = new StateMachine.factory({
           scratch.say(scratchProgram[i][1]);
         }
       },
+      _setCurrentProject: function(projectName) {
+        for (var name in scratch.projects) {
+          if (projectName == name) {
+            scratch.currentProject = scratch.projects[name];
+            return true;
+          }
+        }
+        return false;
+      },
       handleUtterance: function(utterance) {
         utterance = utterance.trim();
         // Handle utterances that switch context.
         var triggerType = scratch._getTriggerType(utterance);
         if (triggerType) {
           if (scratch.can(triggerType) || triggerType.startsWith('get')) {
+
+            if (triggerType == 'editExistingProject') {
+              // see if the utterance asks to see inside a specific project.
+              var matches = utterance.match('see inside (.*)')
+              if (matches) {
+                var nameOfDesiredProject = matches[1];
+                success = scratch._setCurrentProject(nameOfDesiredProject);
+                if (!success) {
+                  scratch.say("There's no project called " + nameOfDesiredProject);
+                }
+              } else {
+                triggerType = 'stay';
+              }
+            }
+
             scratch[triggerType].call(scratch);
             console.log('executing code on ' + scratch.state);
           } else if (triggerType == 'play' && scratch.state == 'InsideProject') {
@@ -155,6 +189,14 @@ var ScratchStateMachine = new StateMachine.factory({
           scratch.say("I don't know how to do that.");
         }
       },
+      _matches: function(matching_phrases, trigger) {
+        for (let phrase of matching_phrases) {
+          if (trigger.indexOf(phrase) != -1) {
+            return true;
+          }
+        }
+        return false;
+      },
       _getTriggerType: function(utterance) {
         // Filter utterance for filler words.
         var lowercase = utterance.toLowerCase();
@@ -172,7 +214,7 @@ var ScratchStateMachine = new StateMachine.factory({
 
           // TODO: implement flexibility by accepting a trigger to CONTAIN
           // the matching phrase.
-          if (matching_phrases.indexOf(trigger) >= 0) {
+          if (this._matches(matching_phrases, trigger)) {
             if (triggerType == 'play') {
               var getName = function(string) {
                 var pattern = /scratch (.*)/;
