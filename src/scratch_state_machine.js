@@ -10,7 +10,7 @@ var ScratchStateMachine = new StateMachine.factory({
       { name: 'newProject', from: 'Home',  to: 'InsideProject' },
       // Return should take you back to the last state
       { name: 'return',   from: '*', to: function() {
-          return scratch.history[scratch.history.length - 2];
+          return this.history[this.history.length - 2];
         }
       }, {
         name: 'finishProject', from: 'InsideProject', to: 'Home'},
@@ -19,7 +19,7 @@ var ScratchStateMachine = new StateMachine.factory({
       { name: 'newProject', from: 'PlayProject',  to: 'InsideProject' },
       { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
       { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
-      // Support scratch.goto(STATE_NAME);
+      // Support this.goto(STATE_NAME);
       { name: 'goto', from: '*', to: function(s) { return s } },
       { name: 'stay', from: '*', to: function() { return this.state} }
     ],
@@ -50,17 +50,18 @@ var ScratchStateMachine = new StateMachine.factory({
     ],
     methods: {
       getProjectNames: function() {
-        var whatToSay = Object.keys(scratch.projects);
+        var whatToSay = Object.keys(this.projects);
         whatToSay.splice(whatToSay.length-1, 0, 'and');
         whatToSay.join(',')
-        scratch.say(whatToSay);
+        this.say(whatToSay);
       },
       getProjectCount: function() {
-        var count = Object.keys(scratch.projects).length;
-        scratch.say('You have ' + count + ' projects');
+        var count = Object.keys(this.projects).length;
+        this.say('You have ' + count + ' projects');
       },
-      onNewProject: function() {
+      onNewProject: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
+          console.log(scratch);
           scratch.currentProject = new ScratchProject(scratch);
           scratch.untitledCount++;
           scratch.projects['Untitled-' + scratch.untitledCount] = scratch.currentProject;
@@ -68,7 +69,7 @@ var ScratchStateMachine = new StateMachine.factory({
           resolve();
         });
       },
-      onReturn: function() {
+      onReturn: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
           scratch.say('Returning to previous state: ' + scratch.state);
           resolve();
@@ -76,7 +77,7 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       // in order to trigger the play project state, the user must just say
       // Scratch, name of existing project.
-      onPlay: function() {
+      onPlay: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
           var project = scratch.projectToPlay;
           scratch.currentProject = scratch.projectToPlay;
@@ -94,21 +95,21 @@ var ScratchStateMachine = new StateMachine.factory({
           resolve();
         });
       },
-      onEditExistingProject: function() {
+      onEditExistingProject: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
           scratch.say('Opening project ' + scratch.currentProject.name + ' for editing');
           // TODO: begin edit project flow.
           resolve();
         });
       },
-      onEditProject: function() {
+      onEditProject: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
           scratch.say('Opening project ' + scratch.currentProject.name + ' for editing');
           // TODO: begin edit project flow.
           resolve();
         });
       },
-      onPlayCurrentProject: function() {
+      onPlayCurrentProject: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
           scratch.say('Playing current project ' + scratch.currentProject.name);
           resolve();
@@ -116,60 +117,64 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       say: function(whatToSay) {
         var whatToSay = new SpeechSynthesisUtterance(whatToSay);
-        console.log('saying ' + whatToSay.text);
-        scratch.synth.speak(whatToSay);
+        var scratch = this;
+        this.recognition.stop();
+        this.synth.speak(whatToSay);
+        whatToSay.onend = function(event) {
+          scratch.recognition.start();
+        }
       },
       executeProgram: function(scratchProgram) {
         // Assuming that the project can only be made of 'say' instructions
         for (var i = 1; i < scratchProgram.length; i++) {
-          scratch.say(scratchProgram[i][1]);
+          this.say(scratchProgram[i][1]);
         }
       },
       _setCurrentProject: function(projectName) {
-        for (var name in scratch.projects) {
+        for (var name in this.projects) {
           if (projectName == name) {
-            scratch.currentProject = scratch.projects[name];
+            this.currentProject = this.projects[name];
             return true;
           }
         }
         return false;
       },
-      handleUtterance: function(utterance) {
+      handleUtterance: function(utterance)  {
         utterance = utterance.trim();
         // Handle utterances that switch context.
-        var triggerType = scratch._getTriggerType(utterance);
+        var triggerType = this._getTriggerType(utterance);
         if (triggerType) {
-          if (scratch.can(triggerType) || triggerType.startsWith('get')) {
+          if (this.can(triggerType) || triggerType.startsWith('get')) {
 
             if (triggerType == 'editExistingProject') {
               // see if the utterance asks to see inside a specific project.
               var matches = utterance.match('see inside (.*)')
               if (matches) {
                 var nameOfDesiredProject = matches[1];
-                success = scratch._setCurrentProject(nameOfDesiredProject);
+                success = this._setCurrentProject(nameOfDesiredProject);
                 if (!success) {
-                  scratch.say("There's no project called " + nameOfDesiredProject);
+                  this.say("There's no project called " + nameOfDesiredProject);
                 }
               } else {
                 triggerType = 'stay';
               }
             }
 
-            scratch[triggerType].call(scratch);
-            console.log('executing code on ' + scratch.state);
-          } else if (triggerType == 'play' && scratch.state == 'InsideProject') {
-            if (scratch.currentProject.state == 'empty') {
+            this[triggerType](this);
+            console.log('executing code on ' + this.state);
+          } else if (triggerType == 'play' && this.state == 'InsideProject') {
+            if (this.currentProject.state == 'empty') {
               // User is trying to give a project the same name as a previous
               // project.
-              scratch.say('You already have a project called that.')
+              this.say('You already have a project called that.')
             } else {
               // User is composing a Scratch program from other Scratch programs.
-              var result = scratch.currentProject.handleUtterance(utterance);
+              var result = this.currentProject.handleUtterance(utterance);
             }
           } else {
             console.log('could not make transition: ' + triggerType);
           }
-        } else if (scratch.state == 'PlayProject') {
+        } else if (this.state == 'PlayProject') {
           if (utterance == 'scratch stop') {
             this.synth.cancel();
           } else if (utterance == 'scratch pause') {
@@ -177,19 +182,19 @@ var ScratchStateMachine = new StateMachine.factory({
           } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
             this.synth.resume();
           }
-        } else if (scratch.state == 'InsideProject') {
+        } else if (this.state == 'InsideProject') {
           // Handle utterances in the InsideProject context.
-          var result = scratch.currentProject.handleUtterance(utterance);
+          var result = this.currentProject.handleUtterance(utterance);
           if (result == 'exit') {
-            scratch.finishProject();
+            this.finishProject();
           }
         } else if (utterance.toLowerCase().indexOf('scratch') != -1) {
           // TODO: integrate Scratch, Help!
           console.log('found Scratch in failed utterance');
-          scratch.say("I don't know how to do that.");
+          this.say("I don't know how to do that.");
         }
       },
-      _matches: function(matching_phrases, trigger) {
+      _matches: (matching_phrases, trigger) => {
         for (let phrase of matching_phrases) {
           if (trigger.indexOf(phrase) != -1) {
             return true;
@@ -200,14 +205,14 @@ var ScratchStateMachine = new StateMachine.factory({
       _getTriggerType: function(utterance) {
         // Filter utterance for filler words.
         var lowercase = utterance.toLowerCase();
-        var trigger = scratch._removeFillerWords(lowercase).trim();
+        var trigger = this._removeFillerWords(lowercase).trim();
 
         // Update list of projects that can be triggered.
-        this._triggers['play'] = Object.keys(scratch.projects).map(
-            (projectName) => 'scratch ' + scratch._removeFillerWords(projectName.trim()));
+        this._triggers['play'] = Object.keys(this.projects).map(
+            (projectName) => 'scratch ' + this._removeFillerWords(projectName.trim()));
         this._triggers['play'] = this._triggers['play'].concat(
-          Object.keys(scratch.projects).map(
-            (projectName) => scratch._removeFillerWords(projectName.trim())));
+          Object.keys(this.projects).map(
+            (projectName) => this._removeFillerWords(projectName.trim())));
 
         for (var triggerType in this._triggers) {
           var matching_phrases = this._triggers[triggerType];
@@ -225,7 +230,7 @@ var ScratchStateMachine = new StateMachine.factory({
                   return utterance.trim();
                 }
               }
-              scratch.projectToPlay = scratch.projects[getName(utterance)];
+              this.projectToPlay = this.projects[getName(utterance)];
             }
             return triggerType;
           }
@@ -246,18 +251,18 @@ var ScratchStateMachine = new StateMachine.factory({
         if (!window.localStorage.scratchProjects) {
           window.localStorage.scratchProjects = JSON.stringify({});
         }
-        for (var projectName in scratch.projects) {
+        for (var projectName in this.projects) {
           var savedProjects = JSON.parse(window.localStorage.scratchProjects);
-          savedProjects[projectName] = scratch.projects[projectName].instructions;
+          savedProjects[projectName] = this.projects[projectName].instructions;
           window.localStorage.scratchProjects = JSON.stringify(savedProjects);
         }
       },
       loadFromLocalStorage: function() {
         var savedProjects = JSON.parse(window.localStorage.scratchProjects);
         for (var name in savedProjects) {
-          scratch.projects[name] = new ScratchProject(scratch);
-          scratch.projects[name].name = name;
-          scratch.projects[name].instructions = savedProjects[name];
+          this.projects[name] = new ScratchProject(scratch);
+          this.projects[name].name = name;
+          this.projects[name].instructions = savedProjects[name];
         }
       }
     }
