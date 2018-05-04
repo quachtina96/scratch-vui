@@ -100,6 +100,7 @@ var ScratchProject = StateMachine.factory({
     { name: 'addInstruction', from: 'named', to: 'nonempty'},
     { name: 'addInstruction', from: 'nonempty', to: 'nonempty'},
     { name: 'finishProject', from: 'nonempty', to: 'nonempty'},
+    { name: 'finishProject', from: '*', to: () => { this.state } },
     { name: 'goto', from: '*', to: function(s) { return s } }
   ],
   data: function(scratchStateMachine) {
@@ -183,12 +184,13 @@ var ScratchProject = StateMachine.factory({
           console.log(this.instructions);
         },
         deleteStep: function(args) {
+          console.log(this);
           var index = text2num(args[1])-1;
           if (index == null) {
             index = parseInt(args[1])-1;
           }
           var removedScratchInstruction = this.instructions.splice(index, 1);
-          this.scratch.say('removed step ' + index);
+          this.scratch.say('Removed step ' + (index+1));
           console.log(this.instructions);
         },
         replaceStep: function(args) {
@@ -196,9 +198,12 @@ var ScratchProject = StateMachine.factory({
           if (index == null) {
             index = parseInt(args[1])-1;
           }
-          var step = new ScratchInstruction(args[1]);
+          var step = new ScratchInstruction(args[2]);
+          if (!step) {
+            this.scratch.say(step + 'is not a Scratch command');
+          }
           this.instructions.splice(index, 1, step);
-          this.scratch.say('replaced step ' + index);
+          this.scratch.say('replaced step ' + (index+1));
           console.log(this.instructions);
         },
         replaceInStep: function(args) {
@@ -257,7 +262,7 @@ var ScratchProject = StateMachine.factory({
     },
     _getName: function(utterance) {
       var pattern = /call the project(.*)/;
-      var matches = utterance.match(pattern);
+      var matches = Utils.match(utterance, pattern);
       if (matches && matches.length > 0) {
         return matches[1].trim();
       } else {
@@ -292,13 +297,13 @@ var ScratchProject = StateMachine.factory({
         }
 
         // Parse instruction to add as a last result.
-        try {
-          var instruction = new ScratchInstruction(utterance);
+        var instruction = new ScratchInstruction(utterance);
+        if (instruction.steps != null) {
           this.instructions.push(instruction);
           this.addInstruction();
-        } catch (e) {
-          console.log(e)
-          this.scratch.say("Sorry, that doesn't match any Scratch commands.");
+        } else {
+          this.scratch.say("I heard you say " + utterance);
+          this.scratch.say("That doesn't match any Scratch commands.");
         }
       }
     },
@@ -313,8 +318,8 @@ var ScratchProject = StateMachine.factory({
         nextStep: /go to next step|next step|what's next\?/,
         previousStep: /previous step|go back a step/,
         playStep: /play step|play current step|what does it do\?/,
-        insertStepBefore: /(.*) before step (.*)/,
-        insertStepAfter: /(.*) after step (.*)/,
+        insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
+        insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
         deleteStep: /delete step (.*)/,
         // TODO: distinguish between replacing everywhere and replacing in a
         // specific place.
@@ -324,14 +329,12 @@ var ScratchProject = StateMachine.factory({
         replaceInStep: /in step (.*) replace (.*) with (.*)/,
         stopEditing: /stop|i\'m done|that\'s it'/
       }
-
+      var scratchProject = this;
       for (var commandType in editCommands) {
-        var args = utterance.match(editCommands[commandType]);
+        var args = Utils.match(utterance, editCommands[commandType]);
         if (args) {
-          console.log(this);
-          console.log(typeof this);
-          this.editCommands[commandType].bind(this)
-          this.editCommands[commandType](args);
+          this.editCommands[commandType].call(scratchProject,args);
+          this.scratch.saveToLocalStorage();
           return true;
         }
       }

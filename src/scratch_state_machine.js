@@ -21,7 +21,9 @@ var ScratchStateMachine = new StateMachine.factory({
       { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
       // Support this.goto(STATE_NAME);
       { name: 'goto', from: '*', to: function(s) { return s } },
-      { name: 'stay', from: '*', to: function() { return this.state} }
+      { name: 'stay', from: '*', to: function() { return this.state} },
+      { name: 'getProjectNames', from: '*', to: function() { return this.state} },
+      { name: 'getProjectCount', from: '*', to: function() { return this.state} }
     ],
     data: function() {
       return {
@@ -49,15 +51,21 @@ var ScratchStateMachine = new StateMachine.factory({
       new StateMachineHistory()     //  <-- plugin enabled here
     ],
     methods: {
-      getProjectNames: function() {
-        var whatToSay = Object.keys(this.projects);
-        whatToSay.splice(whatToSay.length-1, 0, 'and');
-        whatToSay.join(',')
-        this.say(whatToSay);
+      onGetProjectNames: (lifecycle, scratch) => {
+        return new Promise(function(resolve, reject) {
+          var whatToSay = Object.keys(scratch.projects);
+          whatToSay.splice(whatToSay.length-1, 0, 'and');
+          whatToSay.join(',')
+          scratch.say(whatToSay);
+          resolve();
+        });
       },
-      getProjectCount: function() {
-        var count = Object.keys(this.projects).length;
-        this.say('You have ' + count + ' projects');
+      onGetProjectCount: (lifecycle, scratch) => {
+        return new Promise(function(resolve, reject) {
+          var count = Object.keys(scratch.projects).length;
+          scratch.say('You have ' + count + ' projects');
+          resolve();
+        });
       },
       onNewProject: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
@@ -90,6 +98,7 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       onFinishProject: function() {
         return new Promise(function(resolve, reject) {
+          scratch.saveToLocalStorage();
           // TODO: cue exiting project
           // Save project.
           resolve();
@@ -111,16 +120,22 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       onPlayCurrentProject: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
+          scratch.saveToLocalStorage();
           scratch.say('Playing current project ' + scratch.currentProject.name);
+          scratch.executeProgram(scratch.currentProject.getScratchProgram());
+          scratch.say('done playing project');
           resolve();
         });
       },
       say: function(whatToSay) {
         var whatToSay = new SpeechSynthesisUtterance(whatToSay);
         var scratch = this;
+        console.log('stopping recognition')
         this.recognition.stop();
         this.synth.speak(whatToSay);
+        console.log(whatToSay.text)
         whatToSay.onend = function(event) {
+          console.log('starting recog')
           scratch.recognition.start();
         }
       },
@@ -140,23 +155,24 @@ var ScratchStateMachine = new StateMachine.factory({
         return false;
       },
       handleUtterance: function(utterance)  {
+        var scratch = this;
+        scratch._getTriggerType.bind(scratch);
         utterance = utterance.trim();
         // Handle utterances that switch context.
         var triggerType = this._getTriggerType(utterance);
         if (triggerType) {
-          if (this.can(triggerType) || triggerType.startsWith('get')) {
+          if (this.can(triggerType)) {
 
             if (triggerType == 'editExistingProject') {
               // see if the utterance asks to see inside a specific project.
-              var matches = utterance.match('see inside (.*)')
+              var matches = Utils.match(utterance, 'see inside (.*)')
               if (matches) {
                 var nameOfDesiredProject = matches[1];
                 success = this._setCurrentProject(nameOfDesiredProject);
                 if (!success) {
                   this.say("There's no project called " + nameOfDesiredProject);
+                  triggerType = 'stay';
                 }
-              } else {
-                triggerType = 'stay';
               }
             }
 
@@ -184,13 +200,16 @@ var ScratchStateMachine = new StateMachine.factory({
           }
         } else if (this.state == 'InsideProject') {
           // Handle utterances in the InsideProject context.
-          var result = this.currentProject.handleUtterance(utterance);
-          if (result == 'exit') {
-            this.finishProject();
+          if (this.currentProject) {
+            var result = this.currentProject.handleUtterance(utterance);
+            if (result == 'exit') {
+              this.finishProject();
+            }
           }
         } else if (utterance.toLowerCase().indexOf('scratch') != -1) {
           // TODO: integrate Scratch, Help!
           console.log('found Scratch in failed utterance');
+          this.say("I heard you say " + utterance);
           this.say("I don't know how to do that.");
         }
       },
@@ -208,29 +227,37 @@ var ScratchStateMachine = new StateMachine.factory({
         var trigger = this._removeFillerWords(lowercase).trim();
 
         // Update list of projects that can be triggered.
-        this._triggers['play'] = Object.keys(this.projects).map(
-            (projectName) => 'scratch ' + this._removeFillerWords(projectName.trim()));
+        var projectNames = Object.keys(this.projects);
+        // Define triggers for play to follow the format:
+        this._triggers['play'] = projectNames.map(
+            (projectName) => this._removeFillerWords(projectName.trim()));
         this._triggers['play'] = this._triggers['play'].concat(
-          Object.keys(this.projects).map(
-            (projectName) => this._removeFillerWords(projectName.trim())));
+          this._triggers['play'].map((projectName) => 'play ' + projectName));
+        this._triggers['play'] = this._triggers['play'].concat(this._triggers['play'].map(
+            (trigger) => 'scratch ' + trigger));
 
+        // Determine what trigger types match.
         for (var triggerType in this._triggers) {
           var matching_phrases = this._triggers[triggerType];
 
-          // TODO: implement flexibility by accepting a trigger to CONTAIN
-          // the matching phrase.
-          if (this._matches(matching_phrases, trigger)) {
+          if (this._matches(matching_phrases, trigger) && this.can(triggerType)) {
             if (triggerType == 'play') {
               var getName = function(string) {
-                var pattern = /scratch (.*)/;
-                var matches = utterance.match(pattern);
+                var pattern = /scratch (.*)|scratch play(.*)|play(.*)/;
+                var matches = Utils.match(utterance, pattern);
                 if (matches && matches.length > 0) {
                   return matches[1].trim();
                 } else {
                   return utterance.trim();
                 }
               }
-              this.projectToPlay = this.projects[getName(utterance)];
+              // Play project if it exists.
+              var projectName = getName(utterance);
+              if (projectName in this.projects) {
+                this.projectToPlay = this.projects[getName(utterance)];
+              } else {
+                return 'stay';
+              }
             }
             return triggerType;
           }

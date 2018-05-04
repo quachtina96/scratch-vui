@@ -16,7 +16,11 @@ class ScratchInstruction {
    */
   constructor(rawInstruction) {
     this.raw = rawInstruction.trim();
-    this.steps = this.getSteps();
+    try {
+      this.steps = this.getSteps();
+    } catch(e) {
+      this.steps = null;
+    }
   }
 
   /**
@@ -84,7 +88,7 @@ class ScratchInstruction {
 
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
-      var matches = sentence.match(commandTemplates[key]);
+      var matches = Utils.match(sentence, commandTemplates[key]);
       if (matches) {
         switch (key) {
           case 'when EVENT, you CMD':
