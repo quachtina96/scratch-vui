@@ -9,88 +9,6 @@
 // scratch project level, since we manage what the currentproject is.
 // to resolve the issue of this referring to the wrong this.
 
-
-function text2num(numberWord) {
-  var parseResult = parseInt(numberWord);
-  if (!isNaN(parseResult)) {
-    return numberWord;
-  }
-
-    var a, n, g;
-    a = numberWord.toString().split(/[\s-]+/);
-    n = 0;
-    g = 0;
-
-    var Small = {
-        'zero': 0,
-        'one': 1,
-        'two': 2,
-        'three': 3,
-        'four': 4,
-        'five': 5,
-        'six': 6,
-        'seven': 7,
-        'eight': 8,
-        'nine': 9,
-        'ten': 10,
-        'eleven': 11,
-        'twelve': 12,
-        'thirteen': 13,
-        'fourteen': 14,
-        'fifteen': 15,
-        'sixteen': 16,
-        'seventeen': 17,
-        'eighteen': 18,
-        'nineteen': 19,
-        'twenty': 20,
-        'thirty': 30,
-        'forty': 40,
-        'fifty': 50,
-        'sixty': 60,
-        'seventy': 70,
-        'eighty': 80,
-        'ninety': 90
-    };
-
-    var Magnitude = {
-        'thousand':     1000,
-        'million':      1000000,
-        'billion':      1000000000,
-        'trillion':     1000000000000,
-        'quadrillion':  1000000000000000,
-        'quintillion':  1000000000000000000,
-        'sextillion':   1000000000000000000000,
-        'septillion':   1000000000000000000000000,
-        'octillion':    1000000000000000000000000000,
-        'nonillion':    1000000000000000000000000000000,
-        'decillion':    1000000000000000000000000000000000,
-    };
-
-    function feach(w) {
-        var x = Small[w];
-        if (x != null) {
-            g = g + x;
-        }
-        else if (w == "hundred") {
-            g = g * 100;
-        }
-        else {
-            x = Magnitude[w];
-            if (x != null) {
-                n = n + g * x
-                g = 0;
-            }
-            else {
-                return null;
-            }
-        }
-    }
-    a.forEach(feach);
-    return n + g;
-}
-
-
-
 var ScratchProject = StateMachine.factory({
   init: 'create',
   transitions: [
@@ -100,7 +18,7 @@ var ScratchProject = StateMachine.factory({
     { name: 'addInstruction', from: 'named', to: 'nonempty'},
     { name: 'addInstruction', from: 'nonempty', to: 'nonempty'},
     { name: 'finishProject', from: 'nonempty', to: 'nonempty'},
-    { name: 'finishProject', from: '*', to: () => { this.state } },
+    { name: 'finishProject', from: '*', to: (s) => { return s} },
     { name: 'goto', from: '*', to: function(s) { return s } }
   ],
   data: function(scratchStateMachine) {
@@ -125,7 +43,7 @@ var ScratchProject = StateMachine.factory({
           }
         },
         goToStep: (args) => {
-          this.instructionPointer = text2num(args[1]);
+          this.instructionPointer = Utils.text2num(args[1]);
           if (this.instructionPointer == null) {
             this.instructionPointer = parseInt(args[1]);
           }
@@ -164,7 +82,7 @@ var ScratchProject = StateMachine.factory({
           // TODO: use try catch to handle inability to convert the Scratch
           // instruction.
           var stepToInsert = new ScratchInstruction(args[1]);
-          var referenceStepNumber = text2num(args[2])-1;
+          var referenceStepNumber = Utils.text2num(args[2])-1;
           if (referenceStepNumber == null) {
             referenceStepNumber = parseInt(args[2])-1;
           }
@@ -174,7 +92,7 @@ var ScratchProject = StateMachine.factory({
         },
         insertStepAfter: function(args) {
           var stepToInsert = new ScratchInstruction(args[1]);
-          var referenceStepNumber = text2num(args[2])-1;
+          var referenceStepNumber = Utils.text2num(args[2])-1;
           if (referenceStepNumber == null) {
             referenceStepNumber = parseInt(args[2])-1;
           }
@@ -185,7 +103,7 @@ var ScratchProject = StateMachine.factory({
         },
         deleteStep: function(args) {
           console.log(this);
-          var index = text2num(args[1])-1;
+          var index = Utils.text2num(args[1])-1;
           if (index == null) {
             index = parseInt(args[1])-1;
           }
@@ -194,7 +112,7 @@ var ScratchProject = StateMachine.factory({
           console.log(this.instructions);
         },
         replaceStep: function(args) {
-          var index = text2num(args[1])-1;
+          var index = Utils.text2num(args[1])-1;
           if (index == null) {
             index = parseInt(args[1])-1;
           }
@@ -207,7 +125,7 @@ var ScratchProject = StateMachine.factory({
           console.log(this.instructions);
         },
         replaceInStep: function(args) {
-          var index = text2num(args[1])-1;
+          var index = Utils.text2num(args[1])-1;
           if (index == null) {
             index = parseInt(args[1])-1;
           }
@@ -287,7 +205,7 @@ var ScratchProject = StateMachine.factory({
       } else if (this.state == 'named' || this.state == 'nonempty') {
         // Detect project completion.
         if (utterance.indexOf("that's it") != -1) {
-          this.finishProject();
+          this.finishProject(this.state);
           return 'exit';
         }
 
