@@ -29,6 +29,22 @@ var ScratchProject = StateMachine.factory({
       // TODO: deal with 1 versus 0 based indexing.
       // TODO: handle word forms of words in referencing steps.
       instructionPointer: null,
+      editTriggers: {
+        goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
+        nextStep: /go to next step|next step|what's next/,
+        previousStep: /previous step|go back a step/,
+        playStep: /play step|play current step|what does it do/,
+        insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
+        insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
+        deleteStep: /delete step (.*)/,
+        // TODO: distinguish between replacing everywhere and replacing in a
+        // specific place.
+        replaceStep: /replace step (.*) with (.*)/,
+        replaceSound: /replace the (.*) sound with the (.*) sound'/,
+        // TODO: address potential complex behavior in line below.
+        replaceInStep: /in step (.*) replace (.*) with (.*)/,
+        stopEditing: /stop|i\'m done|that\'s it'/
+      },
       editCommands: {
         _describeCurrentStep: () => {
           // this does not refer to the state machine, but to the editCommands
@@ -231,25 +247,9 @@ var ScratchProject = StateMachine.factory({
      */
     _handleEditCommands: function(utterance) {
       utterance = utterance.toLowerCase();
-      var editCommands = {
-        goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
-        nextStep: /go to next step|next step|what's next\?/,
-        previousStep: /previous step|go back a step/,
-        playStep: /play step|play current step|what does it do\?/,
-        insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
-        insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
-        deleteStep: /delete step (.*)/,
-        // TODO: distinguish between replacing everywhere and replacing in a
-        // specific place.
-        replaceStep: /replace step (.*) with (.*)/,
-        replaceSound: /replace the (.*) sound with the (.*) sound'/,
-        // TODO: address potential complex behavior in line below.
-        replaceInStep: /in step (.*) replace (.*) with (.*)/,
-        stopEditing: /stop|i\'m done|that\'s it'/
-      }
       var scratchProject = this;
-      for (var commandType in editCommands) {
-        var args = Utils.match(utterance, editCommands[commandType]);
+      for (var commandType in this.editTriggers) {
+        var args = Utils.match(utterance, this.editTriggers[commandType]);
         if (args) {
           this.editCommands[commandType].call(scratchProject,args);
           this.scratch.saveToLocalStorage();

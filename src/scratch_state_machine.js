@@ -245,6 +245,12 @@ var ScratchStateMachine = new StateMachine.factory({
           this.projects[name].name = name;
           this.projects[name].instructions = savedProjects[name];
         }
+      },
+      updateGrammarWithProjects: () => {
+        var grammar = `#JSGF V1.0;
+        grammar scratch_state_machine.project; \n
+        <project> =` + Object.keys(this.projects).join('|') + ';\n';
+        this.recognition.grammars.addFromString(grammar, 1);
       }
     }
   });

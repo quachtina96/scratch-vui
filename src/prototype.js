@@ -9,6 +9,10 @@ if (!window.localStorage.scratchProjects) {
 }
 var scratch = new ScratchStateMachine();
 scratch.loadFromLocalStorage();
+scratch.updateGrammarWithProjects.bind(scratch);
+scratch.recognition.grammars.addFromString(ScratchGrammar.commands);
+scratch.recognition.grammars.addFromString(ScratchGrammar.numbers);
+scratch.recognition.grammars.addFromString(ScratchGrammar.sounds);
 
 scratch.observe('onAfterTransition', function() {
   document.getElementById("current_state").innerHTML = scratch.state;
