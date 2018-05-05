@@ -9,6 +9,7 @@ if (!window.localStorage.scratchProjects) {
 }
 var scratch = new ScratchStateMachine();
 scratch.loadFromLocalStorage();
+scratch._updatePlayRegex();
 scratch.updateGrammarWithProjects.bind(scratch);
 scratch.recognition.grammars.addFromString(ScratchGrammar.commands);
 scratch.recognition.grammars.addFromString(ScratchGrammar.numbers);

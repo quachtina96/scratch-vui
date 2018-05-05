@@ -39,7 +39,7 @@ var ScratchStateMachine = new StateMachine.factory({
           'editExistingProject': /see inside (.*)/,
           'editProject': /see inside/,
           'finishProject': /i'm done|i'm finished/,
-          'play': /scratch (.*)|scratch play (.*)|play (.*)|(.*)/,
+          'play': /scratch (.*)|scratch play (.*)|play (.*)/,
           'playCurrentProject': /play project|start project|play current project|test project/,
           'return': /stop|i'm done|go back|quit|exit/,
           'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
@@ -67,7 +67,7 @@ var ScratchStateMachine = new StateMachine.factory({
           resolve();
         });
       },
-      onNewProject: (lifecycle, scratc) => {
+      onNewProject: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
           console.log(scratch);
           scratch.currentProject = new ScratchProject(scratch);
@@ -103,6 +103,7 @@ var ScratchStateMachine = new StateMachine.factory({
       onFinishProject: function() {
         return new Promise(function(resolve, reject) {
           scratch.saveToLocalStorage();
+          scratch._updatePlayRegex();
           // TODO: cue exiting project
           // Save project.
           resolve();
@@ -154,14 +155,23 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       handleUtterance: function(utterance) {
         var lowercase = utterance.toLowerCase();
-        var trigger = this._removeFillerWords(lowercase).trim();
+        var utterance = this._removeFillerWords(lowercase).trim();
 
         var scratch = this;
+
+        this._triggers['play'] = this._triggers['play']
 
         // Attempt to match utterance to trigger.
         for (var commandType in this._triggers) {
           var args = Utils.match(utterance, this._triggers[commandType]);
           if (args) {
+            if (commandType == 'play') {
+              // Verify that the utterance is actually the name of a project.
+              if (!args[1] in this.projects) {
+                this.say("I can't play a project called " + args[1]);
+                return false;
+              }
+            }
 
             if (this.can(commandType)) {
               try {
@@ -245,6 +255,13 @@ var ScratchStateMachine = new StateMachine.factory({
           this.projects[name].name = name;
           this.projects[name].instructions = savedProjects[name];
         }
+      },
+      // In order to properly detect playing projects, add project names to
+      // match phrases for the play triggerType.
+      _updatePlayRegex: function() {
+        var pattern = this._triggers['play'].toString();
+        var prefix = pattern.substring(0,pattern.length-1);
+        this._triggers['play'] = prefix + '|(' + Object.keys(this.projects).map((projectName) => this._removeFillerWords(projectName).trim()).join(')|(') + ')/';
       },
       updateGrammarWithProjects: () => {
         var grammar = `#JSGF V1.0;
