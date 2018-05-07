@@ -10,7 +10,11 @@ ScratchGrammar = {}
 
 
 ScratchGrammar.commands = `#JSGF V1.0;
+	// Import the grammar that includes the name of the projects
+	import <scratch_state_machine.project>
+
 	grammar scratch_state_machine.command;
+
 	public <newProject> = new project|create new project|create project|make new project|make project;
 
 	public <editExistingProject> = see inside ;
@@ -36,9 +40,9 @@ ScratchGrammar.commands = `#JSGF V1.0;
 
 	public <playStep> = play step|play current step|what does it do;
 
-	public <insertStepBefore> = insert  before step | before step ;
+	public <insertStepBefore> = insert before step | before step ;
 
-	public <insertStepAfter> = insert  after step | after step ;
+	public <insertStepAfter> = insert after step | after step ;
 
 	public <deleteStep> = delete step ;
 

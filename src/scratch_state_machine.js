@@ -158,8 +158,7 @@ var ScratchStateMachine = new StateMachine.factory({
 
         // Synthesis speech!
         this.synth.speak(whatToSay);
-        console.log('saying' whatToSay.text)
-
+        console.log('saying' + whatToSay.text);
       },
       executeProgram: function(scratchProgram) {
         // Assuming that the project can only be made of 'say' instructions
