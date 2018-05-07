@@ -84,20 +84,28 @@ var ScratchStateMachine = new StateMachine.factory({
         });
       },
       // Play existing project
-      onPlay: (lifecycle, scratch, args) => {
+      onPlay: (lifecycle, scratch, args, utterance) => {
         return new Promise(function(resolve, reject) {
-          var projectName = args[1].trim();
-          if (projectName in scratch.projects) {
-            scratch.currentProject = scratch.projects[projectName];
-            scratch.say('playing project');
-            scratch.executeProgram(scratch.currentProject.getScratchProgram());
-            // TODO: cue the start and
-            scratch.say('done playing project');
-            resolve();
-          } else {
-            resolve();
-            scratch.return();
+          var projectToPlayName = args[1].trim();
+
+          // play the project that matches!
+          for (var projectName in scratch.projects) {
+            if (scratch._removeFillerWords(projectName) == projectToPlayName) {
+              scratch.currentProject = scratch.projects[projectName];
+              scratch.say('playing project');
+              scratch.executeProgram(scratch.currentProject.getScratchProgram());
+              scratch.say('done playing project');
+              resolve();
+              return;
+            }
           }
+
+          // TODO: Does args[1] actually contain the project name as it is said?
+          // or will the filler words be removed.
+          scratch.say("You said " + utterance);
+          scratch.say("I don't have a project called " + args[1]);
+          resolve();
+          scratch.return();
         })
       },
       onFinishProject: function() {
@@ -132,25 +140,31 @@ var ScratchStateMachine = new StateMachine.factory({
           resolve();
         });
       },
+      /**
+       * Speak aloud given text.
+       * @param {!String} whatToSay - text to say aloud.
+       */
       say: function(whatToSay) {
         var whatToSay = new SpeechSynthesisUtterance(whatToSay);
+
+        // Stop speech recognition during speech synthesis.
         var scratch = this;
-        console.log('stopping recognition')
-        this.recognition.stop();
-        this.synth.speak(whatToSay);
-        console.log(whatToSay.text)
+        whatToSay.onstart = function(event) {
+          scratch.recognition.stop();
+        }
         whatToSay.onend = function(event) {
-          console.log('starting recog')
           scratch.recognition.start();
         }
+
+        // Synthesis speech!
+        this.synth.speak(whatToSay);
+        console.log('saying' whatToSay.text)
+
       },
       executeProgram: function(scratchProgram) {
         // Assuming that the project can only be made of 'say' instructions
         for (var i = 1; i < scratchProgram.length; i++) {
           this.say(scratchProgram[i][1]);
-          while (this.synth.speaking) {
-            // block execution?
-          }
         }
       },
       handleUtterance: function(utterance) {
@@ -165,17 +179,9 @@ var ScratchStateMachine = new StateMachine.factory({
         for (var commandType in this._triggers) {
           var args = Utils.match(utterance, this._triggers[commandType]);
           if (args) {
-            if (commandType == 'play') {
-              // Verify that the utterance is actually the name of a project.
-              if (!args[1] in this.projects) {
-                this.say("I can't play a project called " + args[1]);
-                return false;
-              }
-            }
-
             if (this.can(commandType)) {
               try {
-                this[commandType](scratch, args);
+                this[commandType](scratch, args, utterance);
                 return true;
               } catch(e) {
                 // Handle failure based on transition type.
@@ -260,8 +266,9 @@ var ScratchStateMachine = new StateMachine.factory({
       // match phrases for the play triggerType.
       _updatePlayRegex: function() {
         var pattern = this._triggers['play'].toString();
-        var prefix = pattern.substring(0,pattern.length-1);
-        this._triggers['play'] = prefix + '|(' + Object.keys(this.projects).map((projectName) => this._removeFillerWords(projectName).trim()).join(')|(') + ')/';
+        var prefix = pattern.substring(1,pattern.length-1);
+        var regexString = prefix + '|(' + Object.keys(this.projects).map((projectName) => this._removeFillerWords(projectName).trim()).join(')|(') + ')';
+        this._triggers['play'] = new RegExp(regexString, "i");
       },
       updateGrammarWithProjects: () => {
         var grammar = `#JSGF V1.0;
