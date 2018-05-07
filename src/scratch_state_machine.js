@@ -23,6 +23,7 @@ var ScratchStateMachine = new StateMachine.factory({
       // Support this.goto(STATE_NAME);
       { name: 'goto', from: '*', to: function(s) { return s } },
       { name: 'stay', from: '*', to: function() { return this.state} },
+      { name: 'getCurrentProject', from: '*', to: function() { return this.state} },
       { name: 'getProjectNames', from: '*', to: function() { return this.state} },
       { name: 'getProjectCount', from: '*', to: function() { return this.state} },
 
@@ -45,6 +46,7 @@ var ScratchStateMachine = new StateMachine.factory({
           'play': /scratch (.*)|scratch play (.*)|play (.*)/,
           'playCurrentProject': /play project|start project|play current project|test project/,
           'return': /stop|i'm done|go back|quit|exit/,
+          'getCurrentProject': /get current project|what project am i on|what’s my current project|what is my current project/,
           'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
           'getProjectCount': /how many projects do i have|how many projects have i made/
         }
@@ -54,6 +56,13 @@ var ScratchStateMachine = new StateMachine.factory({
       new StateMachineHistory()     //  <-- plugin enabled here
     ],
     methods: {
+      onGetCurrentProject: (lifecycle, scratch) => {
+        if (scratch.currentProject) {
+          scratch.say('The current project is ' + scratch.currentProject.name);
+        } else {
+          scratch.say('You are not currently on a project');
+        }
+      },
       onDeleteProject: (lifecycle, scratch, args, utterance) => {
         return new Promise(function(resolve, reject) {
           var projectToPlayName = args[1].trim();
