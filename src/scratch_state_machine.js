@@ -6,6 +6,7 @@
 var ScratchStateMachine = new StateMachine.factory({
     init: 'Home',
     transitions: [
+      { name: 'deleteProject', from: '*', to: function() { return this.state} },
       { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
       { name: 'newProject', from: 'Home',  to: 'InsideProject' },
       // Return should take you back to the last state
@@ -23,7 +24,8 @@ var ScratchStateMachine = new StateMachine.factory({
       { name: 'goto', from: '*', to: function(s) { return s } },
       { name: 'stay', from: '*', to: function() { return this.state} },
       { name: 'getProjectNames', from: '*', to: function() { return this.state} },
-      { name: 'getProjectCount', from: '*', to: function() { return this.state} }
+      { name: 'getProjectCount', from: '*', to: function() { return this.state} },
+
     ],
     data: function() {
       return {
@@ -36,8 +38,9 @@ var ScratchStateMachine = new StateMachine.factory({
         recognition: new webkitSpeechRecognition(),
         _triggers: {
           'newProject': /new project|create new project|create project|make new project|make project/,
-          'editExistingProject': /see inside (.*)/,
-          'editProject': /see inside/,
+          'deleteProject': /delete (.*) project/,
+          'editExistingProject': /see inside (.*)|what's inside (.*)/,
+          'editProject': /see inside|what's inside/,
           'finishProject': /i'm done|i'm finished/,
           'play': /scratch (.*)|scratch play (.*)|play (.*)/,
           'playCurrentProject': /play project|start project|play current project|test project/,
@@ -51,6 +54,29 @@ var ScratchStateMachine = new StateMachine.factory({
       new StateMachineHistory()     //  <-- plugin enabled here
     ],
     methods: {
+      onDeleteProject: (lifecycle, scratch, args, utterance) => {
+        return new Promise(function(resolve, reject) {
+          var projectToPlayName = args[1].trim();
+
+          // play the project that matches!
+          for (var projectName in scratch.projects) {
+            if (scratch._removeFillerWords(projectName) == projectToPlayName) {
+              scratch.say(projectName + ' project deleted.')
+              delete scratch.projects[projectName];
+              scratch.removeFromLocalStorage();
+              resolve();
+              return;
+            }
+          }
+
+          // TODO: Does args[1] actually contain the project name as it is said?
+          // or will the filler words be removed.
+          scratch.say("You said " + utterance);
+          scratch.say("I can't delete a project I don't have");
+          resolve();
+          scratch.return();
+        })
+      },
       onGetProjectNames: (lifecycle, scratch) => {
         return new Promise(function(resolve, reject) {
           var whatToSay = Object.keys(scratch.projects);
@@ -117,8 +143,10 @@ var ScratchStateMachine = new StateMachine.factory({
           resolve();
         });
       },
-      onEditExistingProject: (lifecycle, scratch, projectName) => {
+      onEditExistingProject: (lifecycle, scratch, args) => {
         return new Promise(function(resolve, reject) {
+          console.log(args);
+          var projectName = args;
           scratch.say('Opening project ' + projectName + ' for editing');
           // TODO: begin edit project flow.
           resolve();
@@ -171,8 +199,6 @@ var ScratchStateMachine = new StateMachine.factory({
         var utterance = this._removeFillerWords(lowercase).trim();
 
         var scratch = this;
-
-        this._triggers['play'] = this._triggers['play']
 
         // Attempt to match utterance to trigger.
         for (var commandType in this._triggers) {
@@ -242,6 +268,13 @@ var ScratchStateMachine = new StateMachine.factory({
         var tokens = stripped.split(' ');
         var result = tokens.filter(token => filler_words.indexOf(token) == -1);
         return result.join(' ');
+      },
+      removeFromLocalStorage: function(projectName) {
+        if (window.localStorage.scratchProjects) {
+          var savedProjects = JSON.parse(window.localStorage.scratchProjects);
+          delete savedProjects[projectName];
+          window.localStorage.scratchProjects = JSON.stringify(savedProjects);
+        }
       },
       saveToLocalStorage: function() {
         if (!window.localStorage.scratchProjects) {
