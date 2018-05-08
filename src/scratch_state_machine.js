@@ -128,8 +128,10 @@ var ScratchStateMachine = new StateMachine.factory({
             if (scratch._removeFillerWords(projectName) == projectToPlayName) {
               scratch.currentProject = scratch.projects[projectName];
               scratch.say('playing project');
-              scratch.executeProgram(scratch.currentProject.getScratchProgram());
-              scratch.say('done playing project');
+              scratch.executeCurrentProject(scratch, 'FromStart');
+              // TODO(quacht): saying I'm done playing the project doesnt work
+              // here when doing event handling.
+              // scratch.say('done playing project');
               resolve();
               return;
             }
@@ -172,7 +174,7 @@ var ScratchStateMachine = new StateMachine.factory({
         return new Promise(function(resolve, reject) {
           scratch.saveToLocalStorage();
           scratch.say('Playing current project ' + scratch.currentProject.name);
-          scratch.executeProgram(scratch.currentProject.getScratchProgram());
+          scratch.executeCurrentProject(scratch, 'FromStart');
           scratch.say('done playing project');
           resolve();
         });
@@ -197,10 +199,41 @@ var ScratchStateMachine = new StateMachine.factory({
         this.synth.speak(whatToSay);
         console.log('saying' + whatToSay.text);
       },
-      executeProgram: function(scratchProgram) {
-        // Assuming that the project can only be made of 'say' instructions
-        for (var i = 1; i < scratchProgram.length; i++) {
-          this.say(scratchProgram[i][1]);
+      /**
+       * Execute current project.
+       * @param {string} mode - 'FromStart' to execute the project from the first
+       *    or 'WhereItLeftOff'.
+       */
+      executeCurrentProject: (scratch, mode) => {
+        if (!scratch.currentProject) {
+          console.log(scratch);
+          throw Error('scratch.currentProject is ' + scratch.currentProject);
+        }
+        if (mode == 'WhereItLeftOff') {
+          var startIndex = scratch.currentProject.instructionPointer;
+        } else if ('FromStart') {
+          // Start at index 1 to skip the "when green flag clicked instruction"
+          var startIndex = 1;
+        }
+
+        var scratchProgram = scratch.currentProject.getScratchProgram();
+        for (var i = startIndex; i < scratchProgram.length; i++) {
+          var opcode = scratchProgram[i][0];
+          var args = scratchProgram[i][1];
+          if (opcode == 'say:') {
+              scratch.say(scratchProgram[i][1]);
+          } else if (Array.isArray(opcode)) {
+            if (opcode[0] == 'doAsk')
+              if (opcode[1] == '') {
+              // Handle 'when i say event'
+              var whatToListenFor = args[1][2];
+              var whatToSay = args[2][0][1];
+              scratch.currentProject.tempTrigger = whatToListenFor;
+              scratch.currentProject.tempResponse= whatToSay;
+              scratch.currentProject.instructionPointer = i + 1;
+              return;
+            }
+          }
         }
       },
       handleUtterance: function(utterance) {
@@ -247,13 +280,7 @@ var ScratchStateMachine = new StateMachine.factory({
         }
 
         if (this.state == 'PlayProject') {
-          if (utterance == 'scratch stop') {
-            this.synth.cancel();
-          } else if (utterance == 'scratch pause') {
-            this.synth.pause();
-          } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
-            this.synth.resume();
-          }
+            this.currentProject.handleUtteranceDuringExecution(utterance);
         } else if (this.state == 'InsideProject') {
          // Handle utterances in the InsideProject context.
           if (this.currentProject) {
