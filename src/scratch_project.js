@@ -204,6 +204,8 @@ var ScratchProject = StateMachine.factory({
       }
     },
     handleUtterance: function(utterance) {
+      utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
+
       // Name project
       if (this.state == 'create') {
         if (this.name) {
@@ -246,7 +248,8 @@ var ScratchProject = StateMachine.factory({
      * command, execute the command.
      */
     _handleEditCommands: function(utterance) {
-      utterance = utterance.toLowerCase();
+      utterance = Utils.removeFillerWords(utterance.toLowerCase());
+
       var scratchProject = this;
       for (var commandType in this.editTriggers) {
         var args = Utils.match(utterance, this.editTriggers[commandType]);

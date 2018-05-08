@@ -69,7 +69,7 @@ var ScratchStateMachine = new StateMachine.factory({
 
           // play the project that matches!
           for (var projectName in scratch.projects) {
-            if (scratch._removeFillerWords(projectName) == projectToPlayName) {
+            if (Utils.removeFillerWords(projectName) == projectToPlayName) {
               scratch.say(projectName + ' project deleted.')
               delete scratch.projects[projectName];
               scratch.removeFromLocalStorage();
@@ -125,7 +125,7 @@ var ScratchStateMachine = new StateMachine.factory({
 
           // play the project that matches!
           for (var projectName in scratch.projects) {
-            if (scratch._removeFillerWords(projectName) == projectToPlayName) {
+            if (Utils.removeFillerWords(projectName) == projectToPlayName) {
               scratch.currentProject = scratch.projects[projectName];
               scratch.say('playing project');
               scratch.executeProgram(scratch.currentProject.getScratchProgram());
@@ -155,9 +155,10 @@ var ScratchStateMachine = new StateMachine.factory({
       onEditExistingProject: (lifecycle, scratch, args) => {
         return new Promise(function(resolve, reject) {
           console.log(args);
-          var projectName = args;
+          var projectName = args[1];
+          var stepCount = scratch.projects[projectName].instructions.length;
           scratch.say('Opening project ' + projectName + ' for editing');
-          // TODO: begin edit project flow.
+          scratch.say('There are ' + stepCount + ' steps');
           resolve();
         });
       },
@@ -205,7 +206,7 @@ var ScratchStateMachine = new StateMachine.factory({
       },
       handleUtterance: function(utterance) {
         var lowercase = utterance.toLowerCase();
-        var utterance = this._removeFillerWords(lowercase).trim();
+        var utterance = Utils.removeFillerWords(lowercase).trim();
 
         var scratch = this;
 
@@ -269,15 +270,6 @@ var ScratchStateMachine = new StateMachine.factory({
           this.say("I don't know how to do that.");
         }
       },
-      _removeFillerWords: function(utterance) {
-        var filler_words = ["the", "a", "um", "uh", "er", "ah", "like"];
-
-        var utterance = utterance.toLowerCase();
-        var stripped = utterance.replace(/\b[-.,()&$#!\[\]{}"']+\B|\B[-.,()&$#!\[\]{}"']+\b/g, "");
-        var tokens = stripped.split(' ');
-        var result = tokens.filter(token => filler_words.indexOf(token) == -1);
-        return result.join(' ');
-      },
       removeFromLocalStorage: function(projectName) {
         if (window.localStorage.scratchProjects) {
           var savedProjects = JSON.parse(window.localStorage.scratchProjects);
@@ -308,7 +300,7 @@ var ScratchStateMachine = new StateMachine.factory({
       _updatePlayRegex: function() {
         var pattern = this._triggers['play'].toString();
         var prefix = pattern.substring(1,pattern.length-1);
-        var regexString = prefix + '|(' + Object.keys(this.projects).map((projectName) => this._removeFillerWords(projectName).trim()).join(')|(') + ')';
+        var regexString = prefix + '|(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')|(') + ')';
         this._triggers['play'] = new RegExp(regexString, "i");
       },
       updateGrammarWithProjects: () => {
