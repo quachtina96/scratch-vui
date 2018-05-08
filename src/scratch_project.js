@@ -243,6 +243,22 @@ var ScratchProject = StateMachine.factory({
         }
       }
     },
+    handleUtteranceDuringExecution: function(utterance) {
+      var scratchProject = this;
+      if (utterance == 'scratch stop') {
+        this.synth.cancel();
+      } else if (utterance == 'scratch pause') {
+        this.synth.pause();
+      } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
+        this.synth.resume();
+      } else {
+        // Utterance should be an argument for the project.
+        if (utterance == this.tempTrigger) {
+          this.scratch.say(this.tempResponse)
+          this.scratch.executeCurrentProject(scratch, 'WhereItLeftOff');
+        }
+      }
+    },
     /**
      * If the utterance matches the form of a supported program editing
      * command, execute the command.
