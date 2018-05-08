@@ -38,15 +38,15 @@ var ScratchStateMachine = new StateMachine.factory({
         synth: window.speechSynthesis,
         recognition: new webkitSpeechRecognition(),
         _triggers: {
-          'newProject': /new project|create new project|create project|make new project|make project/,
+          'newProject': /new project|create a? new project|create a? project|make a? new project|make a? project/,
           'deleteProject': /delete (.*) project/,
           'editExistingProject': /see inside (.*)|what's inside (.*)/,
           'editProject': /see inside|what's inside/,
           'finishProject': /i'm done|i'm finished/,
           'play': /scratch (.*)|scratch play (.*)|play (.*)/,
-          'playCurrentProject': /play project|start project|play current project|test project/,
+          'playCurrentProject': /play (?:the)? ?project|start (?:the)? ?project|play c(?:the)? ?urrent project|test (?:the)? ?project/,
           'return': /stop|i'm done|go back|quit|exit/,
-          'getCurrentProject': /get current project|what project am i on|what’s my current project|what is my current project/,
+          'getCurrentProject': /get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
           'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
           'getProjectCount': /how many projects do i have|how many projects have i made/
         }
