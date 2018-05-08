@@ -95,7 +95,7 @@
 }
 
 Utils.removeFillerWords = function(utterance) {
-  var filler_words = ["the", "a", "um", "uh", "er", "ah", "like"];
+  var filler_words = ["um", "uh", "er", "ah", "like"];
 
   var utterance = utterance.toLowerCase();
   var stripped = utterance.replace(/\b[-.,()&$#!\[\]{}"']+\B|\B[-.,()&$#!\[\]{}"']+\b/g, "");
