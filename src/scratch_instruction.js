@@ -79,10 +79,9 @@ class ScratchInstruction {
     }
 
     let commandTemplates = {
-      'when EVENT, you CMD': /[wW]hen (.*), you (.*)/,
-      'when EVENT, CMD': /[wW]hen (.*), (.*)/,
-      'then/next/after, CMD': /([Tt]hen|[nN]ext|[aA]fter), (.*)/,
-      'first, CMD': /[fF]irst, (.*)/,
+      'when EVENT, you CMD': /[wW]hen (.*),? you (.*)/,
+      'then/next/after, CMD': /([Tt]hen|[nN]ext|[aA]fter),? (.*)/,
+      'first, CMD': /[fF]irst,? (.*)/,
     };
     var keys = Object.keys(commandTemplates);
 
@@ -92,7 +91,6 @@ class ScratchInstruction {
       if (matches) {
         switch (key) {
           case 'when EVENT, you CMD':
-          case 'when EVENT, CMD':
             instructionJson.event = matches[1];
             instructionJson.command = matches[2];
             return instructionJson;
@@ -143,7 +141,7 @@ class ScratchInstruction {
 
     if (instructionJson.event) {
       if (instructionJson.event.toLowerCase().startsWith('i say')) {
-        let argument = instructionJson.event.substring(5);
+        let argument = instructionJson.event.substring(6);
         command = [["doAsk", ""],["doIf", ["=", ["answer"], argument], [command]]];
       }
       // else if (instructionJson.event == 'first') {
@@ -152,6 +150,7 @@ class ScratchInstruction {
       //   // TODO: Need some way to pass this information to Scratch model for building the progam.
       // }
     }
+
     return command;
   }
 }
