@@ -6,6 +6,8 @@
 var ScratchStateMachine = new StateMachine.factory({
     init: 'Home',
     transitions: [
+      { name: 'renameCurrentProject', from: '*', to: function() { return this.state} },
+      { name: 'renameProject', from: '*', to: function() { return this.state} },
       { name: 'deleteProject', from: '*', to: function() { return this.state} },
       { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
       { name: 'newProject', from: 'Home',  to: 'InsideProject' },
@@ -37,9 +39,13 @@ var ScratchStateMachine = new StateMachine.factory({
         currentProject: null,
         synth: window.speechSynthesis,
         recognition: new webkitSpeechRecognition(),
+        // Triggers should be listed from more specific to more general to
+        // ensure that the best fit trigger gets matched to the utterance.
         _triggers: {
           'newProject': /new project|create a? new project|create a? project|make a? new project|make a? project/,
           'deleteProject': /delete (.*) project/,
+          'renameCurrentProject': /rename current project to (.*)/,
+          'renameProject': /change name of (.*) project to (.*)/,
           'editExistingProject': /see inside (.*)|what's inside (.*)/,
           'editProject': /see inside|what's inside/,
           'finishProject': /i'm done|i'm finished/,
@@ -56,12 +62,50 @@ var ScratchStateMachine = new StateMachine.factory({
       new StateMachineHistory()     //  <-- plugin enabled here
     ],
     methods: {
+      renameProject: (scratch, oldName, newName) => {
+        scratch.projects[newName] = scratch.projects[oldName]
+        scratch.projects[newName].name = newName;
+        delete scratch.projects[oldName];
+        scratch.removeFromLocalStorage(oldName);
+        scratch.saveToLocalStorage();
+      },
       onGetCurrentProject: (lifecycle, scratch) => {
         if (scratch.currentProject) {
           scratch.say('The current project is ' + scratch.currentProject.name);
         } else {
           scratch.say('You are not currently on a project');
         }
+      },
+      onRenameCurrentProject: (lifecycle, scratch, args) => {
+        if (scratch.currentProject) {
+          var newName = args[1];
+          scratch.renameProject(scratch, scratch.currentProject.name, newName);
+          scratch.say('The current project is now called ' + scratch.currentProject.name);
+        } else {
+          scratch.say('You are not currently on a project');
+          // TODO(quacht): support an interaction where instead of the above,
+          // scratch also says and responds to
+          // What project would you like to rename?
+        }
+      },
+      onRenameProject: (lifecycle, scratch, args) => {
+          var oldName = args[1];
+          var newName = args[2];
+
+          // play the project that matches!
+          for (var projectName in scratch.projects) {
+            if (scratch._removeFillerWords(projectName) == oldName) {
+              scratch.renameProject(scratch, projectName, newName)
+              scratch.say('Renamed ' + projectName + ' to ' + newName)
+              return;
+            }
+          }
+
+          scratch.say('The current project is ' + scratch.currentProject.name);
+          scratch.say('You are not currently on a project');
+          // TODO(quacht): support an interaction where instead of the above,
+          // scratch also says and responds to
+          // What project would you like to rename?
       },
       onDeleteProject: (lifecycle, scratch, args, utterance) => {
         return new Promise(function(resolve, reject) {
@@ -72,7 +116,7 @@ var ScratchStateMachine = new StateMachine.factory({
             if (Utils.removeFillerWords(projectName) == projectToPlayName) {
               scratch.say(projectName + ' project deleted.')
               delete scratch.projects[projectName];
-              scratch.removeFromLocalStorage();
+              scratch.removeFromLocalStorage(projectName);
               resolve();
               return;
             }
@@ -243,6 +287,7 @@ var ScratchStateMachine = new StateMachine.factory({
               }
             } else {
               console.log('could not make transition: ' + commandType);
+              console.log('current state: ' + scratch.state);
             }
           }
         }
