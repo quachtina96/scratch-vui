@@ -63,7 +63,7 @@ document.getElementById("start_button").onclick =  function(event) {
 
 global.showInfo = function(s) {
   if (s) {
-    for (global.child = info.firstChild; child; child = child.nextSibling) {
+    for (var child = info.firstChild; child; child = child.nextSibling) {
       if (child.style) {
         child.style.display = child.id == s ? 'inline' : 'none';
       }
