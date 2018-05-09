@@ -155,4 +155,4 @@ class ScratchInstruction {
   }
 }
 
-//module.exports = ScratchInstruction;
+module.exports = ScratchInstruction;

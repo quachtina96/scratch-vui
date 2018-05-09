@@ -4,6 +4,10 @@
  *
  * @author quacht@mit.edu (Tina Quach)
  */
+var StateMachine = require('javascript-state-machine');
+const ScratchInstruction = require('./scratch_instruction.js');
+const Utils = require('./utils.js');
+
 
 // TODO: idea: move the edit commands to the state machine level instead of the
 // scratch project level, since we manage what the currentproject is.
@@ -278,3 +282,5 @@ var ScratchProject = StateMachine.factory({
     }
   }
 });
+
+module.exports = ScratchProject;

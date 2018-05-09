@@ -4,11 +4,16 @@
  * JavaScript for the Scratch Voice User Interface prototype.
  * @author Tina Quach (quacht@mit.edu)
  */
+var ScratchStateMachine = require('./scratch_state_machine.js');
+
 if (!window.localStorage.scratchProjects) {
-  window.localStorage.scratchProjects = {};
+  window.localStorage.scratchProjects = JSON.stringify({});
+} else {
+  scratch.loadFromLocalStorage();
 }
+
 var scratch = new ScratchStateMachine();
-scratch.loadFromLocalStorage();
+
 scratch._updatePlayRegex();
 scratch.updateGrammarWithProjects.bind(scratch);
 scratch.recognition.grammars.addFromString(ScratchGrammar.commands);

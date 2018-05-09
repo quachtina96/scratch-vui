@@ -90,6 +90,7 @@
         }
     }
   }
+
   a.forEach(feach);
   return n + g;
 }
@@ -103,3 +104,5 @@ Utils.removeFillerWords = function(utterance) {
   var result = tokens.filter(token => filler_words.indexOf(token) == -1);
   return result.join(' ');
 };
+
+module.exports = Utils;

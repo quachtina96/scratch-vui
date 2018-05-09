@@ -114,4 +114,5 @@ function test_getRules() {
   console.log(getRules(triggers))
 }
 
+module.exports = ScratchGrammar;
 
