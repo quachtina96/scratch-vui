@@ -6,13 +6,13 @@
  */
 var ScratchStateMachine = require('./scratch_state_machine.js');
 
+var scratch = new ScratchStateMachine();
+
 if (!window.localStorage.scratchProjects) {
   window.localStorage.scratchProjects = JSON.stringify({});
 } else {
   scratch.loadFromLocalStorage();
 }
-
-var scratch = new ScratchStateMachine();
 
 scratch._updatePlayRegex();
 scratch.updateGrammarWithProjects.bind(scratch);

@@ -372,7 +372,7 @@ var ScratchStateMachine = new StateMachine.factory({
       }
       var savedProjects = JSON.parse(window.localStorage.scratchProjects);
       for (var name in savedProjects) {
-        this.projects[name] = new ScratchProject(scratch);
+        this.projects[name] = new ScratchProject(this);
         this.projects[name].name = name;
         this.projects[name].instructions = savedProjects[name];
       }
