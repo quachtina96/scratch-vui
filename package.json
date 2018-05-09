@@ -4,7 +4,7 @@
   "description": "voice user interface for scratch",
   "main": "prototype.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --watch --progress",
     "start": "webpack-dev-server",
     "test:lint": "eslint . --ext=js",
     "test:unit": "tap test/unit/*.js",

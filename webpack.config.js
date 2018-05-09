@@ -13,5 +13,6 @@ module.exports = {
             from: 'static',
             to: '.'
         }])
-    ]
+    ],
+    watch: true
 };

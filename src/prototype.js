@@ -4,9 +4,9 @@
  * JavaScript for the Scratch Voice User Interface prototype.
  * @author Tina Quach (quacht@mit.edu)
  */
-var ScratchStateMachine = require('./scratch_state_machine.js');
+global.ScratchStateMachine = require('./scratch_state_machine.js');
 
-var scratch = new ScratchStateMachine();
+global.scratch = new ScratchStateMachine();
 
 if (!window.localStorage.scratchProjects) {
   window.localStorage.scratchProjects = JSON.stringify({});
@@ -24,18 +24,70 @@ scratch.observe('onAfterTransition', function() {
   document.getElementById("current_state").innerHTML = scratch.state;
 });
 
-showInfo('info_start');
+global.final_transcript = '';
+global.recognizing = false;
+global.ignore_onend;
+global.start_timestamp;
 
-var final_transcript = '';
-var recognizing = false;
-var ignore_onend;
-var start_timestamp;
+global.upgrade = function() {
+  start_button.style.visibility = 'hidden';
+  showInfo('info_upgrade');
+}
+
+global.two_line = /\n\n/g;
+global.one_line = /\n/g;
+global.linebreak = function(s) {
+  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+}
+
+global.first_char = /\S/;
+global.capitalize = function(s) {
+  return s.replace(first_char, function(m) { return m.toUpperCase(); });
+}
+
+document.getElementById("start_button").onclick =  function(event) {
+  if (recognizing) {
+    recognition.stop();
+    return;
+  }
+  final_transcript = '';
+  recognition.start();
+  ignore_onend = false;
+  final_span.innerHTML = '';
+  interim_span.innerHTML = '';
+  start_img.src = 'assets/mic-slash.gif';
+  showInfo('info_allow');
+  showButtons('none');
+  start_timestamp = event.timeStamp;
+}
+
+global.showInfo = function(s) {
+  if (s) {
+    for (global.child = info.firstChild; child; child = child.nextSibling) {
+      if (child.style) {
+        child.style.display = child.id == s ? 'inline' : 'none';
+      }
+    }
+    info.style.visibility = 'visible';
+  } else {
+    info.style.visibility = 'hidden';
+  }
+}
+
+global.current_style;
+global.showButtons = function(style) {
+  if (style == global.current_style) {
+    return;
+  }
+  global.current_style = style;
+}
+
 
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
 } else {
   start_button.style.display = 'inline-block';
-  var recognition = scratch.recognition;
+  global.recognition = scratch.recognition;
   recognition.continuous = true;
   recognition.interimResults = true;
 
@@ -79,7 +131,7 @@ if (!('webkitSpeechRecognition' in window)) {
     showInfo('');
     if (window.getSelection) {
       window.getSelection().removeAllRanges();
-      var range = document.createRange();
+      global.range = document.createRange();
       range.selectNode(document.getElementById('final_span'));
       window.getSelection().addRange(range);
     }
@@ -90,8 +142,8 @@ if (!('webkitSpeechRecognition' in window)) {
   // partial utterance.
   // The API still helps us recognize when a pause has occured.
   recognition.onresult = function(event) {
-    var interim_transcript = '';
-    for (var i = event.resultIndex; i < event.results.length; ++i) {
+    global.interim_transcript = '';
+    for (global.i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
         final_transcript = event.results[i][0].transcript;
         console.log(event.results[i][0].transcript)
@@ -109,57 +161,4 @@ if (!('webkitSpeechRecognition' in window)) {
       showButtons('inline-block');
     }
   };
-}
-
-function upgrade() {
-  start_button.style.visibility = 'hidden';
-  showInfo('info_upgrade');
-}
-
-var two_line = /\n\n/g;
-var one_line = /\n/g;
-function linebreak(s) {
-  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
-}
-
-var first_char = /\S/;
-function capitalize(s) {
-  return s.replace(first_char, function(m) { return m.toUpperCase(); });
-}
-
-function startButton(event) {
-  if (recognizing) {
-    recognition.stop();
-    return;
-  }
-  final_transcript = '';
-  recognition.start();
-  ignore_onend = false;
-  final_span.innerHTML = '';
-  interim_span.innerHTML = '';
-  start_img.src = 'assets/mic-slash.gif';
-  showInfo('info_allow');
-  showButtons('none');
-  start_timestamp = event.timeStamp;
-}
-
-function showInfo(s) {
-  if (s) {
-    for (var child = info.firstChild; child; child = child.nextSibling) {
-      if (child.style) {
-        child.style.display = child.id == s ? 'inline' : 'none';
-      }
-    }
-    info.style.visibility = 'visible';
-  } else {
-    info.style.visibility = 'hidden';
-  }
-}
-
-var current_style;
-function showButtons(style) {
-  if (style == current_style) {
-    return;
-  }
-  current_style = style;
 }
