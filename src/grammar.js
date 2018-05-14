@@ -71,7 +71,7 @@ public <sound_name> = meow|moo|boing|droplet';`
  * @param {!Object} triggerMap - map of trigger types to regular expressions
  * @return {!String} the grammar rules
  */
-function getRules(triggerMap) {
+ScratchGrammar.getRules(triggerMap) {
 	var rules = []
 	for (var triggerType in triggerMap) {
 		var regexString = triggerMap[triggerType].toString().replace(/\(\.\*\)/g,"");
@@ -84,7 +84,7 @@ function getRules(triggerMap) {
 
 // Upon using the system, you want the grammar to recognize expected phrases more
 // easily.
-function generateGrammar(scratch) {
+ScratchGrammar.generateGrammar(scratch) {
 	var header = `#JSGF V1.0;
 	grammar scratch_state_machine; \n`
 
@@ -97,21 +97,6 @@ function generateGrammar(scratch) {
 
 	var grammar = header + stateMachineRules + projectRules + projectNameRule;
 	return grammar.replace(/\\/g,"")
-}
-
-function test_getRules() {
-	var triggers = {
-    'newProject': /new project|create new project|create project|make new project|make project/,
-    'editExistingProject': /see inside (.*)/,
-    'editProject': /see inside/,
-    'finishProject': /i'm done|i'm finished/,
-    'play': /scratch (.*)|scratch play (.*)|play (.*)|(.*)/,
-    'playCurrentProject': /play project|start project|play current project|test project/,
-    'return': /stop|i'm done|go back|quit|exit/,
-    'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
-    'getProjectCount': /how many projects do i have|how many projects have i made/
-  }
-  console.log(getRules(triggers))
 }
 
 module.exports = ScratchGrammar;
