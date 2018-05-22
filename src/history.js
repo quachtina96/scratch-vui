@@ -7,7 +7,7 @@
 		exports["StateMachineHistory"] = factory();
 	else
 		root["StateMachineHistory"] = factory();
-})(this, function() {
+})(this, () => {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};

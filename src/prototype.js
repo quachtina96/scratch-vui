@@ -8,7 +8,7 @@ global.ScratchStateMachine = require('./scratch_state_machine.js');
 
 global.scratch = new ScratchStateMachine();
 
-scratch.observe('onAfterTransition', function() {
+scratch.observe('onAfterTransition', () => {
   document.getElementById("current_state").innerHTML = scratch.state;
 });
 
@@ -30,7 +30,7 @@ global.linebreak = function(s) {
 
 global.first_char = /\S/;
 global.capitalize = function(s) {
-  return s.replace(first_char, function(m) { return m.toUpperCase(); });
+  return s.replace(first_char, (m) => { return m.toUpperCase(); });
 }
 
 document.getElementById("start_button").onclick =  function(event) {

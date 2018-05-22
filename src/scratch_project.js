@@ -40,34 +40,34 @@ var ScratchProject = StateMachine.factory({
   },
   methods: {
     onStartProjectCreation: (lifecycle, project) =>  {
-      return new Promise(function(resolve, reject) {
+      return new Promise(((resolve, reject) => {
         project.pm.say('What do you want to call it?');
         resolve();
-      });
+      }));
     },
     onNameProject: function() {
       var project = this;
-      return new Promise(function(resolve, reject) {
+      return new Promise(((resolve, reject) => {
         // problem w/ using this.name is that this refers to the window--NOT to the scratch project.
         project.pm.say('Okay. When you say, Scratch, ' + project.name + ', I’ll play the project. What’s the first step?');
         resolve();
-      })
+      }))
     },
     onAddInstruction: function() {
       var project = this;
-      return new Promise(function(resolve, reject) {
+      return new Promise(((resolve, reject) => {
         project.pm.say('Okay, what’s the next step?');
         project.pm.save();
         resolve();
-      })
+      }))
     },
     onFinishProject: function() {
       var project = this;
-      return new Promise(function(resolve, reject) {
+      return new Promise(((resolve, reject) => {
         project.pm.say('Cool, now you can say, Scratch, ' + project.name + ', to play the project.');
         project.pm.save();
         resolve();
-      })
+      }))
     },
     /**
      * Return Scratch program.

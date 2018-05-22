@@ -7,7 +7,7 @@
 		exports["StateMachine"] = factory();
 	else
 		root["StateMachine"] = factory();
-})(this, function() {
+})(this, () => {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -390,7 +390,7 @@ mixin(JSM.prototype, {
   },
 
   can: function(transition) {
-    return !this.isPending() && !!this.seek(transition);
+    return !this.isPending() && Boolean(this.seek(transition));
   },
 
   cannot: function(transition) {
@@ -619,7 +619,7 @@ function build(target, config) {
   Object.defineProperties(target, PublicProperties);
   mixin(target, PublicMethods);
   mixin(target, config.methods);
-  config.allTransitions().forEach(function(transition) {
+  config.allTransitions().forEach((transition) => {
     target[camelize(transition)] = function() {
       return this._fsm.fire(transition, [].slice.call(arguments))
     }

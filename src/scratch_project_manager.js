@@ -247,7 +247,7 @@ class ScratchProjectManager {
 	}
 	deleteProject(lifecycle, args, utterance) {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			var projectToPlayName = args[1].trim();
 
 			// play the project that matches!
@@ -267,43 +267,43 @@ class ScratchProjectManager {
 			pm.say("I can't delete a project I don't have");
 			resolve();
 			scratch.return();
-		})
+		}))
 	}
 	getProjectNames() {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			var whatToSay = Object.keys(pm.projects);
 			whatToSay.splice(whatToSay.length-1, 0, 'and');
 			whatToSay.join(',')
 			pm.say(whatToSay);
 			resolve();
-		});
+		}));
 	}
 	getProjectCount() {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			var count = Object.keys(pm.projects).length;
 			pm.say('You have ' + count + ' projects');
 			resolve();
-		});
+		}));
 	}
 	newProject() {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			console.log(pm);
 			pm.currentProject = new ScratchProject(pm);
 			pm.untitledCount++;
 			pm.projects['Untitled-' + pm.untitledCount] = pm.currentProject;
 			pm.currentProject.startProjectCreation(pm.currentProject);
 			resolve();
-		});
+		}));
 	}
 	returnToPreviousState() {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			pm.say('Returning to previous state: ' + pm.ssm.state);
 			resolve();
-		});
+		}));
 	}
 	// Play existing project
 	play(lifecycle, args, utterance) {
@@ -335,13 +335,13 @@ class ScratchProjectManager {
 	}
 	finishProject() {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			ScratchStorage.save();
 			pm._updatePlayRegex();
 			// TODO: cue exiting project
 			// Save project.
 			resolve();
-		});
+		}));
 	}
 	announceProjectToEdit(project) {
 		this.say('Opening project ' + project.name + ' for editing');
@@ -355,30 +355,30 @@ class ScratchProjectManager {
 
 	editExistingProject(lifecycle, args) {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			console.log(args);
 			var projectName = args[1];
 			pm.announceProjectToEdit(pm.projects[projectName])
 			pm.currentProject = pm.projects[projectName];
 			resolve();
-		});
+		}));
 	}
 	editProject() {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			pm.announceProjectToEdit(pm.currentProject)
 			resolve();
-		});
+		}));
 	}
 	playCurrentProject() {
 		var pm = this;
-		return new Promise(function(resolve, reject) {
+		return new Promise(((resolve, reject) => {
 			ScratchStorage.save();
 			pm.say('Playing current project ' + pm.currentProject.name);
 			pm.executeCurrentProject('FromStart');
 			pm.say('done playing project');
 			resolve();
-		});
+		}));
 	}
 }
 
