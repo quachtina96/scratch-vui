@@ -1,6 +1,7 @@
 /**
  * @fileoverview Utility functions used across files.
  */
+var natural = require('natural');
 
 /**
  * Namespace
@@ -8,8 +9,13 @@
  Utils = {}
 
 /**
-* Get all defined matches of string to given regular expression.
-*/
+ * Match utterance to a desired action.
+ */
+Utils.fuzzyMatch = (utterance, triggers) => {
+}
+/**
+ * Get all defined matches of string to given regular expression.
+ */
 Utils.match = (utterance, pattern) => {
 	var matches = utterance.match(pattern, "i");
 	return matches ? matches.filter(word => word != undefined && word != "") : null
