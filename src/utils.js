@@ -1,6 +1,7 @@
 /**
  * @fileoverview Utility functions used across files.
  */
+var natural = require('natural');
 
 /**
  * Namespace
@@ -17,6 +18,13 @@ Utils.matchRegex = (utterance, pattern) => {
 
 /**
  * Force the utterance to begin with Scratch if triggering a command.
+ * Match utterance to a desired action.
+ */
+Utils.fuzzyMatch = (utterance, triggers) => {
+}
+
+/**
+ * Get all defined matches of string to given regular expression.
  */
 Utils.match = (utterance, pattern) => {
   // Be flexible in how you recognize Scratch at the beginning of an utterance.
