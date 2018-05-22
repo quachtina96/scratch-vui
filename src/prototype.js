@@ -8,18 +8,6 @@ global.ScratchStateMachine = require('./scratch_state_machine.js');
 
 global.scratch = new ScratchStateMachine();
 
-if (!window.localStorage.scratchProjects) {
-  window.localStorage.scratchProjects = JSON.stringify({});
-} else {
-  scratch.loadFromLocalStorage();
-}
-
-scratch._updatePlayRegex();
-scratch.updateGrammarWithProjects.bind(scratch);
-scratch.recognition.grammars.addFromString(ScratchGrammar.commands);
-scratch.recognition.grammars.addFromString(ScratchGrammar.numbers);
-scratch.recognition.grammars.addFromString(ScratchGrammar.sounds);
-
 scratch.observe('onAfterTransition', function() {
   document.getElementById("current_state").innerHTML = scratch.state;
 });
@@ -82,12 +70,11 @@ global.showButtons = function(style) {
   global.current_style = style;
 }
 
-
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
 } else {
   start_button.style.display = 'inline-block';
-  global.recognition = scratch.recognition;
+  global.recognition = scratch.pm.recognition;
   recognition.continuous = true;
   recognition.interimResults = true;
 

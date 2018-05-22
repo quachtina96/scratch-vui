@@ -25,9 +25,10 @@ var ScratchProject = StateMachine.factory({
     { name: 'finishProject', from: '*', to: (s) => { return s} },
     { name: 'goto', from: '*', to: function(s) { return s } }
   ],
-  data: function(scratchStateMachine) {
+  data: function(pm) {
     return {
-      scratch: scratchStateMachine,
+      pm: pm,
+      ssm: pm.ssm,
       name: null,
       instructions: [],
       // TODO: deal with 1 versus 0 based indexing.
@@ -55,8 +56,8 @@ var ScratchProject = StateMachine.factory({
           // object holding these functions.
           if (0 < this.instructionPointer &&
               this.instructionPointer <= this.instructions.length) {
-            this.scratch.say('Step ' + this.instructionPointer);
-            this.scratch.say(this.instructions[this.instructionPointer-1].raw)
+            this.pm.say('Step ' + this.instructionPointer);
+            this.pm.say(this.instructions[this.instructionPointer-1].raw)
             return true;
           } else {
             return false;
@@ -68,7 +69,7 @@ var ScratchProject = StateMachine.factory({
             this.instructionPointer = parseInt(args[1]);
           }
           if (!this.editCommands._describeCurrentStep()) {
-            this.scratch.say('there is no step ' + this.instructionPointer);
+            this.pm.say('there is no step ' + this.instructionPointer);
           }
         },
         nextStep: () => {
@@ -77,7 +78,7 @@ var ScratchProject = StateMachine.factory({
             this.editCommands._describeCurrentStep();
           } else {
             this.instructionPointer--;
-            this.scratch.say('No more steps');
+            this.pm.say('No more steps');
           }
         },
         previousStep: () => {
@@ -86,7 +87,7 @@ var ScratchProject = StateMachine.factory({
             this.editCommands._describeCurrentStep();
           } else {
             this.instructionPointer++;
-            this.scratch.say('No more steps');
+            this.pm.say('No more steps');
           }
         },
 
@@ -95,7 +96,7 @@ var ScratchProject = StateMachine.factory({
           var steps = this.instructions[this.instructionPointer-1].getSteps();
           // Assuming that the project can only be made of 'say' instructions
           for (var i = 0; i < steps.length; i++) {
-            scratch.say(steps[i][1]);
+            this.pm.say(steps[i][1]);
           }
         },
         insertStepBefore: function(args) {
@@ -118,7 +119,7 @@ var ScratchProject = StateMachine.factory({
           }
           this.instructions.splice(referenceStepNumber + 1, 0, stepToInsert);
           this.instructionPointer = referenceStepNumber + 1;
-          this.scratch.say('inserted step');
+          this.pm.say('inserted step');
           console.log(this.instructions);
         },
         deleteStep: function(args) {
@@ -128,7 +129,7 @@ var ScratchProject = StateMachine.factory({
             index = parseInt(args[1])-1;
           }
           var removedScratchInstruction = this.instructions.splice(index, 1);
-          this.scratch.say('Removed step ' + (index+1));
+          this.pm.say('Removed step ' + (index+1));
           console.log(this.instructions);
         },
         replaceStep: function(args) {
@@ -138,10 +139,10 @@ var ScratchProject = StateMachine.factory({
           }
           var step = new ScratchInstruction(args[2]);
           if (!step) {
-            this.scratch.say(step + 'is not a Scratch command');
+            this.pm.say(step + 'is not a Scratch command');
           }
           this.instructions.splice(index, 1, step);
-          this.scratch.say('replaced step ' + (index+1));
+          this.pm.say('replaced step ' + (index+1));
           console.log(this.instructions);
         },
         replaceInStep: function(args) {
@@ -164,27 +165,28 @@ var ScratchProject = StateMachine.factory({
   },
   methods: {
     onStartProjectCreation() {
+      var project = this;
       return new Promise(function(resolve, reject) {
-        this.scratch.say('What do you want to call it?');
+        project.pm.say('What do you want to call it?');
         resolve();
       });
     },
     onNameProject: function() {
       return new Promise(function(resolve, reject) {
         // problem w/ using this.name is that this refers to the window--NOT to the scratch project.
-        this.scratch.say('Okay. When you say, Scratch, ' + this.scratch.currentProject.name + ', I’ll play the project. What’s the first step?');
+        this.pm.say('Okay. When you say, Scratch, ' + this.pm.currentProject.name + ', I’ll play the project. What’s the first step?');
         resolve();
       })
     },
     onAddInstruction: function(utterance) {
       return new Promise(function(resolve, reject) {
-        this.scratch.say('Okay, what’s the next step?');
+        this.pm.say('Okay, what’s the next step?');
         resolve();
       })
     },
     onFinishProject: function(utterance) {
       return new Promise(function(resolve, reject) {
-        this.scratch.say('Cool, now you can say, Scratch, ' + this.scratch.currentProject.name + ', to play the project.');
+        this.pm.say('Cool, now you can say, Scratch, ' + this.pm.currentProject.name + ', to play the project.');
         resolve();
       })
     },
@@ -220,8 +222,8 @@ var ScratchProject = StateMachine.factory({
       }
       if (this.state == 'empty') {
         this.name = this._getName(utterance);
-        this.scratch.projects[this.name] = this.scratch.currentProject;
-        delete this.scratch.projects['Untitled-'+this.scratch.untitledCount];
+        this.pm.projects[this.name] = this.pm.currentProject;
+        delete this.pm.projects['Untitled-'+this.pm.untitledCount];
         this.nameProject();
       // Add to or finish project.
       } else if (this.state == 'named' || this.state == 'nonempty') {
@@ -242,8 +244,8 @@ var ScratchProject = StateMachine.factory({
           this.instructions.push(instruction);
           this.addInstruction();
         } else {
-          this.scratch.say("I heard you say " + utterance);
-          this.scratch.say("That doesn't match any Scratch commands.");
+          this.pm.say("I heard you say " + utterance);
+          this.pm.say("That doesn't match any Scratch commands.");
         }
       }
     },
@@ -258,8 +260,8 @@ var ScratchProject = StateMachine.factory({
       } else {
         // Utterance should be an argument for the project.
         if (utterance == this.tempTrigger) {
-          this.scratch.say(this.tempResponse)
-          this.scratch.executeCurrentProject(scratch, 'WhereItLeftOff');
+          this.pm.say(this.tempResponse)
+          this.pm.executeCurrentProject(scratch, 'WhereItLeftOff');
         }
       }
     },
@@ -274,8 +276,8 @@ var ScratchProject = StateMachine.factory({
       for (var commandType in this.editTriggers) {
         var args = Utils.match(utterance, this.editTriggers[commandType]);
         if (args) {
-          this.editCommands[commandType].call(scratchProject,args);
-          this.scratch.saveToLocalStorage();
+          this.editCommands[commandType].call(scratchProject, args);
+          this.pm.save();
           return true;
         }
       }

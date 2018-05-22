@@ -71,7 +71,7 @@ public <sound_name> = meow|moo|boing|droplet';`
  * @param {!Object} triggerMap - map of trigger types to regular expressions
  * @return {!String} the grammar rules
  */
-ScratchGrammar.getRules(triggerMap) {
+ScratchGrammar.getRules = function(triggerMap) {
 	var rules = []
 	for (var triggerType in triggerMap) {
 		var regexString = triggerMap[triggerType].toString().replace(/\(\.\*\)/g,"");
@@ -82,16 +82,32 @@ ScratchGrammar.getRules(triggerMap) {
 	return rules.join('\n');
 }
 
-// Upon using the system, you want the grammar to recognize expected phrases more
-// easily.
-ScratchGrammar.generateGrammar(scratch) {
+
+/**
+ * Get the grammar in JSFG V1.0 format.
+ * @param {!ScratchStateMachine} scratch - where the projects names are stored
+ * @return {!String} the grammar
+ */
+ScratchGrammar.updateGrammarWithProjects = function(scratch) {
+	var grammar = `#JSGF V1.0;
+	grammar scratch_state_machine.project; \n
+	<project> =` + Object.keys(scratch.projects).join('|') + ';\n';
+	scratch.recognition.grammars.addFromString(grammar, 1);
+}
+
+/**
+ * Get the grammar in JSFG V1.0 format.
+ * @param {!ScratchStateMachine} scratch - where the projects names are stored
+ * @return {!String} the grammar
+ */
+ScratchGrammar.generateGrammar = function(scratch) {
 	var header = `#JSGF V1.0;
 	grammar scratch_state_machine; \n`
 
 	var stateMachineRules = getRules(scratch._triggers);
 
 	var dummyProject = new ScratchProject();
-	var projectRules = getRules(dummyProject.editTriggers);
+	var projectRules = ScratchGrammar.getRules(dummyProject.editTriggers);
 	var projectNameRule = 'public <project_name> = ' +
 			Object.keys(scratch.projects).join('|') + ';\n';
 

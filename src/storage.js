@@ -4,7 +4,7 @@
 
 class ScratchStorage {
 
-	static removeFromLocalStorage(projectName) {
+	static removeProject(projectName) {
 		if (window.localStorage.scratchProjects) {
 			var savedProjects = JSON.parse(window.localStorage.scratchProjects);
 			delete savedProjects[projectName];
@@ -12,7 +12,7 @@ class ScratchStorage {
 		}
 	}
 
-	static saveToLocalStorage(scratch) {
+	static save(scratch) {
 		if (!window.localStorage.scratchProjects) {
 			window.localStorage.scratchProjects = JSON.stringify({});
 		}
@@ -23,7 +23,7 @@ class ScratchStorage {
 		}
 	}
 
-	static loadFromLocalStorage() {
+	static load() {
 		if (!window.localStorage.scratchProjects) {
 			window.localStorage.scratchProjects = JSON.stringify({});
 		}
@@ -35,3 +35,5 @@ class ScratchStorage {
 		}
 	}
 }
+
+module.exports = ScratchStorage;
