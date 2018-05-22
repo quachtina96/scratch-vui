@@ -164,6 +164,9 @@ var ScratchProject = StateMachine.factory({
     }
   },
   methods: {
+    onEmpty: () => {
+      console.log('yo im an empty project')
+    },
     onStartProjectCreation() {
       var project = this;
       return new Promise(function(resolve, reject) {
@@ -172,21 +175,24 @@ var ScratchProject = StateMachine.factory({
       });
     },
     onNameProject: function() {
+      var project = this;
       return new Promise(function(resolve, reject) {
         // problem w/ using this.name is that this refers to the window--NOT to the scratch project.
-        this.pm.say('Okay. When you say, Scratch, ' + this.pm.currentProject.name + ', I’ll play the project. What’s the first step?');
+        project.pm.say('Okay. When you say, Scratch, ' + this.name + ', I’ll play the project. What’s the first step?');
         resolve();
       })
     },
     onAddInstruction: function(utterance) {
+      var project = this;
       return new Promise(function(resolve, reject) {
-        this.pm.say('Okay, what’s the next step?');
+        project.pm.say('Okay, what’s the next step?');
         resolve();
       })
     },
     onFinishProject: function(utterance) {
+      var project = this;
       return new Promise(function(resolve, reject) {
-        this.pm.say('Cool, now you can say, Scratch, ' + this.pm.currentProject.name + ', to play the project.');
+        project.pm.say('Cool, now you can say, Scratch, ' + this.name + ', to play the project.');
         resolve();
       })
     },

@@ -30,6 +30,18 @@ class ScratchProjectManager {
 		this.triggers = ScratchRegex.getGeneralTriggers();
 	}
 
+	load() {
+		if (!window.localStorage.scratchProjects) {
+			window.localStorage.scratchProjects = JSON.stringify({});
+		}
+		var savedProjects = JSON.parse(window.localStorage.scratchProjects);
+		for (var name in savedProjects) {
+			this.projects[name] = new ScratchProject(this);
+			this.projects[name].name = name;
+			this.projects[name].instructions = savedProjects[name];
+		}
+	}
+
 	renameProject(oldName, newName) {
 		this.projects[newName] = this.projects[oldName]
 		this.projects[newName].name = newName;
@@ -128,7 +140,7 @@ class ScratchProjectManager {
 				if (this.ssm.can(commandType)) {
 					try {
 						// TODO: HAVING TROUBLE HERE W/ THE REFACTOR...
-						this[commandType](args, utterance);
+						this.ssm[commandType](args, utterance);
 						return true;
 					} catch(e) {
 						// Handle failure based on transition type.
@@ -164,8 +176,8 @@ class ScratchProjectManager {
 				this.ssm.currentProject.handleUtteranceDuringExecution(utterance);
 		} else if (this.ssm.state == 'InsideProject') {
 		 // Handle utterances in the InsideProject context.
-			if (this.ssm.currentProject) {
-				var result = this.ssm.currentProject.handleUtterance(utterance);
+			if (this.currentProject) {
+				var result = this.currentProject.handleUtterance(utterance);
 				if (result == 'exit') {
 					this.ssm.finishProject();
 				}
@@ -173,8 +185,8 @@ class ScratchProjectManager {
 		} else if (utterance.toLowerCase().indexOf('scratch') != -1) {
 			// TODO: integrate Scratch, Help!
 			console.log('found Scratch in failed utterance');
-			pm.say("I heard you say " + utterance);
-			pm.say("I don't know how to do that.");
+			this.say("I heard you say " + utterance);
+			this.say("I don't know how to do that.");
 		}
 	}
 
@@ -187,7 +199,7 @@ class ScratchProjectManager {
 		this.triggers['play'] = new RegExp(regexString, "i");
 	}
 
-	getCurrentProject(lifecycle) {
+	getCurrentProject() {
 		if (this.currentProject) {
 			this.say('The current project is ' + this.currentProject.name);
 		} else {
@@ -249,7 +261,7 @@ class ScratchProjectManager {
 			scratch.return();
 		})
 	}
-	getProjectNames(lifecycle) {
+	getProjectNames() {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
 			var whatToSay = Object.keys(pm.projects);
@@ -259,7 +271,7 @@ class ScratchProjectManager {
 			resolve();
 		});
 	}
-	getProjectCount(lifecycle) {
+	getProjectCount() {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
 			var count = Object.keys(pm.projects).length;
@@ -267,7 +279,7 @@ class ScratchProjectManager {
 			resolve();
 		});
 	}
-	newProject(lifecycle) {
+	newProject() {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
 			console.log(pm);
@@ -278,7 +290,7 @@ class ScratchProjectManager {
 			resolve();
 		});
 	}
-	returnToPreviousState(lifecycle) {
+	returnToPreviousState() {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
 			pm.say('Returning to previous state: ' + pm.ssm.state);
@@ -334,7 +346,7 @@ class ScratchProjectManager {
 			resolve();
 		});
 	}
-	editProject(lifecycle) {
+	editProject() {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
 			pm.say('Opening project ' + pm.currentProject.name + ' for editing');
@@ -342,7 +354,7 @@ class ScratchProjectManager {
 			resolve();
 		});
 	}
-	playCurrentProject(lifecycle) {
+	playCurrentProject() {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
 			ScratchStorage.save();

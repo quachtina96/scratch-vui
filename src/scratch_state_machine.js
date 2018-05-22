@@ -38,11 +38,6 @@ var ScratchStateMachine = new StateMachine.factory({
   ],
   data: function() {
     var ssm = this;
-    console.log('hieeee')
-    console.log('ssm')
-    console.log(ssm)
-    console.log('this')
-    console.log(this)
     return {
       pm: new ScratchProjectManager(ssm)
     };
@@ -56,7 +51,7 @@ var ScratchStateMachine = new StateMachine.factory({
       if (!window.localStorage.scratchProjects) {
         window.localStorage.scratchProjects = JSON.stringify({});
       } else {
-        ScratchStorage.load();
+        this.pm.load();
       }
       this.setMethods();
       this.pm._updatePlayRegex();
@@ -70,21 +65,20 @@ var ScratchStateMachine = new StateMachine.factory({
     setMethods: function() {
       methodMap = {
         handleUtterance: (utterance) => {this.pm.handleUtterance(utterance)},
-        onHome: (lifecycle, args) => {this.pm.initialize},
-        onGetCurrentProject: (lifecycle, args) => {this.pm.getCurrentProject},
-        onRenameCurrentProject: (lifecycle, args) => {this.pm.renameCurrentProject},
-        onRenameProject: (lifecycle, args) => {this.pm.renameSpecifiedProject},
-        onDeleteProject: (lifecycle, args) => {this.pm.deleteProject},
-        onGetProjectNames: (lifecycle, args) => {this.pm.getProjectNames},
-        onGetProjectCount: (lifecycle, args) => {this.pm.getProjectCount},
-        onNewProject: (lifecycle, args) => {this.pm.newProject},
-        onReturn: (lifecycle, args) => {this.pm.returnToPreviousState},
+        onGetCurrentProject: () => {this.pm.getCurrentProject()},
+        onRenameCurrentProject: (lifecycle, args) => {this.pm.renameCurrentProject(lifecycle, args)},
+        onRenameProject: (lifecycle, args) => {this.pm.renameSpecifiedProject(lifecycle, args)},
+        onDeleteProject: (lifecycle, args, utterance) => {this.pm.deleteProject(lifecycle, args, utterance)},
+        onGetProjectNames: () => {this.pm.getProjectNames()},
+        onGetProjectCount: () => {this.pm.getProjectCount()},
+        onNewProject: () => {this.pm.newProject()},
+        onReturn: (lifecycle, args) => {this.pm.returnToPreviousState(lifecycle, args)},
         // Play existing project
-        onPlay: (lifecycle, args, utterance) => {this.pm.play},
-        onFinishProject: (lifecycle, args) => {this.pm.finishProject},
-        onEditExistingProject: (lifecycle, args) => {this.pm.editExistingProject},
-        onEditProject: (lifecycle, args) => {this.pm.editProject},
-        onPlayCurrentProject: (lifecycle, args) => {this.pm.playCurrentProject},
+        onPlay: (lifecycle, args, utterance) => {this.pm.play(lifecycle, args, utterance)},
+        onFinishProject: () => {this.pm.finishProject()},
+        onEditExistingProject: (lifecycle, args) => {this.pm.editExistingProject(lifecycle, args)},
+        onEditProject: () => {this.pm.editProject()},
+        onPlayCurrentProject: () => {this.pm.playCurrentProject()},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];

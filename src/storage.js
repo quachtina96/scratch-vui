@@ -1,6 +1,7 @@
 /**
  * @fileoverview Manage storage of projects in browser.
  */
+const ScratchProject = require('./scratch_project.js');
 
 class ScratchStorage {
 
@@ -20,18 +21,6 @@ class ScratchStorage {
 			var savedProjects = JSON.parse(window.localStorage.scratchProjects);
 			savedProjects[projectName] = this.projects[projectName].instructions;
 			window.localStorage.scratchProjects = JSON.stringify(savedProjects);
-		}
-	}
-
-	static load() {
-		if (!window.localStorage.scratchProjects) {
-			window.localStorage.scratchProjects = JSON.stringify({});
-		}
-		var savedProjects = JSON.parse(window.localStorage.scratchProjects);
-		for (var name in savedProjects) {
-			this.projects[name] = new ScratchProject(this);
-			this.projects[name].name = name;
-			this.projects[name].instructions = savedProjects[name];
 		}
 	}
 }
