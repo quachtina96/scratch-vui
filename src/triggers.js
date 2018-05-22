@@ -28,6 +28,7 @@ ScratchRegex.getGeneralTriggers = function() {
 
 ScratchRegex.getEditProjectTriggers = function() {
 	return {
+	getCurrentStep: /what step am i on|what’s my current step|what step is this/,
     goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
     nextStep: /go to next step|next step|what's next/,
     previousStep: /previous step|go back a step/,

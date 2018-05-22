@@ -13,13 +13,16 @@ class ScratchStorage {
 		}
 	}
 
-	static save(scratch) {
+	/**
+	 * Save map of project names to ScratchProjects.
+	 */
+	static save(projects) {
 		if (!window.localStorage.scratchProjects) {
 			window.localStorage.scratchProjects = JSON.stringify({});
 		}
-		for (var projectName in this.projects) {
+		for (var projectName in projects) {
 			var savedProjects = JSON.parse(window.localStorage.scratchProjects);
-			savedProjects[projectName] = this.projects[projectName].instructions;
+			savedProjects[projectName] = projects[projectName].instructions;
 			window.localStorage.scratchProjects = JSON.stringify(savedProjects);
 		}
 	}

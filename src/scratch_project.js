@@ -4,8 +4,9 @@
  *
  * @author quacht@mit.edu (Tina Quach)
  */
-var StateMachine = require('javascript-state-machine');
 const ScratchInstruction = require('./scratch_instruction.js');
+const StateMachine = require('javascript-state-machine');
+const ScratchProjectEditor = require('./scratch_project_editor.js');
 const ScratchRegex = require('./triggers.js');
 const Utils = require('./utils.js');
 
@@ -32,126 +33,13 @@ var ScratchProject = StateMachine.factory({
       ssm: pm.ssm,
       name: null,
       instructions: [],
-      // TODO: deal with 1 versus 0 based indexing.
       // TODO: handle word forms of words in referencing steps.
-      instructionPointer: null,
-      editTriggers: ScratchRegex.getEditProjectTriggers(),
-      editCommands: {
-        _describeCurrentStep: () => {
-          // this does not refer to the state machine, but to the editCommands
-          // object holding these functions.
-          if (0 < this.instructionPointer &&
-              this.instructionPointer <= this.instructions.length) {
-            this.pm.say('Step ' + this.instructionPointer);
-            this.pm.say(this.instructions[this.instructionPointer-1].raw)
-            return true;
-          } else {
-            return false;
-          }
-        },
-        goToStep: (args) => {
-          this.instructionPointer = Utils.text2num(args[1]);
-          if (this.instructionPointer == null) {
-            this.instructionPointer = parseInt(args[1]);
-          }
-          if (!this.editCommands._describeCurrentStep()) {
-            this.pm.say('there is no step ' + this.instructionPointer);
-          }
-        },
-        nextStep: () => {
-          this.instructionPointer++;
-          if (this.instructionPointer <= this.instructions.length) {
-            this.editCommands._describeCurrentStep();
-          } else {
-            this.instructionPointer--;
-            this.pm.say('No more steps');
-          }
-        },
-        previousStep: () => {
-          this.instructionPointer--;
-          if (this.instructionPointer > 0) {
-            this.editCommands._describeCurrentStep();
-          } else {
-            this.instructionPointer++;
-            this.pm.say('No more steps');
-          }
-        },
-
-        // todo - test below
-        playStep: function() {
-          var steps = this.instructions[this.instructionPointer-1].getSteps();
-          // Assuming that the project can only be made of 'say' instructions
-          for (var i = 0; i < steps.length; i++) {
-            this.pm.say(steps[i][1]);
-          }
-        },
-        insertStepBefore: function(args) {
-          // TODO: use try catch to handle inability to convert the Scratch
-          // instruction.
-          var stepToInsert = new ScratchInstruction(args[1]);
-          var referenceStepNumber = Utils.text2num(args[2])-1;
-          if (referenceStepNumber == null) {
-            referenceStepNumber = parseInt(args[2])-1;
-          }
-          this.instructions.splice(referenceStepNumber, 0, stepToInsert);
-          this.instructionPointer = referenceStepNumber;
-          console.log(this.instructions);
-        },
-        insertStepAfter: function(args) {
-          var stepToInsert = new ScratchInstruction(args[1]);
-          var referenceStepNumber = Utils.text2num(args[2])-1;
-          if (referenceStepNumber == null) {
-            referenceStepNumber = parseInt(args[2])-1;
-          }
-          this.instructions.splice(referenceStepNumber + 1, 0, stepToInsert);
-          this.instructionPointer = referenceStepNumber + 1;
-          this.pm.say('inserted step');
-          console.log(this.instructions);
-        },
-        deleteStep: function(args) {
-          console.log(this);
-          var index = Utils.text2num(args[1])-1;
-          if (index == null) {
-            index = parseInt(args[1])-1;
-          }
-          var removedScratchInstruction = this.instructions.splice(index, 1);
-          this.pm.say('Removed step ' + (index+1));
-          console.log(this.instructions);
-        },
-        replaceStep: function(args) {
-          var index = Utils.text2num(args[1])-1;
-          if (index == null) {
-            index = parseInt(args[1])-1;
-          }
-          var step = new ScratchInstruction(args[2]);
-          if (!step) {
-            this.pm.say(step + 'is not a Scratch command');
-          }
-          this.instructions.splice(index, 1, step);
-          this.pm.say('replaced step ' + (index+1));
-          console.log(this.instructions);
-        },
-        replaceInStep: function(args) {
-          var index = Utils.text2num(args[1])-1;
-          if (index == null) {
-            index = parseInt(args[1])-1;
-          }
-          var oldWord = args[2];
-          var newWord = args[3];
-          var instructionToModify = this.instructions[index];
-          // TODO: determine how to replace things w/in a step.
-        },
-        replaceSound: function(args) {
-          var oldSound = args[1];
-          var newSound = args[2];
-          // TODO: how does sound work in Scratch Programs.
-        }
-      }
+      instructionPointer: 1, // Use 1-based indexing
+      editor: new ScratchProjectEditor(),
     }
   },
   methods: {
-    onStartProjectCreation() {
-      var project = this;
+    onStartProjectCreation: (lifecycle, project) =>  {
       return new Promise(function(resolve, reject) {
         project.pm.say('What do you want to call it?');
         resolve();
@@ -165,17 +53,19 @@ var ScratchProject = StateMachine.factory({
         resolve();
       })
     },
-    onAddInstruction: function(utterance) {
+    onAddInstruction: function() {
       var project = this;
       return new Promise(function(resolve, reject) {
         project.pm.say('Okay, what’s the next step?');
+        project.pm.save();
         resolve();
       })
     },
-    onFinishProject: function(utterance) {
+    onFinishProject: function() {
       var project = this;
       return new Promise(function(resolve, reject) {
         project.pm.say('Cool, now you can say, Scratch, ' + project.name + ', to play the project.');
+        project.pm.save();
         resolve();
       })
     },
@@ -218,12 +108,12 @@ var ScratchProject = StateMachine.factory({
       } else if (this.state == 'named' || this.state == 'nonempty') {
         // Detect project completion.
         if (utterance.indexOf("that's it") != -1) {
-          this.finishProject(this.state);
+          this.finishProject();
           return 'exit';
         }
 
         // Detect and handle explicit edit commands.
-        if (this._handleEditCommands(utterance)) {
+        if (this.editor.handleUtterance(utterance, this)) {
           return;
         }
 
@@ -254,23 +144,6 @@ var ScratchProject = StateMachine.factory({
         }
       }
     },
-    /**
-     * If the utterance matches the form of a supported program editing
-     * command, execute the command.
-     */
-    _handleEditCommands: function(utterance) {
-      utterance = Utils.removeFillerWords(utterance.toLowerCase());
-
-      var scratchProject = this;
-      for (var commandType in this.editTriggers) {
-        var args = Utils.match(utterance, this.editTriggers[commandType]);
-        if (args) {
-          this.editCommands[commandType].call(scratchProject, args);
-          this.pm.save();
-          return true;
-        }
-      }
-    }
   }
 });
 

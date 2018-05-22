@@ -63,7 +63,7 @@ class ScratchProjectManager {
 	 */
 	save() {
 		// Save project to local storage.
-		ScratchStorage.save()
+		ScratchStorage.save(this.projects)
 	}
 
 	/**
@@ -92,20 +92,28 @@ class ScratchProjectManager {
 	 * @param {string} mode - 'FromStart' to execute the project from the first
 	 *    or 'WhereItLeftOff'.
 	 */
-	executeCurrentProject(scratch, mode) {
+	executeCurrentProject(mode) {
 		if (!this.currentProject) {
-			console.log(scratch);
 			throw Error('this.currentProject is ' + this.currentProject);
-		}
-		if (mode == 'WhereItLeftOff') {
-			var startIndex = this.currentProject.instructionPointer;
-		} else if ('FromStart') {
-			// Start at index 1 to skip the "when green flag clicked instruction"
-			var startIndex = 1;
 		}
 
 		var scratchProgram = this.currentProject.getScratchProgram();
-		for (var i = startIndex; i < scratchProgram.length; i++) {
+
+		// Set bounds for which steps to execute
+		var endIndex, startIndex;
+		if (mode == 'WhereItLeftOff') {
+			startIndex = this.currentProject.instructionPointer;
+			endIndex = scratchProgram.length;
+		} else if (mode == 'FromStart') {
+			// Start at index 1 to skip the "when green flag clicked instruction"
+			startIndex = 1;
+			endIndex = scratchProgram.length;
+		} else if (mode == 'SingleStepWhereILeftOff') {
+			startIndex = this.currentProject.instructionPointer;
+			endIndex = startIndex + 1;
+		}
+
+		for (var i = startIndex; i < endIndex; i++) {
 			var opcode = scratchProgram[i][0];
 			var args = scratchProgram[i][1];
 			if (opcode == 'say:') {
@@ -286,7 +294,7 @@ class ScratchProjectManager {
 			pm.currentProject = new ScratchProject(pm);
 			pm.untitledCount++;
 			pm.projects['Untitled-' + pm.untitledCount] = pm.currentProject;
-			pm.currentProject.startProjectCreation();
+			pm.currentProject.startProjectCreation(pm.currentProject);
 			resolve();
 		});
 	}
@@ -308,10 +316,10 @@ class ScratchProjectManager {
 				if (Utils.removeFillerWords(projectName) == projectToPlayName) {
 					pm.currentProject = pm.projects[projectName];
 					pm.say('playing project');
-					pm.executeCurrentProject(scratch, 'FromStart');
+					pm.executeCurrentProject('FromStart');
 					// TODO(quacht): saying I'm done playing the project doesnt work
 					// here when doing event handling.
-					// pm.say('done playing project');
+					pm.say('done playing project');
 					resolve();
 					return;
 				}
@@ -322,7 +330,7 @@ class ScratchProjectManager {
 			pm.say("You said " + utterance);
 			pm.say("I don't have a project called " + args[1]);
 			resolve();
-			scratch.return();
+			this.ssm.return();
 		})
 	}
 	finishProject() {
@@ -335,14 +343,22 @@ class ScratchProjectManager {
 			resolve();
 		});
 	}
+	announceProjectToEdit(project) {
+		this.say('Opening project ' + project.name + ' for editing');
+		var stepCount = project.instructions.length;
+		if (stepCount != 1) {
+			this.say('There are ' + stepCount + ' steps');
+		} else {
+			this.say('There is 1 step');
+		}
+	}
+
 	editExistingProject(lifecycle, args) {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
 			console.log(args);
 			var projectName = args[1];
-			var stepCount = pm.projects[projectName].instructions.length;
-			pm.say('Opening project ' + projectName + ' for editing');
-			pm.say('There are ' + stepCount + ' steps');
+			pm.announceProjectToEdit(pm.projects[projectName])
 			pm.currentProject = pm.projects[projectName];
 			resolve();
 		});
@@ -350,8 +366,7 @@ class ScratchProjectManager {
 	editProject() {
 		var pm = this;
 		return new Promise(function(resolve, reject) {
-			pm.say('Opening project ' + pm.currentProject.name + ' for editing');
-			// TODO: begin edit project flow.
+			pm.announceProjectToEdit(pm.currentProject)
 			resolve();
 		});
 	}
@@ -360,7 +375,7 @@ class ScratchProjectManager {
 		return new Promise(function(resolve, reject) {
 			ScratchStorage.save();
 			pm.say('Playing current project ' + pm.currentProject.name);
-			pm.executeCurrentProject(scratch, 'FromStart');
+			pm.executeCurrentProject('FromStart');
 			pm.say('done playing project');
 			resolve();
 		});
