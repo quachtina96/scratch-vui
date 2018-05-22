@@ -1,12 +1,18 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
 module.exports = {
-  entry: './src/prototype.js',
-  output: {
-    filename: 'prototype_bundle.js',
-    path: path.resolve(__dirname, 'src')
-  },
-	node: {
-	   fs: "empty"
-	}
+    mode: 'development',
+    entry: './src/prototype.js',
+    output: {
+        path: path.resolve(__dirname, './build'),
+        filename: 'bundle.js'
+    },
+    plugins: [
+        new CopyWebpackPlugin([{
+            from: 'static',
+            to: '.'
+        }])
+    ],
+    watch: true
 };

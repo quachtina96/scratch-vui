@@ -71,7 +71,7 @@ public <sound_name> = meow|moo|boing|droplet';`
  * @param {!Object} triggerMap - map of trigger types to regular expressions
  * @return {!String} the grammar rules
  */
-function getRules(triggerMap) {
+ScratchGrammar.getRules = function(triggerMap) {
 	var rules = []
 	for (var triggerType in triggerMap) {
 		var regexString = triggerMap[triggerType].toString().replace(/\(\.\*\)/g,"");
@@ -82,16 +82,32 @@ function getRules(triggerMap) {
 	return rules.join('\n');
 }
 
-// Upon using the system, you want the grammar to recognize expected phrases more
-// easily.
-function generateGrammar(scratch) {
+
+/**
+ * Get the grammar in JSFG V1.0 format.
+ * @param {!ScratchStateMachine} scratch - where the projects names are stored
+ * @return {!String} the grammar
+ */
+ScratchGrammar.updateGrammarWithProjects = function(scratch) {
+	var grammar = `#JSGF V1.0;
+	grammar scratch_state_machine.project; \n
+	<project> =` + Object.keys(scratch.projects).join('|') + ';\n';
+	scratch.recognition.grammars.addFromString(grammar, 1);
+}
+
+/**
+ * Get the grammar in JSFG V1.0 format.
+ * @param {!ScratchStateMachine} scratch - where the projects names are stored
+ * @return {!String} the grammar
+ */
+ScratchGrammar.generateGrammar = function(scratch) {
 	var header = `#JSGF V1.0;
 	grammar scratch_state_machine; \n`
 
 	var stateMachineRules = getRules(scratch._triggers);
 
 	var dummyProject = new ScratchProject();
-	var projectRules = getRules(dummyProject.editTriggers);
+	var projectRules = ScratchGrammar.getRules(dummyProject.editTriggers);
 	var projectNameRule = 'public <project_name> = ' +
 			Object.keys(scratch.projects).join('|') + ';\n';
 
@@ -99,19 +115,5 @@ function generateGrammar(scratch) {
 	return grammar.replace(/\\/g,"")
 }
 
-function test_getRules() {
-	var triggers = {
-    'newProject': /new project|create new project|create project|make new project|make project/,
-    'editExistingProject': /see inside (.*)/,
-    'editProject': /see inside/,
-    'finishProject': /i'm done|i'm finished/,
-    'play': /scratch (.*)|scratch play (.*)|play (.*)|(.*)/,
-    'playCurrentProject': /play project|start project|play current project|test project/,
-    'return': /stop|i'm done|go back|quit|exit/,
-    'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
-    'getProjectCount': /how many projects do i have|how many projects have i made/
-  }
-  console.log(getRules(triggers))
-}
-
+module.exports = ScratchGrammar;
 
