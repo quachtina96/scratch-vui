@@ -6,6 +6,7 @@
  */
 var StateMachine = require('javascript-state-machine');
 const ScratchInstruction = require('./scratch_instruction.js');
+const ScratchRegex = require('./triggers.js');
 const Utils = require('./utils.js');
 
 
@@ -34,22 +35,7 @@ var ScratchProject = StateMachine.factory({
       // TODO: deal with 1 versus 0 based indexing.
       // TODO: handle word forms of words in referencing steps.
       instructionPointer: null,
-      editTriggers: {
-        goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
-        nextStep: /go to next step|next step|what's next/,
-        previousStep: /previous step|go back a step/,
-        playStep: /play step|play current step|what does it do/,
-        insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
-        insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
-        deleteStep: /delete step (.*)/,
-        // TODO: distinguish between replacing everywhere and replacing in a
-        // specific place.
-        replaceStep: /replace step (.*) with (.*)/,
-        replaceSound: /replace the (.*) sound with the (.*) sound'/,
-        // TODO: address potential complex behavior in line below.
-        replaceInStep: /in step (.*) replace (.*) with (.*)/,
-        stopEditing: /stop|i\'m done|that\'s it'/
-      },
+      editTriggers: ScratchRegex.getEditProjectTriggers(),
       editCommands: {
         _describeCurrentStep: () => {
           // this does not refer to the state machine, but to the editCommands
@@ -164,9 +150,6 @@ var ScratchProject = StateMachine.factory({
     }
   },
   methods: {
-    onEmpty: () => {
-      console.log('yo im an empty project')
-    },
     onStartProjectCreation() {
       var project = this;
       return new Promise(function(resolve, reject) {
@@ -178,7 +161,7 @@ var ScratchProject = StateMachine.factory({
       var project = this;
       return new Promise(function(resolve, reject) {
         // problem w/ using this.name is that this refers to the window--NOT to the scratch project.
-        project.pm.say('Okay. When you say, Scratch, ' + this.name + ', I’ll play the project. What’s the first step?');
+        project.pm.say('Okay. When you say, Scratch, ' + project.name + ', I’ll play the project. What’s the first step?');
         resolve();
       })
     },
@@ -192,7 +175,7 @@ var ScratchProject = StateMachine.factory({
     onFinishProject: function(utterance) {
       var project = this;
       return new Promise(function(resolve, reject) {
-        project.pm.say('Cool, now you can say, Scratch, ' + this.name + ', to play the project.');
+        project.pm.say('Cool, now you can say, Scratch, ' + project.name + ', to play the project.');
         resolve();
       })
     },

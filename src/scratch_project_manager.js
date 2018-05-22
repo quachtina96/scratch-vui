@@ -93,32 +93,32 @@ class ScratchProjectManager {
 	 *    or 'WhereItLeftOff'.
 	 */
 	executeCurrentProject(scratch, mode) {
-		if (!pm.currentProject) {
+		if (!this.currentProject) {
 			console.log(scratch);
-			throw Error('pm.currentProject is ' + pm.currentProject);
+			throw Error('this.currentProject is ' + this.currentProject);
 		}
 		if (mode == 'WhereItLeftOff') {
-			var startIndex = pm.currentProject.instructionPointer;
+			var startIndex = this.currentProject.instructionPointer;
 		} else if ('FromStart') {
 			// Start at index 1 to skip the "when green flag clicked instruction"
 			var startIndex = 1;
 		}
 
-		var scratchProgram = pm.currentProject.getScratchProgram();
+		var scratchProgram = this.currentProject.getScratchProgram();
 		for (var i = startIndex; i < scratchProgram.length; i++) {
 			var opcode = scratchProgram[i][0];
 			var args = scratchProgram[i][1];
 			if (opcode == 'say:') {
-					pm.say(scratchProgram[i][1]);
+					this.say(scratchProgram[i][1]);
 			} else if (Array.isArray(opcode)) {
 				if (opcode[0] == 'doAsk')
 					if (opcode[1] == '') {
 					// Handle 'when i say event'
 					var whatToListenFor = args[1][2];
 					var whatToSay = args[2][0][1];
-					pm.currentProject.tempTrigger = whatToListenFor;
-					pm.currentProject.tempResponse= whatToSay;
-					pm.currentProject.instructionPointer = i + 1;
+					this.currentProject.tempTrigger = whatToListenFor;
+					this.currentProject.tempResponse= whatToSay;
+					this.currentProject.instructionPointer = i + 1;
 					return;
 				}
 			}
@@ -173,7 +173,7 @@ class ScratchProjectManager {
 		}
 
 		if (this.ssm.state == 'PlayProject') {
-				this.ssm.currentProject.handleUtteranceDuringExecution(utterance);
+				this.currentProject.handleUtteranceDuringExecution(utterance);
 		} else if (this.ssm.state == 'InsideProject') {
 		 // Handle utterances in the InsideProject context.
 			if (this.currentProject) {
@@ -209,7 +209,7 @@ class ScratchProjectManager {
 	renameCurrentProject(lifecycle, args) {
 		if (this.currentProject) {
 			var newName = args[1];
-			this.renameProject(scratch, this.currentProject.name, newName);
+			this.renameProject(this.currentProject.name, newName);
 			this.say('The current project is now called ' + this.currentProject.name);
 		} else {
 			this.say('You are not currently on a project');
@@ -225,7 +225,7 @@ class ScratchProjectManager {
 			// play the project that matches!
 			for (var projectName in this.projects) {
 				if (Utils.removeFillerWords(projectName) == oldName) {
-					this.renameProject(scratch, projectName, newName)
+					this.renameProject(projectName, newName)
 					this.say('Renamed ' + projectName + ' to ' + newName)
 					return;
 				}
@@ -343,6 +343,7 @@ class ScratchProjectManager {
 			var stepCount = pm.projects[projectName].instructions.length;
 			pm.say('Opening project ' + projectName + ' for editing');
 			pm.say('There are ' + stepCount + ' steps');
+			pm.currentProject = pm.projects[projectName];
 			resolve();
 		});
 	}
