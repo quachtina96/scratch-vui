@@ -8,6 +8,7 @@
     "start": "webpack-dev-server",
     "test:lint": "eslint . --ext=js",
     "test:unit": "tap test/unit/*.js",
+    "test:speech": "tap test/unit/test_utterance_match.js",
     "test": "npm run test:lint && npm run test:unit"
   },
   "dependencies": {

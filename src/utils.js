@@ -2,6 +2,7 @@
  * @fileoverview Utility functions used across files.
  */
 var natural = require('natural');
+var assert = require('assert');
 
 /**
  * Namespace
@@ -9,10 +10,80 @@ var natural = require('natural');
  Utils = {}
 
 /**
- * Match utterance to a desired action.
+ * Get the grammar rules in JSFG V1.0 format.
+ * @param {!Object} triggerMap - map of trigger types to regular expressions
+ * @return {!String} the grammar rules
+ */
+Utils.getTargets = function(triggerMap) {
+	var targets = {}
+	for (var triggerType in triggerMap) {
+		var regexString = triggerMap[triggerType].toString().replace(/\(\.\*\)/g,"");
+		var matches = regexString.substring(1,regexString.length-1).split('|');
+		targets[triggerType] = matches;
+	}
+	return targets
+}
+
+/**
+ * Match utterance to a desired action based on word distance.
+ * @param {!String} utterance - the text to match to triggers
+ * @param {!Object} triggers - dict mapping trigger types to the regular
+ * 		expressions that allow text to match to that trigger.
+ * @return {!Array} a tuple consisting of the triggerType and the score
  */
 Utils.fuzzyMatch = (utterance, triggers) => {
+	// Get Levenshtein and JaroWinkler Distances between the utterance and the
+	// potential triggers.
+
+	// Rank the trigger types by the shortest distance between its triggers and
+	// the utterance
+	targetMap = Utils.getTargets(triggers)
+
+	// triggerScores is an array of tuples (trigger, score)
+	var getTriggerScoreDict = function(utterance, targets) {
+		var triggerScores = {}
+
+		targets.forEach((target) => {
+			var jaro = natural.JaroWinklerDistance(target, utterance);
+			var leven = natural.LevenshteinDistance(target, utterance);
+			triggerScores[target] = {'jaro': jaro, 'leven': leven}
+		});
+		return triggerScores
+	}
+
+	var getMinDistance = function(triggerScores) {
+		triggerScores.sort(function(first, second) {
+		    return first[1]- second[1];
+		});
+		return triggerScores[0]
+	}
+
+	var getMaxDistance = function(triggerScores) {
+		triggerScores.sort(function(first, second) {
+		    return second[1] - first[1];
+		});
+		return triggerScores[0]
+	}
+
+	var triggerScores = []
+	for (var triggerType in targetMap) {
+		var targets = targetMap[triggerType]
+		var triggerScoreDict = getTriggerScoreDict(utterance, targets);
+		var minLeven = getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], x[1].leven]))
+		var minJaro = getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], 1 - x[1].jaro]))
+		triggerScores.push([triggerType, minJaro[1]])
+		// Alternative ways we can calculate trigger scores are below. I chose
+		// JaroWinkler to start with because it is the simplest and the other
+		// measures have the same results.
+
+		// triggerScores.push([triggerType, minLeven[1]])
+		// triggerScores.push([triggerType, 15*minJaro[1] + minLeven[1]])
+	}
+
+	var result = getMinDistance(triggerScores)
+	return result
 }
+
 /**
  * Get all defined matches of string to given regular expression.
  */
