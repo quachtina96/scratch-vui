@@ -17,7 +17,7 @@ Utils.getRhymes = function(grammarList) {
 	var rhymes = {}
 	var tokenizer = new natural.WordTokenizer();
 	for (let source of grammarList.map(x => x.src)) {
-		tokens = tokenizer.tokenize(source)
+		tokens = tokenizer.tokenize(decodeURIComponent(source))
 		for (let token of tokens) {
 			rhymes[token] = words[token];
 		}
