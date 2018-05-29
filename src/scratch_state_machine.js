@@ -7,6 +7,7 @@ const StateMachine = require('javascript-state-machine');
 const StateMachineHistory = require('javascript-state-machine/lib/history')
 const ScratchStorage = require('./storage.js');
 const ScratchProjectManager = require('./scratch_project_manager.js');
+const ScratchGrammar = require('./grammar.js')
 const Utils = require('./utils.js');
 
 var ScratchStateMachine = new StateMachine.factory({
@@ -55,10 +56,11 @@ var ScratchStateMachine = new StateMachine.factory({
         this.pm.load();
       }
       this.setMethods();
+      this.setSpeechRecognition();
       this.pm._updatePlayRegex();
     },
     setSpeechRecognition: function() {
-      this.pm.updateGrammarWithProjects.bind(this);
+      ScratchGrammar.updateGrammarWithProjects(this.pm);
       this.pm.recognition.grammars.addFromString(ScratchGrammar.commands);
       this.pm.recognition.grammars.addFromString(ScratchGrammar.numbers);
       this.pm.recognition.grammars.addFromString(ScratchGrammar.sounds);

@@ -18,7 +18,7 @@ ScratchRegex.getGeneralTriggers = function() {
 	  'editProject': /see inside|what's inside/,
 	  'finishProject': /i'm done|i'm finished/,
 	  'play': /play (.*)/,
-	  'playCurrentProject': /play (?:the)? ?project|start (?:the)? ?project|play (?:the)? ?current project|test (?:the)? ?project/,
+	  'playCurrentProject': /play (?:the)? ?(?:current)? ?project|start (?:the)? ?(?:current)? ?project|test (?:the)? ?(?:current)? ?project/,
 	  'return': /stop|i'm done|go back|quit|exit/,
 	  'getCurrentProject': /get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
       'getNthProject': /((?:what is|what's)) project (?:number)? ?(.*)/,
