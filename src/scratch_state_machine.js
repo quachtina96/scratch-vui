@@ -8,7 +8,7 @@ const StateMachineHistory = require('javascript-state-machine/lib/history')
 const ScratchStorage = require('./storage.js');
 const ScratchProjectManager = require('./scratch_project_manager.js');
 const ScratchGrammar = require('./grammar.js')
-const Utils = require('./utils.js');
+const Utils = require('./utils.js').Utils;
 
 var ScratchStateMachine = new StateMachine.factory({
   init: 'Home',

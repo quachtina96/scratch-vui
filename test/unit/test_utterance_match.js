@@ -249,6 +249,7 @@ var writeTest = (mistake, triggers) => {
 	var target = mistake[0]
 	var utterance = mistake[1]
 	test(utterance + " should see triggerType: " +  target, t => {
+         Utils.getRhymeMatches(text, grammarList)
 			var result = Utils.fuzzyMatch(utterance, triggers);
 			console.log(result);
 	    t.same(result[0], target);
