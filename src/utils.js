@@ -1,13 +1,45 @@
 /**
  * @fileoverview Utility functions used across files.
  */
-var natural = require('natural');
-var assert = require('assert');
+const natural = require('natural');
+const words = require('cmu-pronouncing-dictionary')
 
 /**
  * Namespace
  */
  Utils = {}
+
+/**
+ * Given a grammar list, generate a dictionary of words mapped to their
+ * pronunciations
+ */
+Utils.getRhymes = function(grammarList) {
+	var rhymes = {}
+	var tokenizer = new natural.WordTokenizer();
+	for (let source of grammarList.map(x => x.src)) {
+		tokens = tokenizer.tokenize(source)
+		for (let token of tokens) {
+			rhymes[token] = words[token];
+		}
+	}
+	return rhymes;
+}
+
+/**
+ * Given text, get list of viable phonetic matches from grammarList
+ */
+Utils.getRhymeMatches = function(text, grammarList) {
+	var rhymes = getRhymes(grammarList)
+	var tokenizer = new natural.WordTokenizer();
+	var tokens = tokenizer.tokenize(text);
+	var phoneticTokens = tokens.map(token => words[token])
+	var phoneticText = phoneticTokens.join(' ');
+	// It might make most sense to use dynamic programming to map the text to the
+	// optimal match by phoneme...
+	// i'd need to map using multiple phonemes...=
+	// TODO
+}
+
 
 /**
  * Get the grammar rules in JSFG V1.0 format.
@@ -65,13 +97,14 @@ Utils.fuzzyMatch = (utterance, triggers) => {
 		return triggerScores[0]
 	}
 
+	// Build array of [triggerType, 1-JaroWinkler Score, Target Phrase]
 	var triggerScores = []
 	for (var triggerType in targetMap) {
 		var targets = targetMap[triggerType]
 		var triggerScoreDict = getTriggerScoreDict(utterance, targets);
 		var minLeven = getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], x[1].leven]))
 		var minJaro = getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], 1 - x[1].jaro]))
-		triggerScores.push([triggerType, minJaro[1]])
+		triggerScores.push([triggerType, minJaro[1], minJaro[0]])
 		// Alternative ways we can calculate trigger scores are below. I chose
 		// JaroWinkler to start with because it is the simplest and the other
 		// measures have the same results.
@@ -79,9 +112,7 @@ Utils.fuzzyMatch = (utterance, triggers) => {
 		// triggerScores.push([triggerType, minLeven[1]])
 		// triggerScores.push([triggerType, 15*minJaro[1] + minLeven[1]])
 	}
-
-	var result = getMinDistance(triggerScores)
-	return result
+	return getMinDistance(triggerScores)
 }
 
 /**

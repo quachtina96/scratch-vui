@@ -18,15 +18,15 @@ class ScratchProjectManager {
 	constructor(scratchStateMachine) {
 		this.ssm = scratchStateMachine;
 		this.storage = new ScratchStorage();
-    this.projects = {};
-    this.untitledCount = 0;
-    // Project currently being edited
-    this.projectToPlay = null;
-    this.currentProject = null;
-    this.synth = window.speechSynthesis;
-    this.recognition = new webkitSpeechRecognition();
-    // Triggers should be listed from more specific to more general to
-    // ensure that the best fit trigger gets matched to the utterance.
+		this.projects = {};
+		this.untitledCount = 0;
+		// Project currently being edited
+		this.projectToPlay = null;
+		this.currentProject = null;
+		this.synth = window.speechSynthesis;
+		this.recognition = new webkitSpeechRecognition();
+		// Triggers should be listed from more specific to more general to
+		// ensure that the best fit trigger gets matched to the utterance.
 		this.triggers = ScratchRegex.getGeneralTriggers();
 	}
 
@@ -134,7 +134,7 @@ class ScratchProjectManager {
 	}
 
 	/**
-	 * Handler utterance on the general navigation level.
+	 * Handle utterance on the general navigation level.
 	 */
 	handleUtterance(utterance) {
 		// NOTE: 'this' refers to the ScratchStateMachine that calls this function
@@ -147,7 +147,6 @@ class ScratchProjectManager {
 			if (args && args.length > 0) {
 				if (this.ssm.can(commandType)) {
 					try {
-						// TODO: HAVING TROUBLE HERE W/ THE REFACTOR...
 						this.ssm[commandType](args, utterance);
 						return true;
 					} catch(e) {
@@ -194,7 +193,21 @@ class ScratchProjectManager {
 			// TODO: integrate Scratch, Help!
 			console.log('found Scratch in failed utterance');
 			this.say("I heard you say " + utterance);
-			this.say("I don't know how to do that.");
+
+			// Suggest a close match if there exists one via fuzzy matching.
+			result = Utils.fuzzyMatch(utterance, ScratchRegex.getGeneralTriggers())
+			console.log('fuzzy match result: ' + result)
+			// result[1] should contain 1 - JaroWinkler Distance.
+			if (result[1] < .25) {
+				// TODO: enable the line below
+				// this.say("Did you mean to say " + spoken version of detected trigger type + "?");
+				this.say("Did you want to " + result[1] + "?");
+				// TODO: implement some way to listen to the response and act on it.
+				// If so, replace utterance w/ fuzzy match  → regex to get arguments → handle utterance as before
+				// Otherwise, ask the user to try asking again
+			} else {
+				this.say("I don't know how to do that.");
+			}
 		}
 	}
 
