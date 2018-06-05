@@ -42,13 +42,17 @@ Running the project requires Node.js to be installed.
 Open the following link in the Chrome browser
 ```http://localhost:8080/build/prototype.html```
 Start interacting with the system by
-1. tabbing to and clicking on the "Start" image
-or
-1. clicking on the microphone.
-
-2. Try the example conversation from above, line by line.
-3. Just refresh the page to start over--your projects will be saved to the browser's local storage.
-
+1. tabbing to and clicking on the "Start" image or clicking on the microphone.
+2. Try the example conversation from above, by saying the following line by line.
+```Scratch, new project.
+Call the project “Tell a knock knock joke.”
+You say, “knock, knock.”
+When I say “who’s there?”, you say “King tut”.
+When I say, “King Tut who?”, you say “King Tut-key fried chicken!”.
+That’s it.
+Scratch, tell a knock knock joke.
+```
+3. Check out the reference docs to see what other commands you can try!
 ## Documentation
 In the system, there are three main contexts you can be in: Home, Editing Project, and Playing Project.
 ![System Overview](img/overview.png)
