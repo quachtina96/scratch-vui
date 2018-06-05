@@ -55,7 +55,9 @@ Scratch, tell a knock knock joke.
 3. Check out the reference docs to see what other commands you can try!
 ## Documentation
 In the system, there are three main contexts you can be in: Home, Editing Project, and Playing Project.
-![System Overview](img/overview.png)
+
+<img src="/docs/img/overview.png" width="70%">
+
 The transitions in the diagram are each labeled by a trigger type. When you say a phrase that can be matched to one of these trigger types and you are in the appropriate starting state, you will transition to the end state.
 
   * [Supported Scratch Commands](docs/supported-scratch-commands.md)
