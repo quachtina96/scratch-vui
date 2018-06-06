@@ -80,8 +80,8 @@ var ScratchProject = StateMachine.factory({
       return [['whenGreenFlag']].concat(steps);
     },
     _getName: function(utterance) {
-      var pattern = /call the project(.*)/;
-      var matches = Utils.match(utterance, pattern);
+      var pattern = /call the project (.*)/;
+      var matches = Utils.matchRegex(utterance, pattern);
       if (matches && matches.length > 0) {
         return matches[1].trim();
       } else {

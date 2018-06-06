@@ -32,6 +32,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'goto', from: '*', to: function(s) { return s } },
     { name: 'stay', from: '*', to: function() { return this.state} },
     { name: 'getCurrentProject', from: '*', to: function() { return this.state} },
+    { name: 'getNthProject', from: '*', to: function() { return this.state} },
     { name: 'getProjectNames', from: '*', to: function() { return this.state} },
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
 
@@ -71,6 +72,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onDeleteProject: (lifecycle, args, utterance) => {this.pm.deleteProject(lifecycle, args, utterance)},
         onGetProjectNames: () => {this.pm.getProjectNames()},
         onGetProjectCount: () => {this.pm.getProjectCount()},
+        onGetNthProject: (lifecycle, args) => {this.pm.getNthProject(lifecycle, args)},
         onNewProject: () => {this.pm.newProject()},
         onReturn: (lifecycle, args) => {this.pm.returnToPreviousState(lifecycle, args)},
         // Play existing project

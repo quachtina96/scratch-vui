@@ -141,6 +141,13 @@ class ScratchProjectManager {
 		var lowercase = utterance.toLowerCase();
 		var utterance = Utils.removeFillerWords(lowercase).trim();
 
+		// Address the issue of "You said Scratch. I don't know how to do that".
+		// TODO: remember that Scratch was said and initiate listening mode with
+		// feedback: "yes?"
+		if (utterance == 'Scratch') {
+			return;
+		}
+
 		// Attempt to match utterance to trigger.
 		for (var commandType in this.triggers) {
 			var args = Utils.match(utterance, this.triggers[commandType]);
@@ -207,6 +214,31 @@ class ScratchProjectManager {
 		this.triggers['play'] = new RegExp(regexString, "i");
 	}
 
+  _describeProject(projectNumber) {
+ 		var projectList = Object.keys(this.projects)
+ 		projectList.sort()
+    // this does not refer to the state machine, but to the editCommands
+    // object holding these functions.
+    if (0 < projectNumber &&
+        projectNumber <= projectList.length) {
+      this.say('Project ' + projectNumber + ' is ' + projectList[projectNumber-1])
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getNthProject(lifecycle, args) {
+  	var numberArg = args.pop();
+    var projectNumber = Utils.text2num(numberArg);
+    if (projectNumber == null) {
+      projectNumber = parseInt(numberArg);
+    }
+    if (!this._describeProject(projectNumber)) {
+      this.say('there is no project number ' + projectNumber.toString());
+    }
+  }
+
 	getCurrentProject() {
 		if (this.currentProject) {
 			this.say('The current project is ' + this.currentProject.name);
@@ -214,6 +246,7 @@ class ScratchProjectManager {
 			this.say('You are not currently on a project');
 		}
 	}
+
 	renameCurrentProject(lifecycle, args) {
 		if (this.currentProject) {
 			var newName = args[1];
