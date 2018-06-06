@@ -11,7 +11,7 @@ ScratchRegex = {};
 ScratchRegex.getGeneralTriggers = function() {
 	return {
 	  'newProject': /new project|create a? new project|create a? project|make a? new project|make a? project/,
-	  'deleteProject': /delete (.*) project/,
+	  'deleteProject': /delete (?:the)? ?(.*) project/,
 	  'renameCurrentProject': /rename current project to (.*)/,
 	  'renameProject': /change name of (.*) project to (.*)|rename (.*) to (?:be)? ?(.*)/,
 	  'editExistingProject': /see inside (.*)|what's inside (.*)/,
