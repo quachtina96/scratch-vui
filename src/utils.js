@@ -19,7 +19,8 @@ Utils.matchRegex = (utterance, pattern) => {
  * Force the utterance to begin with Scratch if triggering a command.
  */
 Utils.match = (utterance, pattern) => {
-  if (utterance.startsWith('scratch ')) {
+  // Be flexible in how you recognize Scratch at the beginning of an utterance.
+  if (Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/)) {
     return Utils.matchRegex(utterance, pattern);
   }
   return null;
