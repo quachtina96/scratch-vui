@@ -51,6 +51,9 @@ class Utils {
   /**
    * Given a list of tuples of phonetic matches and their location, create a
    * string joining them in the correct order.
+   * @param {!Array} matches - An array of arrays of the format [word,
+   *    match_location, levenshtein.substring.length]
+   * @return {string} the matches strung together
    */
   static getOrderedMatchString(matches) {
     matches.sort(function(first, second) {
@@ -72,6 +75,8 @@ class Utils {
     var phoneticText = phoneticTokens.join(' ');
     let phoneticTextLength  = phoneticText.length
     console.log('text: ' + text)
+    console.log('phoneticText: ' + phoneticText);
+    console.log('phoneticTextLength: ' + phoneticTextLength);
 
     // Build map of each word from the grammar to a list of match locations
     // found within the phonetic text.
