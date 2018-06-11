@@ -140,7 +140,7 @@ var ScratchProject = StateMachine.factory({
         // Utterance should be an argument for the project.
         if (utterance == this.tempTrigger) {
           this.pm.say(this.tempResponse)
-          this.pm.executeCurrentProject(scratch, 'WhereItLeftOff');
+          this.pm.executeCurrentProject('WhereItLeftOff');
         }
       }
     },

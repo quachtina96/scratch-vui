@@ -131,6 +131,8 @@ class ScratchProjectManager {
 				}
 			}
 		}
+		// Return whether the project is finished or not.
+		return i == scratchProgram.length - 1;
 	}
 
 	/**
@@ -140,6 +142,7 @@ class ScratchProjectManager {
 		// NOTE: 'this' refers to the ScratchStateMachine that calls this function
 		var lowercase = utterance.toLowerCase();
 		var utterance = Utils.removeFillerWords(lowercase).trim();
+		console.log('utterance: ' + utterance)
 
 		// Address the issue of "You said Scratch. I don't know how to do that".
 		// TODO: remember that Scratch was said and initiate listening mode with
@@ -349,17 +352,18 @@ class ScratchProjectManager {
 				if (Utils.removeFillerWords(projectName) == projectToPlayName) {
 					pm.currentProject = pm.projects[projectName];
 					pm.say('playing project');
-					pm.executeCurrentProject('FromStart');
-					// TODO(quacht): saying I'm done playing the project doesnt work
-					// here when doing event handling.
-					pm.say('done playing project');
+					let finished = pm.executeCurrentProject('FromStart');
+					if (finished) {
+						pm.say('done playing project');
+					} else {
+						// TODO: cue that the program is waiting for you to say something...
+						// and/or that it's not finished.
+					}
 					resolve();
 					return;
 				}
 			}
 
-			// TODO: Does args[1] actually contain the project name as it is said?
-			// or will the filler words be removed.
 			pm.say("You said " + utterance);
 			pm.say("I don't have a project called " + args[1]);
 			resolve();

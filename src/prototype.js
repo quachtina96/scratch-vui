@@ -14,7 +14,7 @@ scratch.observe('onAfterTransition', () => {
 
 global.final_transcript = '';
 global.recognizing = false;
-global.ignore_onend;
+global.ignore_onend = false;
 global.start_timestamp;
 
 global.upgrade = function() {
