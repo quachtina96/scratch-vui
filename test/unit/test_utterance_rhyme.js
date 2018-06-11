@@ -1,6 +1,5 @@
 const test = require('tap').test;
 const Utils = require('../../src/utils.js').Utils;
-const ScratchRegex = require('../../src/triggers.js');
 const ScratchStateMachine = require('../../src/scratch_state_machine.js');
 const natural = require('natural');
 
