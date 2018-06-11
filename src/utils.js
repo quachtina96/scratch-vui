@@ -1,6 +1,7 @@
 /**
  * @fileoverview Utility functions used across files.
  */
+const Triggers = require('./triggers.js');
 const DiffMatchPatch = require('diff-match-patch');
 const natural = require('natural');
 const words = require('cmu-pronouncing-dictionary');
@@ -16,7 +17,7 @@ class Utils {
    */
   static match(utterance, pattern) {
     // Be flexible in how you recognize Scratch at the beginning of an utterance.
-    if (Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/)) {
+    if (Utils.matchRegex(utterance, Triggers.scratch)) {
       return Utils.matchRegex(utterance, pattern);
     }
     return null;

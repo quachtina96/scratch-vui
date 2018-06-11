@@ -5,7 +5,7 @@
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchStorage = require('./storage.js');
-const ScratchRegex = require('./triggers.js');
+const Triggers = require('./triggers.js');
 const Utils = require('./utils.js').Utils;
 
 /**
@@ -28,7 +28,11 @@ class ScratchProjectManager {
 		this.recognition = new webkitSpeechRecognition();
 		// Triggers should be listed from more specific to more general to
 		// ensure that the best fit trigger gets matched to the utterance.
-		this.triggers = ScratchRegex.getGeneralTriggers();
+		this.triggers = Triggers.general();
+		// Whether currently listening for a yes or no answer.
+		this.yesOrNo = false;
+		// Whether the user has already said Scratch to trigger listening.
+		this.scratchVoiced = false;
 	}
 
 	load() {
@@ -83,7 +87,7 @@ class ScratchProjectManager {
 			scratch.recognition.start();
 		}
 
-		// Synthesis speech!
+		// Synthesize speech!
 		this.synth.speak(whatToSay);
 		console.log('saying' + whatToSay.text);
 	}
@@ -137,6 +141,62 @@ class ScratchProjectManager {
 	}
 
 	/**
+	 * Given callback functions, handle a yes or no response from the user.
+	 * @param {boolean} yesOrNo - the user's choice or answer to the question
+	 * @param {function} yesCallback - the function to execute if user says yes.
+	 * @param {function} noCallback - the function to execute if user says no.
+	 */
+	handleYesOrNo(yesOrNo, yesCallback, noCallback) {
+		// TODO: make this more flexible (handling different forms of yes or no)
+		if (utterance == 'yes') {
+			yesCallback();
+		} else if (utterance == 'no') {
+			noCallback();
+		}
+	}
+
+	/**
+	 * Execute action associated with trigger type with given arguments and
+	 * utterance.
+	 * @param {!string} triggerType - the kind of action to execute.
+	 * @param {Array<string>} args - the arguments extracted from utterance using
+	 * 		the regex associated with the trigger. See Triggers (triggers.js).
+	 * @param {string} - utterance - user input
+	 */
+	triggerAction(triggerType, opt_args, opt_utterance) {
+		opt_args = opt_args ? opt_args : [];
+		opt_utterance = opt_utterance ? opt_utterance : "";
+
+		// Attempt action
+		try {
+			this.ssm[triggerType](opt_args, opt_utterance);
+			return true;
+		} catch(e) {
+			// Handle failure based on transition type.
+			console.log(e)
+			switch (triggerType) {
+				case 'editExistingProject':
+					// If attempting to open a nonexistent project, stay in
+					// current state.
+					this.say("There's no project called that.");
+					triggerType = 'stay';
+					break;
+				case 'play':
+					if (this.ssm.state == 'InsideProject') {
+						if (this.ssm.currentProject.state == 'empty') {
+							// User is trying to give a project the same name as a previous
+							// project.
+							this.say('You already have a project called that.')
+						} else {
+							// User is composing a Scratch program from other Scratch programs.
+							var result = this.ssm.currentProject.handleUtterance(opt_utterance);
+						}
+					}
+			}
+		}
+	}
+
+	/**
 	 * Handle utterance on the general navigation level.
 	 */
 	handleUtterance(utterance) {
@@ -145,47 +205,34 @@ class ScratchProjectManager {
 		var utterance = Utils.removeFillerWords(lowercase).trim();
 		console.log('utterance: ' + utterance)
 
+		if (this.yesOrNo) {
+			this.handleyesOrNo(utterance, this.yesOrNo.yesCallback, this.yesOrNo.noCallback)
+			// Reset yes or no state.
+			this.handleYesOrNo = null;
+		}
+
 		// Address the issue of "You said Scratch. I don't know how to do that".
 		// TODO: remember that Scratch was said and initiate listening mode with
 		// feedback: "yes?"
-		if (utterance == 'Scratch') {
+		if (Utils.matchRegex(utterance, Triggers.scratch)) {
+			this.scratchVoiced = true;
 			return;
 		}
 
 		// Attempt to match utterance to trigger.
-		for (var commandType in this.triggers) {
-			var args = Utils.match(utterance, this.triggers[commandType]);
+		for (var triggerType in this.triggers) {
+
+			// If the user already said Scratch at the end of the previous utterance,
+			// do not require the user to say it again.
+			var opt_args = this.scratchVoiced ? Utils.matchRegex(utterance, this.triggers[triggerType]) : Utils.match(utterance, this.triggers[triggerType]);
+
+			// The command type was matched attempt to execute.
 			if (args && args.length > 0) {
-				if (this.ssm.can(commandType)) {
-					try {
-						this.ssm[commandType](args, utterance);
-						return true;
-					} catch(e) {
-						// Handle failure based on transition type.
-						console.log(e)
-						switch (commandType) {
-							case 'editExistingProject':
-								// If attempting to open a nonexistent project, stay in
-								// current state.
-								pm.say("There's no project called " + nameOfDesiredProject);
-								commandType = 'stay';
-								break;
-							case 'play':
-								if (this.ssm.state == 'InsideProject') {
-									if (this.ssm.currentProject.state == 'empty') {
-										// User is trying to give a project the same name as a previous
-										// project.
-										pm.say('You already have a project called that.')
-									} else {
-										// User is composing a Scratch program from other Scratch programs.
-										var result = this.ssm.currentProject.handleUtterance(utterance);
-									}
-								}
-						}
-					}
+				if (this.ssm.can(triggerType)) {
+					this.triggerAction(triggerType, args, utterance);
 				} else {
-					console.log('could not make transition: ' + commandType);
-					console.log('current state: ' + this.ssm.state);
+					this.say('You are current in ' + this.ssm.state + ' mode and cannot '
+						+ triggerType + ' from here.');
 				}
 			}
 		}
@@ -206,16 +253,21 @@ class ScratchProjectManager {
 			this.say("I heard you say " + utterance);
 
 			// Suggest a close match if there exists one via fuzzy matching.
-			result = Utils.fuzzyMatch(utterance, ScratchRegex.getGeneralTriggers())
+			var result = Utils.fuzzyMatch(utterance, Triggers.general())
 			console.log('fuzzy match result: ' + result)
-			// result[1] should contain 1 - JaroWinkler Distance.
-			if (result[1] < .25) {
-				// TODO: enable the line below
+			var jaroWinklerScore = result[1] //1 - JaroWinkler Distance
+			var triggerType = result[0]
+			if (jaroWinklerScore < .25) {
+				// TODO: enable the line below.
 				// this.say("Did you mean to say " + spoken version of detected trigger type + "?");
-				this.say("Did you want to " + result[1] + "?");
-				// TODO: implement some way to listen to the response and act on it.
-				// If so, replace utterance w/ fuzzy match  → regex to get arguments → handle utterance as before
-				// Otherwise, ask the user to try asking again
+				this.say("Did you want to " + triggerType + "?");
+				// TODO: integrate way to ask for additional arguments to pass to
+				// triggerAction.
+				// Set handle utterance mode to listen for yes or no.
+				this.yesOrNo = {
+					yesCallback: () => {this.triggerAction(triggerType)},
+					noCallback: () => {this.say("Please try again.")}
+				}
 			} else {
 				this.say("I don't know how to do that.");
 			}

@@ -6,7 +6,7 @@ const ScratchInstruction = require('./scratch_instruction.js');
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchStorage = require('./storage.js');
-const ScratchRegex = require('./triggers.js');
+const Triggers = require('./triggers.js');
 
 /**
  * ScratchProjectEditor class
@@ -17,7 +17,7 @@ class ScratchProjectEditor {
 	 * Constructor for ScratchProjectEditor
 	 */
 	constructor() {
-		this.triggers = ScratchRegex.getEditProjectTriggers();
+		this.triggers = Triggers.editProject();
 		this.project = null
 	}
 

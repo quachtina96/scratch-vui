@@ -7,7 +7,7 @@
 const ScratchInstruction = require('./scratch_instruction.js');
 const StateMachine = require('javascript-state-machine');
 const ScratchProjectEditor = require('./scratch_project_editor.js');
-const ScratchRegex = require('./triggers.js');
+const Triggers = require('./triggers.js');
 const Utils = require('./utils.js').Utils;
 
 

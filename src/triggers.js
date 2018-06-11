@@ -4,32 +4,32 @@
  */
 
 /**
- * ScratchRegex namespace.
+ * Triggers namespace.
  */
-ScratchRegex = {};
+Triggers = {};
 
-ScratchRegex.getGeneralTriggers = function() {
-	return {
-	  'newProject': /new project|create a? new project|create a? project|make a? new project|make a? project/,
-	  'deleteProject': /delete (?:the)? ?(.*) project/,
-	  'renameCurrentProject': /rename current project to (.*)/,
-	  'renameProject': /change name of (.*) project to (.*)|rename (.*) to (?:be)? ?(.*)/,
-	  'editExistingProject': /see inside (.*)|what's inside (.*)/,
-	  'editProject': /see inside|what's inside/,
-	  'finishProject': /i'm done|i'm finished/,
-	  'play': /play (.*)/,
-	  'playCurrentProject': /play (?:the)? ?(?:current)? ?project|start (?:the)? ?(?:current)? ?project|test (?:the)? ?(?:current)? ?project/,
-	  'return': /stop|i'm done|go back|quit|exit/,
-	  'getCurrentProject': /get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
+Triggers.general = function() {
+  return {
+    'newProject': /new project|create a? new project|create a? project|make a? new project|make a? project/,
+    'deleteProject': /delete (?:the)? ?(.*) project/,
+    'renameCurrentProject': /rename current project to (.*)/,
+    'renameProject': /change name of (.*) project to (.*)|rename (.*) to (?:be)? ?(.*)/,
+    'editExistingProject': /see inside (.*)|what's inside (.*)/,
+    'editProject': /see inside|what's inside/,
+    'finishProject': /i'm done|i'm finished/,
+    'play': /play (.*)/,
+    'playCurrentProject': /play (?:the)? ?(?:current)? ?project|start (?:the)? ?(?:current)? ?project|test (?:the)? ?(?:current)? ?project/,
+    'return': /stop|i'm done|go back|quit|exit/,
+    'getCurrentProject': /get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
       'getNthProject': /((?:what is|what's)) project (?:number)? ?(.*)/,
-	  'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
-	  'getProjectCount': /how many projects do i have|how many projects have i made/
-	}
+    'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
+    'getProjectCount': /how many projects do i have|how many projects have i made/
+  }
 }
 
-ScratchRegex.getEditProjectTriggers = function() {
-	return {
-	getCurrentStep: /what step am i on|what’s my current step|what step is this/,
+Triggers.editProject = function() {
+  return {
+    getCurrentStep: /what step am i on|what’s my current step|what step is this/,
     goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
     nextStep: /go to next step|next step|what's next/,
     previousStep: /previous step|go back a step/,
@@ -47,5 +47,10 @@ ScratchRegex.getEditProjectTriggers = function() {
   }
 }
 
-module.exports = ScratchRegex;
+Triggers.scratch = function() {
+  return {
+    scratch: /^(?:scratch|search)(?:ed)?/
+  }
+}
+module.exports = Triggers;
 
