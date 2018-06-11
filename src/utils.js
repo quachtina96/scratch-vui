@@ -34,7 +34,7 @@ class Utils {
    * Given a grammar list, generate a dictionary of words contained in grammar
    * mapped to their pronunciations
    */
-  static getRhymes(grammarList) {
+  getRhymes_(grammarList) {
     var rhymes = {}
     var tokenizer = new natural.WordTokenizer();
     for (let source of grammarList.map(x => x.src)) {
@@ -55,7 +55,7 @@ class Utils {
    *    match_location, levenshtein.substring.length]
    * @return {string} the matches strung together
    */
-  static getOrderedMatchString(matches) {
+  getOrderedMatchString_(matches) {
     matches.sort(function(first, second) {
       return first[1] - second[1];
     });
@@ -65,10 +65,10 @@ class Utils {
   }
 
   /**
-   * Given text, get list of viable phonetic matches from grammarList
+   * Given text, get list of viable phonetic word matches from grammarList
    */
   static getRhymeMatches(text, grammarList) {
-    var rhymes = Utils.getRhymes(grammarList);
+    var rhymes = this.getRhymes(grammarList);
     var tokenizer = new natural.WordTokenizer();
     var tokens = tokenizer.tokenize(text);
     var phoneticTokens = tokens.map(token => words[token])
@@ -105,16 +105,15 @@ class Utils {
       }
     }
 
-    return Utils.getOrderedMatchString(matches)
+    return this.getOrderedMatchString_(matches)
   }
-
 
   /**
    * Get the grammar rules in JSFG V1.0 format.
    * @param {!Object} triggerMap - map of trigger types to regular expressions
    * @return {!String} the grammar rules
    */
-  static getTargets(triggerMap) {
+  getTargets_(triggerMap) {
     var targets = {}
     for (var triggerType in triggerMap) {
       var regexString = triggerMap[triggerType].toString().replace(/\(\.\*\)/g,"");
@@ -137,7 +136,7 @@ class Utils {
 
     // Rank the trigger types by the shortest distance between its triggers and
     // the utterance
-    targetMap = Utils.getTargets(triggers)
+    targetMap = this.getTargets_(triggers)
 
     // triggerScores is an array of tuples (trigger, score)
     var getTriggerScoreDict = function(utterance, targets) {
@@ -181,14 +180,6 @@ class Utils {
       // triggerScores.push([triggerType, 15*minJaro[1] + minLeven[1]])
     }
     return getMinDistance(triggerScores)
-  }
-
-  /**
-   * Get all defined matches of string to given regular expression.
-   */
-  static match(utterance, pattern) {
-    var matches = utterance.match(pattern, "i");
-    return matches ? matches.filter(word => word != undefined && word != "") : null
   }
 
   static text2num(numberWord) {
