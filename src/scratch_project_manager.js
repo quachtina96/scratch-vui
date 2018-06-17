@@ -28,7 +28,6 @@ class ScratchProjectManager {
 			this.synth = window.speechSynthesis;
 			this.recognition = new webkitSpeechRecognition();
 		}
-
 		// Triggers should be listed from more specific to more general to
 		// ensure that the best fit trigger gets matched to the utterance.
 		this.triggers = Triggers.general();
@@ -149,7 +148,7 @@ class ScratchProjectManager {
 	 * @param {function} yesCallback - the function to execute if user says yes.
 	 * @param {function} noCallback - the function to execute if user says no.
 	 */
-	handleYesOrNo(yesOrNo, yesCallback, noCallback) {
+	handleYesOrNo(utterance, yesCallback, noCallback) {
 		// TODO: make this more flexible (handling different forms of yes or no)
 		if (utterance == 'yes') {
 			yesCallback();
@@ -209,7 +208,7 @@ class ScratchProjectManager {
 		console.log('utterance: ' + utterance)
 
 		if (this.yesOrNo) {
-			this.handleyesOrNo(utterance, this.yesOrNo.yesCallback, this.yesOrNo.noCallback)
+			this.handleYesOrNo(utterance, this.yesOrNo.yesCallback, this.yesOrNo.noCallback)
 			// Reset yes or no state.
 			this.handleYesOrNo = null;
 		}
