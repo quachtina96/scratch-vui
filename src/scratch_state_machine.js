@@ -57,18 +57,19 @@ var ScratchStateMachine = new StateMachine.factory({
     onHome: function() {
       if (this.pm) {
         // Polyfill:
-        if (!window) {
-          var window = {
-            speechSynthesis: {
-              grammars: null
-            },
-            localStorage: {}
-          };
-        } else {
-          if (!(localStorage in window)) {
-            window.localStorage = {};
-          }
-        }
+        // TODO: modify this polyfill so that it doesn't overwrite the window
+        // if (!window) {
+        //   var window = {
+        //     speechSynthesis: {
+        //       grammars: null
+        //     },
+        //     localStorage: {}
+        //   };
+        // } else {
+        //   if (!(localStorage in window)) {
+        //     window.localStorage = {};
+        //   }
+        // }
 
         if (!window.localStorage.scratchProjects) {
           window.localStorage.scratchProjects = JSON.stringify({});
