@@ -138,18 +138,19 @@ var ScratchProject = StateMachine.factory({
     },
     handleUtteranceDuringExecution: function(utterance, opt_scratchVoiced) {
       var scratchProject = this;
-      if (utterance == 'scratch stop') {
-        this.synth.cancel();
-      } else if (utterance == 'scratch pause') {
-        this.synth.pause();
-      } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
-        this.synth.resume();
 
       if (opt_scratchVoiced) {
         var match = Utils.matchRegex;
       } else {
         var match = Utils.match;
       }
+
+      if (match(utterance,/stop/)) {
+        this.pm.synth.cancel();
+      } else if (match(utterance,/pause/)) {
+        this.pm.synth.pause();
+      } else if (match(utterance, /unpause|resume/)) {
+        this.pm.synth.resume();
       } else {
         // Utterance should be an argument for the project.
         if (utterance == this.tempTrigger) {
