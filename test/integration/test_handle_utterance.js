@@ -1,11 +1,20 @@
 const test = require('tap').test;
 const ScratchStateMachine = require('../../src/scratch_state_machine.js');
 const ScratchProjectManager = require('../../src/scratch_project_manager.js');
+const ScratchStorage = require('../../src/storage.js');
+const Triggers = require('../../src/triggers.js');
 
 class MockPM extends ScratchProjectManager {
   constructor(ssm) {
-    super();
-    this.ssm = ssm;
+    super(ssm, 'excludeWindow');
+    // Polyfill
+    if (!window) {
+      var window = {
+        speechSynthesis: null,
+      }
+    }
+    this.synth = window.speechSynthesis;
+    this.recognition = null;
   }
 
   say(whatToSay) {
@@ -15,9 +24,10 @@ class MockPM extends ScratchProjectManager {
 
 class MockSSM extends ScratchStateMachine {
   constructor() {
-    super();
-    var ssm = this;
-    this.pm = new MockPM(ssm);
+    super('test');
+    this.pm = new MockPM(this);
+    // Initalize construction after pm is set.
+    this.onHome();
     this.output = [];
   }
 

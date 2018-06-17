@@ -16,7 +16,7 @@ class ScratchProjectManager {
 	/**
 	 * Constructor for ScratchProjectManager
 	 */
-	constructor(scratchStateMachine) {
+	constructor(scratchStateMachine, excludeWindow) {
 		this.ssm = scratchStateMachine;
 		this.storage = new ScratchStorage();
 		this.projects = {};
@@ -24,18 +24,8 @@ class ScratchProjectManager {
 		// Project currently being edited
 		this.projectToPlay = null;
 		this.currentProject = null;
-
-		// Polyfill
-		if (!window) {
-			var window = {
-		    speechSynthesis: null,
-		  }
-		}
-		this.synth = window.speechSynthesis;
-
-		if (!('webkitSpeechRecognition' in window)) {
-		  this.recognition = null;
-		} else {
+		if (!excludeWindow) {
+			this.synth = window.speechSynthesis;
 			this.recognition = new webkitSpeechRecognition();
 		}
 

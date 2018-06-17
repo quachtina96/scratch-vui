@@ -38,8 +38,13 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
 
   ],
-  data: function() {
+  data: function(test) {
     var ssm = this;
+    if (test) {
+      return {
+        pm: null
+      };
+    }
     return {
       pm: new ScratchProjectManager(ssm)
     };
@@ -50,28 +55,30 @@ var ScratchStateMachine = new StateMachine.factory({
   methods: {
     // Initialize the state machine.
     onHome: function() {
-      // Polyfill:
-      if (!window) {
-        var window = {
-          speechSynthesis: {
-            grammars: null
-          },
-          localStorage: {}
-        };
-      } else {
-        if (!(localStorage in window)) {
-          window.localStorage = {};
+      if (this.pm) {
+        // Polyfill:
+        if (!window) {
+          var window = {
+            speechSynthesis: {
+              grammars: null
+            },
+            localStorage: {}
+          };
+        } else {
+          if (!(localStorage in window)) {
+            window.localStorage = {};
+          }
         }
-      }
 
-      if (!window.localStorage.scratchProjects) {
-        window.localStorage.scratchProjects = JSON.stringify({});
-      } else {
-        this.pm.load();
+        if (!window.localStorage.scratchProjects) {
+          window.localStorage.scratchProjects = JSON.stringify({});
+        } else {
+          this.pm.load();
+        }
+        this.setMethods();
+        this.setSpeechRecognition();
+        this.pm._updatePlayRegex();
       }
-      this.setMethods();
-      this.setSpeechRecognition();
-      this.pm._updatePlayRegex();
     },
     setSpeechRecognition: function() {
       // Recognition may be null for automated testing.
