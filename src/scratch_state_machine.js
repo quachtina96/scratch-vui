@@ -50,6 +50,20 @@ var ScratchStateMachine = new StateMachine.factory({
   methods: {
     // Initialize the state machine.
     onHome: function() {
+      // Polyfill:
+      if (!window) {
+        var window = {
+          speechSynthesis: {
+            grammars: null
+          },
+          localStorage: {}
+        };
+      } else {
+        if (!(localStorage in window)) {
+          window.localStorage = {};
+        }
+      }
+
       if (!window.localStorage.scratchProjects) {
         window.localStorage.scratchProjects = JSON.stringify({});
       } else {
@@ -60,10 +74,13 @@ var ScratchStateMachine = new StateMachine.factory({
       this.pm._updatePlayRegex();
     },
     setSpeechRecognition: function() {
-      ScratchGrammar.updateGrammarWithProjects(this.pm);
-      this.pm.recognition.grammars.addFromString(ScratchGrammar.commands);
-      this.pm.recognition.grammars.addFromString(ScratchGrammar.numbers);
-      this.pm.recognition.grammars.addFromString(ScratchGrammar.sounds);
+      // Recognition may be null for automated testing.
+      if (this.pm.recognition) {
+        ScratchGrammar.updateGrammarWithProjects(this.pm);
+        this.pm.recognition.grammars.addFromString(ScratchGrammar.commands);
+        this.pm.recognition.grammars.addFromString(ScratchGrammar.numbers);
+        this.pm.recognition.grammars.addFromString(ScratchGrammar.sounds);
+      }
     },
     setMethods: function() {
       methodMap = {

@@ -24,8 +24,21 @@ class ScratchProjectManager {
 		// Project currently being edited
 		this.projectToPlay = null;
 		this.currentProject = null;
+
+		// Polyfill
+		if (!window) {
+			var window = {
+		    speechSynthesis: null,
+		  }
+		}
 		this.synth = window.speechSynthesis;
-		this.recognition = new webkitSpeechRecognition();
+
+		if (!('webkitSpeechRecognition' in window)) {
+		  this.recognition = null;
+		} else {
+			this.recognition = new webkitSpeechRecognition();
+		}
+
 		// Triggers should be listed from more specific to more general to
 		// ensure that the best fit trigger gets matched to the utterance.
 		this.triggers = Triggers.general();
