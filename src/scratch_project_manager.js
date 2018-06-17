@@ -224,7 +224,7 @@ class ScratchProjectManager {
 
 			// If the user already said Scratch at the end of the previous utterance,
 			// do not require the user to say it again.
-			var opt_args = this.scratchVoiced ? Utils.matchRegex(utterance, this.triggers[triggerType]) : Utils.match(utterance, this.triggers[triggerType]);
+			var args = this.scratchVoiced ? Utils.matchRegex(utterance, this.triggers[triggerType]) : Utils.match(utterance, this.triggers[triggerType]);
 
 			// The command type was matched attempt to execute.
 			if (args && args.length > 0) {
