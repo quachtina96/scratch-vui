@@ -92,14 +92,14 @@ var mismatches = [
    }
 ]
 
-test("getOrderedMatchString", t => {
+test("getOrderedMatchString_", t => {
   var matches = [
       ['one', 1],
       ['two', 2],
       ['three',3],
       ['four', 4]
     ];
-  t.same(Utils.getOrderedMatchString(matches), 'one two three four');
+  t.same(Utils.getOrderedMatchString_(matches), 'one two three four');
   t.end()
 });
 
