@@ -214,11 +214,9 @@ class ScratchProjectManager {
 			this.handleYesOrNo = null;
 		}
 
-		// Address the issue of "You said Scratch. I don't know how to do that".
-		// TODO: remember that Scratch was said and initiate listening mode with
-		// feedback: "yes?"
-		if (Utils.matchRegex(utterance, Triggers.scratch())) {
+		if (Utils.matchesScratch(utterance)) {
 			this.scratchVoiced = true;
+			this.say("I'm listening.")
 			return;
 		}
 
@@ -237,15 +235,16 @@ class ScratchProjectManager {
 					this.say('You are current in ' + this.ssm.state + ' mode and cannot '
 						+ triggerType + ' from here.');
 				}
+				return;
 			}
 		}
 
 		if (this.ssm.state == 'PlayProject') {
-				this.currentProject.handleUtteranceDuringExecution(utterance);
+			this.currentProject.handleUtteranceDuringExecution(utterance, this.scratchVoiced);
 		} else if (this.ssm.state == 'InsideProject') {
 		 // Handle utterances in the InsideProject context.
 			if (this.currentProject) {
-				var result = this.currentProject.handleUtterance(utterance);
+				var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
 				if (result == 'exit') {
 					this.ssm.finishProject();
 				}
@@ -275,6 +274,8 @@ class ScratchProjectManager {
 				this.say("I don't know how to do that.");
 			}
 		}
+
+		this.scratchVoiced = false;
 	}
 
 	// In order to properly detect playing projects, add project names to
@@ -395,7 +396,6 @@ class ScratchProjectManager {
 	newProject() {
 		var pm = this;
 		return new Promise(((resolve, reject) => {
-			console.log(pm);
 			pm.currentProject = new ScratchProject(pm);
 			pm.untitledCount++;
 			pm.projects['Untitled-' + pm.untitledCount] = pm.currentProject;
@@ -462,7 +462,6 @@ class ScratchProjectManager {
 	editExistingProject(lifecycle, args) {
 		var pm = this;
 		return new Promise(((resolve, reject) => {
-			console.log(args);
 			var projectName = args[1];
 			pm.announceProjectToEdit(pm.projects[projectName])
 			pm.currentProject = pm.projects[projectName];

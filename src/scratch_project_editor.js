@@ -7,6 +7,7 @@ const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchStorage = require('./storage.js');
 const Triggers = require('./triggers.js');
+const Utils = require('./utils.js').Utils;
 
 /**
  * ScratchProjectEditor class
@@ -25,13 +26,19 @@ class ScratchProjectEditor {
    * If the utterance matches the form of a supported program editing
    * command, execute the command.
    */
-  handleUtterance(utterance, project) {
+  handleUtterance(utterance, project, opt_scratchVoiced) {
+    if (opt_scratchVoiced) {
+      var match = Utils.matchRegex;
+    } else {
+      var match = Utils.match;
+    }
+
   	this.project = project;
     utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
     var scratchProject = this;
     for (var commandType in this.triggers) {
-      var args = Utils.match(utterance, this.triggers[commandType]);
+      var args = match(utterance, this.triggers[commandType]);
       if (args) {
         this[commandType].call(scratchProject, args);
         this.project.pm.save();

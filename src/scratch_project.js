@@ -88,7 +88,7 @@ var ScratchProject = StateMachine.factory({
         return utterance.trim();
       }
     },
-    handleUtterance: function(utterance) {
+    handleUtterance: function(utterance, opt_scratchVoiced) {
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
 
       // Name project
@@ -113,7 +113,7 @@ var ScratchProject = StateMachine.factory({
         }
 
         // Detect and handle explicit edit commands.
-        if (this.editor.handleUtterance(utterance, this)) {
+        if (this.editor.handleUtterance(utterance, this, opt_scratchVoiced)) {
           return;
         }
 
@@ -128,7 +128,7 @@ var ScratchProject = StateMachine.factory({
         }
       }
     },
-    handleUtteranceDuringExecution: function(utterance) {
+    handleUtteranceDuringExecution: function(utterance, opt_scratchVoiced) {
       var scratchProject = this;
       if (utterance == 'scratch stop') {
         this.synth.cancel();
@@ -136,6 +136,12 @@ var ScratchProject = StateMachine.factory({
         this.synth.pause();
       } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
         this.synth.resume();
+
+      if (opt_scratchVoiced) {
+        var match = Utils.matchRegex;
+      } else {
+        var match = Utils.match;
+      }
       } else {
         // Utterance should be an argument for the project.
         if (utterance == this.tempTrigger) {
