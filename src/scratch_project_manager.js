@@ -227,7 +227,7 @@ class ScratchProjectManager {
 		// Address the issue of "You said Scratch. I don't know how to do that".
 		// TODO: remember that Scratch was said and initiate listening mode with
 		// feedback: "yes?"
-		if (Utils.matchRegex(utterance, Triggers.scratch)) {
+		if (Utils.matchRegex(utterance, Triggers.scratch())) {
 			this.scratchVoiced = true;
 			return;
 		}

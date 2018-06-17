@@ -17,7 +17,7 @@ class Utils {
    */
   static match(utterance, pattern) {
     // Be flexible in how you recognize Scratch at the beginning of an utterance.
-    if (Utils.matchRegex(utterance, Triggers.scratch)) {
+    if (Utils.matchRegex(utterance, Triggers.scratch())) {
       return Utils.matchRegex(utterance, pattern);
     }
     return null;
