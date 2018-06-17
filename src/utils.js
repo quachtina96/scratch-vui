@@ -35,7 +35,7 @@ class Utils {
    * Given a grammar list, generate a dictionary of words contained in grammar
    * mapped to their pronunciations
    */
-  getRhymes_(grammarList) {
+  static getRhymes_(grammarList) {
     var rhymes = {}
     var tokenizer = new natural.WordTokenizer();
     for (let source of grammarList.map(x => x.src)) {
@@ -56,7 +56,7 @@ class Utils {
    *    match_location, levenshtein.substring.length]
    * @return {string} the matches strung together
    */
-  getOrderedMatchString_(matches) {
+  static getOrderedMatchString_(matches) {
     matches.sort(function(first, second) {
       return first[1] - second[1];
     });
@@ -69,7 +69,7 @@ class Utils {
    * Given text, get list of viable phonetic word matches from grammarList
    */
   static getRhymeMatches(text, grammarList) {
-    var rhymes = this.getRhymes(grammarList);
+    var rhymes = Utils.getRhymes_(grammarList);
     var tokenizer = new natural.WordTokenizer();
     var tokens = tokenizer.tokenize(text);
     var phoneticTokens = tokens.map(token => words[token])
@@ -114,7 +114,7 @@ class Utils {
    * @param {!Object} triggerMap - map of trigger types to regular expressions
    * @return {!String} the grammar rules
    */
-  getTargets_(triggerMap) {
+  static getTargets_(triggerMap) {
     var targets = {}
     for (var triggerType in triggerMap) {
       var regexString = triggerMap[triggerType].toString().replace(/\(\.\*\)/g,"");
@@ -137,7 +137,7 @@ class Utils {
 
     // Rank the trigger types by the shortest distance between its triggers and
     // the utterance
-    targetMap = this.getTargets_(triggers)
+    var targetMap = Utils.getTargets_(triggers)
 
     // triggerScores is an array of tuples (trigger, score)
     var getTriggerScoreDict = function(utterance, targets) {
