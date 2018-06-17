@@ -39,6 +39,14 @@ var ScratchProject = StateMachine.factory({
     }
   },
   methods: {
+    onInvalidTransition(transition, start, end) {
+      console.log("invalid transition: ");
+      console.log({transition: transition, start: start, end: end});
+    },
+    onPendingTransition(transition, start, end) {
+      console.log("pending transition: ");
+      console.log({transition: transition, start: start, end: end});
+    },
     onStartProjectCreation: (lifecycle, project) =>  {
       return new Promise(((resolve, reject) => {
         project.pm.say('What do you want to call it?');
