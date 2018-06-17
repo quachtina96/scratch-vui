@@ -140,7 +140,7 @@ class ScratchProjectManager {
 			}
 		}
 		// Return whether the project is finished or not.
-		return i == scratchProgram.length - 1;
+		return i == scratchProgram.length;
 	}
 
 	/**
