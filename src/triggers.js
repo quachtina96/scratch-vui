@@ -47,10 +47,5 @@ Triggers.editProject = function() {
   }
 }
 
-Triggers.scratch = function() {
-  return {
-    scratch: /^(?:scratch|search)(?:ed)?/
-  }
-}
 module.exports = Triggers;
 

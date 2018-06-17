@@ -3,6 +3,8 @@
  * to Scratch programs
  * @author Tina Quach (quacht@mit.edu)
  */
+const Utils = require('./utils.js').Utils;
+
 
 /**
  * ScratchInstruction class

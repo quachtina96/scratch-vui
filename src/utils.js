@@ -11,13 +11,21 @@ const dmp = new DiffMatchPatch();
  * Namespace
  */
 class Utils {
+  static startsWithScratch(utterance) {
+    return Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+  }
+
+  static matchesScratch(utterance) {
+    return Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?$/);
+  }
+
   /**
    * Force the utterance to begin with Scratch if triggering a command, and get
    * all defined matches of string to given regular expression.
    */
   static match(utterance, pattern) {
     // Be flexible in how you recognize Scratch at the beginning of an utterance.
-    if (Utils.matchRegex(utterance, Triggers.scratch())) {
+    if (Utils.startsWithScratch(utterance)) {
       return Utils.matchRegex(utterance, pattern);
     }
     return null;
