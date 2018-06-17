@@ -377,10 +377,14 @@ class ScratchProjectManager {
 	getProjectNames() {
 		var pm = this;
 		return new Promise(((resolve, reject) => {
-			var whatToSay = Object.keys(pm.projects);
-			whatToSay.splice(whatToSay.length-1, 0, 'and');
-			whatToSay.join(',')
-			pm.say(whatToSay);
+			if (Object.keys(pm.projects).length) {
+				var whatToSay = Object.keys(pm.projects);
+				whatToSay.splice(whatToSay.length-1, 0, 'and');
+				whatToSay.join(',')
+				pm.say(whatToSay);
+			} else {
+				pm.say("You don't have any projects.");
+			}
 			resolve();
 		}));
 	}
