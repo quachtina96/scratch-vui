@@ -33,6 +33,9 @@ global.capitalize = function(s) {
   return s.replace(first_char, (m) => { return m.toUpperCase(); });
 }
 
+global.audioElement = document.createElement('audio');
+audioElement.type = "audio/wav"
+
 document.getElementById("start_button").onclick =  function(event) {
   if (recognizing) {
     recognition.stop();
@@ -82,6 +85,8 @@ if (!('webkitSpeechRecognition' in window)) {
     recognizing = true;
     showInfo('info_speak_now');
     start_img.src = 'assets/mic-animate.gif';
+    audioElement.src = 'assets/sound/snap.wav'
+    audioElement.play()
   };
 
   recognition.onerror = function(event) {

@@ -35,6 +35,8 @@ class ScratchProjectManager {
 		this.yesOrNo = false;
 		// Whether the user has already said Scratch to trigger listening.
 		this.scratchVoiced = false;
+		this.audioElement = document.createElement('audio');
+		this.audioElement.type = "audio/wav"
 	}
 
 	load() {
@@ -423,12 +425,14 @@ class ScratchProjectManager {
 			for (var projectName in pm.projects) {
 				if (Utils.removeFillerWords(projectName) == projectToPlayName) {
 					pm.currentProject = pm.projects[projectName];
-					pm.say('playing project');
 					let finished = pm.executeCurrentProject('FromStart');
 					if (finished) {
-						pm.say('done playing project');
+						// TODO: force this to play AFTER the project finishes.
+						// perhaps using an audio queue
+						// pm.audioElement.src = 'assets/sound/coin_reverse.wav'
+						// pm.audioElement.play();
 					} else {
-						// TODO: cue that the program is waiting for you to say something...
+						// TODO: cue that the specific is waiting for you to say something...
 						// and/or that it's not finished.
 					}
 					resolve();
@@ -484,7 +488,8 @@ class ScratchProjectManager {
 			ScratchStorage.save();
 			pm.say('Playing current project ' + pm.currentProject.name);
 			pm.executeCurrentProject('FromStart');
-			pm.say('done playing project');
+			pm.audioElement.src = 'assets/sound/coin_reverse.wav'
+			pm.audioElement.play();
 			resolve();
 		}));
 	}
