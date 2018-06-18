@@ -113,11 +113,16 @@ if (!('webkitSpeechRecognition' in window)) {
   recognition.onend = function() {
     recognizing = false;
     if (ignore_onend) {
+      audioElement.src = 'assets/sound/coin_reverse.wav';
+      audioElement.play();
+      recognition.start();
       return;
     }
     start_img.src = 'assets/mic.gif';
     if (!final_transcript) {
       showInfo('info_start');
+      // Force speech recognition to always be happening.
+      recognition.start();
       return;
     }
     showInfo('');
@@ -127,7 +132,6 @@ if (!('webkitSpeechRecognition' in window)) {
       range.selectNode(document.getElementById('final_span'));
       window.getSelection().addRange(range);
     }
-
   };
 
   // Since recognition is continuous, we will get interim results based on the
