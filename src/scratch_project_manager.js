@@ -210,7 +210,7 @@ class ScratchProjectManager {
 		if (this.yesOrNo) {
 			this.handleYesOrNo(utterance, this.yesOrNo.yesCallback, this.yesOrNo.noCallback)
 			// Reset yes or no state.
-			this.handleYesOrNo = null;
+			this.yesOrNo = null;
 		}
 
 		if (Utils.matchesScratch(utterance)) {
