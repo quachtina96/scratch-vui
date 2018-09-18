@@ -3,7 +3,7 @@
  */
 const ScratchProject = require('./scratch_project.js');
 
-class ScratchStorage {
+class ScratchVUIStorage {
 
 	static removeProject(projectName) {
 		if (window.localStorage.scratchProjects) {
@@ -28,4 +28,4 @@ class ScratchStorage {
 	}
 }
 
-module.exports = ScratchStorage;
+module.exports = ScratchVUIStorage;

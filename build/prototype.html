@@ -79,6 +79,23 @@
     background-color:transparent;
     padding: 0;
   }
+/* Style pulled from the benchmark example in scratch-vm */
+#scratch-stage {
+    border: 5px solid black;
+    display: block;
+    width: 400px;
+    height: 300px;
+}
+.render #scratch-stage {
+    display: none;
+}
+.loading label, .profile-count label{
+    width: 15em;
+    display: inline-block;
+}
+.render .loading {
+    display: none;
+}
 </style>
 <h1 class="center" id="headline">
   ScratchVUI <a href="http://dvcs.w3.org/hg/speech-api/raw-file/tip/speechapi.html">
@@ -114,4 +131,6 @@
   <span id="interim_span" class="interim"></span>
   <p>
 </div>
+<!-- Scratch Stage -->
+<canvas id="scratch-stage"></canvas><br />
 <script src='bundle.js'></script>

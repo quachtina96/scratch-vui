@@ -5,7 +5,7 @@
 const ScratchInstruction = require('./scratch_instruction.js');
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
-const ScratchStorage = require('./storage.js');
+const ScratchVUIStorage = require('./storage.js');
 const ScratchRegex = require('./triggers.js');
 
 /**

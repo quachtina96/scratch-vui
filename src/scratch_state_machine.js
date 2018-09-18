@@ -5,7 +5,7 @@
  */
 const StateMachine = require('javascript-state-machine');
 const StateMachineHistory = require('javascript-state-machine/lib/history')
-const ScratchStorage = require('./storage.js');
+const ScratchVUIStorage = require('./storage.js');
 const ScratchProjectManager = require('./scratch_project_manager.js');
 const Utils = require('./utils.js');
 

@@ -4,7 +4,7 @@
 
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
-const ScratchStorage = require('./storage.js');
+const ScratchVUIStorage = require('./storage.js');
 const ScratchRegex = require('./triggers.js');
 
 /**
@@ -17,7 +17,7 @@ class ScratchProjectManager {
 	 */
 	constructor(scratchStateMachine) {
 		this.ssm = scratchStateMachine;
-		this.storage = new ScratchStorage();
+		this.storage = new ScratchVUIStorage();
     this.projects = {};
     this.untitledCount = 0;
     // Project currently being edited
@@ -55,7 +55,7 @@ class ScratchProjectManager {
 	 * Delete project.
 	 */
 	removeProject(projName) {
-		ScratchStorage.removeProject(projName)
+		ScratchVUIStorage.removeProject(projName)
 	}
 
 	/**
@@ -63,7 +63,7 @@ class ScratchProjectManager {
 	 */
 	save() {
 		// Save project to local storage.
-		ScratchStorage.save(this.projects)
+		ScratchVUIStorage.save(this.projects)
 	}
 
 	/**
@@ -291,7 +291,7 @@ class ScratchProjectManager {
 				if (Utils.removeFillerWords(projectName) == projectToPlayName) {
 					pm.say(projectName + ' project deleted.')
 					delete pm.projects[projectName];
-					ScratchStorage.removeProject(projectName);
+					ScratchVUIStorage.removeProject(projectName);
 					resolve();
 					return;
 				}
@@ -373,7 +373,7 @@ class ScratchProjectManager {
 	finishProject() {
 		var pm = this;
 		return new Promise(((resolve, reject) => {
-			ScratchStorage.save();
+			ScratchVUIStorage.save();
 			pm._updatePlayRegex();
 			// TODO: cue exiting project
 			// Save project.
@@ -410,7 +410,7 @@ class ScratchProjectManager {
 	playCurrentProject() {
 		var pm = this;
 		return new Promise(((resolve, reject) => {
-			ScratchStorage.save();
+			ScratchVUIStorage.save();
 			pm.say('Playing current project ' + pm.currentProject.name);
 			pm.executeCurrentProject('FromStart');
 			pm.say('done playing project');
