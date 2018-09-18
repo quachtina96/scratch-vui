@@ -13,8 +13,6 @@ class ScratchInstruction {
   /**
    * Constructor for the ScratchInstruction
    * @param {!String} rawInstruction - the utterance from the user.
-   * @param {!ScratchAction} action - the action to which this instruction
-   *    belongs.
    */
   constructor(rawInstruction) {
     this.raw = rawInstruction.trim();

@@ -57,7 +57,7 @@ class ScratchProjectManager {
 	 * Delete project.
 	 */
 	removeProject(projName) {
-		ScratchVUIStorage.removeProject(projName)
+		this.storage.removeProject(projName)
 	}
 
 	/**
@@ -65,7 +65,7 @@ class ScratchProjectManager {
 	 */
 	save() {
 		// Save project to local storage.
-		ScratchVUIStorage.save(this.projects)
+		this.storage.save(this.projects)
 	}
 
 	/**
@@ -296,7 +296,7 @@ class ScratchProjectManager {
 				if (Utils.removeFillerWords(projectName) == projectToPlayName) {
 					pm.say(projectName + ' project deleted.')
 					delete pm.projects[projectName];
-					ScratchVUIStorage.removeProject(projectName);
+					this.storage.removeProject(projectName);
 					resolve();
 					return;
 				}
@@ -378,7 +378,7 @@ class ScratchProjectManager {
 	finishProject() {
 		var pm = this;
 		return new Promise(((resolve, reject) => {
-			ScratchVUIStorage.save();
+			this.storage.save();
 			pm._updatePlayRegex();
 			// TODO: cue exiting project
 			// Save project.
@@ -415,7 +415,7 @@ class ScratchProjectManager {
 	playCurrentProject() {
 		var pm = this;
 		return new Promise(((resolve, reject) => {
-			ScratchVUIStorage.save();
+			this.storage.save();
 			pm.say('Playing current project ' + pm.currentProject.name);
 			pm.executeCurrentProject('FromStart');
 			pm.say('done playing project');

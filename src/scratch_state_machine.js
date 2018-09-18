@@ -49,6 +49,7 @@ var ScratchStateMachine = new StateMachine.factory({
   methods: {
     // Initialize the state machine.
     onHome: function() {
+      // SCRATCHNLP: use the general storage object here.
       if (!window.localStorage.scratchProjects) {
         window.localStorage.scratchProjects = JSON.stringify({});
       } else {
