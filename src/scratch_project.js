@@ -69,6 +69,7 @@ var ScratchProject = StateMachine.factory({
         resolve();
       }))
     },
+    // SCRATCHNLP
     /**
      * Return Scratch program.
      * @return {Array<Array>} Scratch program generated from instructions
@@ -117,6 +118,7 @@ var ScratchProject = StateMachine.factory({
           return;
         }
 
+        // SCRATCHNLP:
         // Parse instruction to add as a last result.
         var instruction = new ScratchInstruction(utterance);
         if (instruction.steps != null) {
@@ -128,6 +130,7 @@ var ScratchProject = StateMachine.factory({
         }
       }
     },
+    // SCRATCHNLP:
     handleUtteranceDuringExecution: function(utterance) {
       var scratchProject = this;
       if (utterance == 'scratch stop') {

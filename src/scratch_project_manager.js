@@ -18,18 +18,20 @@ class ScratchProjectManager {
 	constructor(scratchStateMachine) {
 		this.ssm = scratchStateMachine;
 		this.storage = new ScratchVUIStorage();
-    this.projects = {};
-    this.untitledCount = 0;
-    // Project currently being edited
-    this.projectToPlay = null;
-    this.currentProject = null;
-    this.synth = window.speechSynthesis;
-    this.recognition = new webkitSpeechRecognition();
-    // Triggers should be listed from more specific to more general to
-    // ensure that the best fit trigger gets matched to the utterance.
+		this.projects = {};
+		this.untitledCount = 0;
+		// Project currently being edited
+		this.projectToPlay = null;
+		this.currentProject = null;
+		this.synth = window.speechSynthesis;
+		this.recognition = new webkitSpeechRecognition();
+		// Triggers should be listed from more specific to more general to
+		// ensure that the best fit trigger gets matched to the utterance.
 		this.triggers = ScratchRegex.getGeneralTriggers();
 	}
 
+	// SCRATCHNLP: Rather than/in additon to loading from localStorage, still
+	// try to load form ScratchVUIStorage
 	load() {
 		if (!window.localStorage.scratchProjects) {
 			window.localStorage.scratchProjects = JSON.stringify({});
@@ -87,6 +89,8 @@ class ScratchProjectManager {
 		console.log('saying' + whatToSay.text);
 	}
 
+	// SCRATCHNLP: instead of executing project by trying to parse my basic
+	// Scratch program.
 	/**
 	 * Execute current project.
 	 * @param {string} mode - 'FromStart' to execute the project from the first
@@ -97,6 +101,7 @@ class ScratchProjectManager {
 			throw Error('this.currentProject is ' + this.currentProject);
 		}
 
+		// SCRATCHNLP:
 		var scratchProgram = this.currentProject.getScratchProgram();
 
 		// Set bounds for which steps to execute
@@ -136,7 +141,7 @@ class ScratchProjectManager {
 	}
 
 	/**
-	 * Handler utterance on the general navigation level.
+	 * Handlerutterance on the general navigation level.
 	 */
 	handleUtterance(utterance) {
 		// NOTE: 'this' refers to the ScratchStateMachine that calls this function
@@ -218,28 +223,28 @@ class ScratchProjectManager {
 	}
 
   _describeProject(projectNumber) {
- 		var projectList = Object.keys(this.projects)
- 		projectList.sort()
-    // this does not refer to the state machine, but to the editCommands
-    // object holding these functions.
-    if (0 < projectNumber &&
-        projectNumber <= projectList.length) {
-      this.say('Project ' + projectNumber + ' is ' + projectList[projectNumber-1])
-      return true;
-    } else {
-      return false;
-    }
+		var projectList = Object.keys(this.projects)
+		projectList.sort()
+	// this does not refer to the state machine, but to the editCommands
+	// object holding these functions.
+	if (0 < projectNumber &&
+		projectNumber <= projectList.length) {
+	  this.say('Project ' + projectNumber + ' is ' + projectList[projectNumber-1])
+	  return true;
+	} else {
+	  return false;
+	}
   }
 
   getNthProject(lifecycle, args) {
-  	var numberArg = args.pop();
-    var projectNumber = Utils.text2num(numberArg);
-    if (projectNumber == null) {
-      projectNumber = parseInt(numberArg);
-    }
-    if (!this._describeProject(projectNumber)) {
-      this.say('there is no project number ' + projectNumber.toString());
-    }
+	var numberArg = args.pop();
+	var projectNumber = Utils.text2num(numberArg);
+	if (projectNumber == null) {
+	  projectNumber = parseInt(numberArg);
+	}
+	if (!this._describeProject(projectNumber)) {
+	  this.say('there is no project number ' + projectNumber.toString());
+	}
   }
 
 	getCurrentProject() {

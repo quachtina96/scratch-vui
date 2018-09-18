@@ -3,6 +3,10 @@
  */
 const ScratchProject = require('./scratch_project.js');
 
+// SCRATCHNLP: instead of having the ScratchVUIStorage be a class with only
+// static methods, consider having it be an instance class that discriminates
+// between different storage methods, or allows for the following:
+// use local storage AND cloud storage?
 class ScratchVUIStorage {
 
 	static removeProject(projectName) {
