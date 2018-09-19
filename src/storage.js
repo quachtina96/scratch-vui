@@ -15,6 +15,28 @@ class ScratchVUIStorage {
     this.useLocalStorage = true;
   }
 
+  getProjects() {
+    if (this.useLocalStorage) {
+      var locallySavedProjects = {}
+      if (!window.localStorage.scratchProjects) {
+        window.localStorage.scratchProjects = JSON.stringify({});
+      }
+      locallySavedProjects = JSON.parse(window.localStorage.scratchProjects);
+    }
+    if (this.saveToServer) {
+      var projectsSavedToServer = {}
+      // TODO: send http request to the URL hosting the server side to get all
+      // projects belonging to the particular user.
+      // /user/<user_name>/allprojects
+      // Process the result to ensure that the format is correct for the
+      // ScratchProjectManager
+    }
+
+    // If the two project dictionaries share the same keys (same project names),
+    // the locally saved projects take precedent.
+    return Object.assign({}, projectsSavedToServer, locallySavedProjects);
+  }
+
   removeProject(projectName) {
     if (this.useLocalStorage) {
       _removeProjectFromLocalStorage(projectName)

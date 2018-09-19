@@ -30,13 +30,8 @@ class ScratchProjectManager {
 		this.triggers = ScratchRegex.getGeneralTriggers();
 	}
 
-	// SCRATCHNLP: Rather than/in additon to loading from localStorage, still
-	// try to load form ScratchVUIStorage
 	load() {
-		if (!window.localStorage.scratchProjects) {
-			window.localStorage.scratchProjects = JSON.stringify({});
-		}
-		var savedProjects = JSON.parse(window.localStorage.scratchProjects);
+		var savedProjects = this.storage.getProjects();
 		for (var name in savedProjects) {
 			this.projects[name] = new ScratchProject(this);
 			this.projects[name].name = name;
@@ -89,8 +84,6 @@ class ScratchProjectManager {
 		console.log('saying' + whatToSay.text);
 	}
 
-	// SCRATCHNLP: instead of executing project by trying to parse my basic
-	// Scratch program.
 	/**
 	 * Execute current project.
 	 * @param {string} mode - 'FromStart' to execute the project from the first
