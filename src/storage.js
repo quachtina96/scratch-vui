@@ -51,10 +51,10 @@ class ScratchVUIStorage {
    */
   save(projects) {
     if (this.useLocalStorage) {
-      savedToLocal = this._saveToLocalStorage(projects);
+      this._saveToLocalStorage(projects);
     }
     if (this.saveToServer) {
-      savedToServer = this._saveToServer(projects);
+      this._saveToServer(projects);
     }
   }
 

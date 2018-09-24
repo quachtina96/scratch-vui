@@ -1,10 +1,10 @@
 /**
- * @fileoverview Define ScratchInstruction class for converting sentences
+ * @fileoverview The ScratchInstruction class serves to hold the appropriate
+ *    information about the ScratchInstruction together.
  * to Scratch programs
  * @author Tina Quach (quacht@mit.edu)
  */
-
-ScratchNLPEndpointURL = "http://127.0.0.1:5000/"
+const Utils = require('./utils.js');
 
 /**
  * ScratchInstruction class
@@ -17,7 +17,7 @@ class ScratchInstruction {
   constructor(rawInstruction) {
     this.raw = rawInstruction.trim();
     try {
-      this.steps = this.getSteps();
+      this.steps = this.getParse();
     } catch(e) {
       this.steps = null;
     }
@@ -46,36 +46,22 @@ class ScratchInstruction {
   /**
    * Returns the steps of the Scratch program.
    */
-  getSteps() {
-    // Detect multiple statements and split them.
-    let sentences = this.raw.replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|");
-    var steps = [];
-    for (var i = 0; i < sentences.length; i++) {
-      try {
-        // SCRATCHNLP
-        url = ScratchNLPEndpointURL + "translate/${raw_instruction}";
-        fetch(url)
-        .then(data => {return data.json()})
-        .then(res => {
-          console.log(res)
-          // Expect the response to be the ScratchProject sb2 json to
-          // deserialize.
-          steps.push(res);
-        })
-        .catch(error => console.log(error));
-
-      } catch (e) {
-        console.log(e);
-        throw new Error("Failed to get steps from instruction: " + this.raw);
-      }
+  getParse() {
+    try {
+      var urlSuffix = "translate/" + this.raw;
+      var method = "get";
+      var parse = Utils.requestScratchNLP(urlSuffix, method)
+      return parse;
+    } catch (e) {
+      console.log(e);
+      throw new Error("Failed to get steps from instruction: " + this.raw);
     }
-    return steps;
   }
 
   /**
    * Returns the steps of the Scratch program.
    */
-  old_getSteps() {
+  getSteps() {
     // Detect multiple statements and split them.
     let sentences = this.raw.replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|");
     var steps = [];

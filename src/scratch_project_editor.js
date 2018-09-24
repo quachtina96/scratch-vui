@@ -84,7 +84,7 @@ class ScratchProjectEditor {
 
   playStep() {
   	this._describeCurrentStep()
-    this.project.pm.executeCurrentProject('SingleStepWhereILeftOff');
+    this.project.pm.executeCurrentProjectWithVM('SingleStepWhereILeftOff');
   }
 
   insertStepBefore(args) {
