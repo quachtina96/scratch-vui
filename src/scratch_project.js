@@ -70,7 +70,8 @@ var ScratchProject = StateMachine.factory({
     },
     /**
      * Return Scratch program.
-     * @return {Array<Array>} Scratch program generated from instructions
+     * @return {!String} Scratch program represented as a JSON or string
+     *    containing the error.
      */
     getScratchProgram: function(startIndex, endIndex) {
       return new Promise((resolve,reject) => {
@@ -92,16 +93,6 @@ var ScratchProject = StateMachine.factory({
           reject(error);
         })
       })
-    },
-    /**
-     * Return Scratch program.
-     * @return {Array<Array>} Scratch program generated from instructions
-     */
-    old_getScratchProgram: function() {
-      let steps = this.instructions.map(instruction => instruction.steps[0]);
-      // Everytime you want to execute the program, you add a
-      // when green flag block to start it.
-      return [['whenGreenFlag']].concat(steps);
     },
     _getName: function(utterance) {
       var pattern = /call the project (.*)/;
