@@ -16,11 +16,7 @@ class ScratchInstruction {
    */
   constructor(rawInstruction) {
     this.raw = rawInstruction.trim();
-    try {
-      this.steps = this.getParse();
-    } catch(e) {
-      this.steps = null;
-    }
+    this.parse = null;
   }
 
   /**
@@ -44,18 +40,12 @@ class ScratchInstruction {
   }
 
   /**
-   * Returns the steps of the Scratch program.
+   * Returns a promise representing the result of trying to translate.
    */
-  getParse() {
-    try {
-      var urlSuffix = "translate/" + this.raw;
-      var method = "get";
-      var parse = Utils.requestScratchNLP(urlSuffix, method)
-      return parse;
-    } catch (e) {
-      console.log(e);
-      throw new Error("Failed to get steps from instruction: " + this.raw);
-    }
+  static parse(rawInstruction) {
+    var urlSuffix = "translate/" + rawInstruction;
+    var method = "get";
+    return Utils.requestScratchNLP(urlSuffix, method)
   }
 
   /**

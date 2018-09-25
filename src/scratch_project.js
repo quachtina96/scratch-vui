@@ -141,14 +141,17 @@ var ScratchProject = StateMachine.factory({
           return;
         }
 
-        var instruction = new ScratchInstruction(utterance);
-        if (instruction.steps != null) {
-          this.instructions.push(instruction);
-          this.addInstruction();
-        } else {
-          this.pm.say("I heard you say " + utterance);
-          this.pm.say("That doesn't match any Scratch commands.");
-        }
+        ScratchInstruction.parse(utterance).then((result) => {
+          if (result == "I don't understand.") {
+            this.pm.say("I heard you say " + utterance);
+            this.pm.say("That doesn't match any Scratch commands.");
+          } else {
+            var instruction = new ScratchInstruction(utterance);
+            instruction.parse = result
+            this.instructions.push(instruction);
+            this.addInstruction();
+          }
+        })
       }
     },
     // TODO: the scratch_project should already be handling utterances during

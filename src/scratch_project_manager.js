@@ -88,40 +88,43 @@ class ScratchProjectManager {
    * Execute current project with VM
    */
    executeCurrentProjectWithVM(mode) {
-    if (!this.currentProject) {
-      throw Error('this.currentProject is ' + this.currentProject);
-    }
+    var pm = this;
+    return new Promise(((resolve, reject) => {
+      if (!pm.currentProject) {
+        throw Error('pm.currentProject is ' + pm.currentProject);
+      }
 
-    var totalInstructionCount = this.currentProject.instructions.length
+      var totalInstructionCount = pm.currentProject.instructions.length
 
-    // Set bounds for which steps to execute
-    var endIndex, startIndex;
-    if (mode == 'WhereItLeftOff') {
-      startIndex = this.currentProject.instructionPointer;
-      endIndex = totalInstructionCount;
-    } else if (mode == 'FromStart') {
-      // TODO: change to indexing by 0 + make sure the changes are
-      // consistent in supporting the project editor.
-      startIndex = 1;
-      endIndex = totalInstructionCount;
-    } else if (mode == 'SingleStepWhereILeftOff') {
-      startIndex = this.currentProject.instructionPointer;
-      endIndex = startIndex + 1;
-    }
+      // Set bounds for which steps to execute
+      var endIndex, startIndex;
+      if (mode == 'WhereItLeftOff') {
+        startIndex = pm.currentProject.instructionPointer;
+        endIndex = totalInstructionCount;
+      } else if (mode == 'FromStart') {
+        // TODO: change to indexing by 0 + make sure the changes are
+        // consistent in supporting the project editor.
+        startIndex = 1;
+        endIndex = totalInstructionCount;
+      } else if (mode == 'SingleStepWhereILeftOff') {
+        startIndex = pm.currentProject.instructionPointer;
+        endIndex = startIndex + 1;
+      }
 
-    // The Scratch program returned includes the code to execute
-    // the desired subsection of the program.
-    this.currentProject.getScratchProgram(startIndex-1, endIndex)
-    .then((scratchProgram) => {
-      // NOTE: We do not need to JSON.stringify the scratch program before
-      // passing it to the vm because it is already a string.
-      this.ssm.vm.loadProject(scratchProgram).then(()=> {
-        this.ssm.vm.greenFlag();
+      // The Scratch program returned includes the code to execute
+      // the desired subsection of the program.
+      pm.currentProject.getScratchProgram(startIndex-1, endIndex)
+      .then((scratchProgram) => {
+        // NOTE: We do not need to JSON.stringify the scratch program before
+        // passing it to the vm because it is already a string.
+        this.ssm.vm.loadProject(scratchProgram).then(()=> {
+          this.ssm.vm.greenFlag();
+        });
+
+        // Return whether the project is finished or not.
+        resolve(endIndex == totalInstructionCount);
       });
-
-      // Return whether the project is finished or not.
-      return endIndex == totalInstructionCount - 1;
-    });
+    }))
   }
 
   /**
@@ -401,13 +404,7 @@ class ScratchProjectManager {
           // the project has been executed? (block further execution until the
           // game is complete? How might that affect the ability to listen to
           // the user (starting and stopping a project))
-          let finished = pm.executeCurrentProjectWithVM('FromStart');
-          if (finished) {
-            pm.say('done playing project');
-          } else {
-            // TODO: cue that the program is waiting for you to say something...
-            // and/or that it's not finished.
-          }
+          pm.executeCurrentProjectWithVM('FromStart')
           resolve();
           return;
         }

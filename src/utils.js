@@ -145,7 +145,10 @@ Utils.requestScratchNLP = function(urlSuffix, method, opt_contents) {
       request.onload = () => {
         resolve(request.responseText);
       };
-      request.onerror = () => reject(request.statusText);
+      request.onerror = () => {
+        console.log(request.statusText);
+        reject(null);
+      };
       request.send(JSON.stringify(opt_contents));
     }
   });
