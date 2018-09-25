@@ -115,8 +115,9 @@ class ScratchProjectManager {
     .then((scratchProgram) => {
       // NOTE: We do not need to JSON.stringify the scratch program before
       // passing it to the vm because it is already a string.
-      this.ssm.vm.loadProject(scratchProgram);
-      this.ssm.vm.greenFlag();
+      this.ssm.vm.loadProject(scratchProgram).then(()=> {
+        this.ssm.vm.greenFlag();
+      });
 
       // Return whether the project is finished or not.
       return endIndex == totalInstructionCount - 1;
