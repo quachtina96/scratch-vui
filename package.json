@@ -11,12 +11,14 @@
     "test": "npm run test:lint && npm run test:unit"
   },
   "dependencies": {
+    "cryptiles": "^4.1.2",
     "fs": "0.0.1-security",
     "javascript-state-machine": "^3.0.1",
     "lapack": "^0.1.0",
     "natural": "^0.5.6",
-    "wordnet-db": "^3.1.6",
-    "scratch-vm": "latest"
+    "scratch-vm": "latest",
+    "url-parse": "^1.4.3",
+    "wordnet-db": "^3.1.6"
   },
   "devDependencies": {
     "copy-webpack-plugin": "4.5.1",
