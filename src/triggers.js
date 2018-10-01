@@ -21,7 +21,7 @@ ScratchRegex.getGeneralTriggers = function() {
 	  'playCurrentProject': /play (?:the)? ?(?:current)? ?project|start (?:the)? ?(?:current)? ?project|test (?:the)? ?(?:current)? ?project/,
 	  'play': /^play (.*)/,
 	  'return': /stop$|go back$|quit$|exit$|cancel$|nevermind$/,
-	  'getCurrentProject': /get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
+	  'getCurrentProject': /get (?:the)? ?current project|what project am i on|what's my current project|what is my current project/,
       'getNthProject': /((?:what is|what's)) project (?:number)? ?(.*)/,
 	  'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
 	  'getProjectCount': /how many projects do i have|how many projects have i made/,
@@ -40,7 +40,7 @@ ScratchRegex.getEditProjectTriggers = function() {
 	return {
 	getStepCount: /how many steps ?(?:are there)?/,
 	getAllSteps: /what are all the steps/,
-	getCurrentStep: /what (?:step|steps|stop|stops|stuff|step) am i on|what’s my current (?:step|steps|stop|stops|stuff|step)|what (?:step|steps|stop|stops|stuff|step) is this/,
+	getCurrentStep: /what (?:step|steps|stop|stops|stuff|step) am i on|what's my current (?:step|steps|stop|stops|stuff|step)|what (?:step|steps|stop|stops|stuff|step) is this/,
     goToStep: /go to (?:step|steps|stop|stops|stuff|step) (.*)|what's (?:step|steps|stop|stops|stuff|step) (.*)|what is (?:step|steps|stop|stops|stuff|step) (.*)/,
     nextStep: /go to next (?:step|steps|stop|stops|stuff|step)|next (?:step|steps|stop|stops|stuff|step)|what's next|next/,
     previousStep: /previous (?:step|steps|stop|stops|stuff|step)|go back a (?:step|steps|stop|stops|stuff|step)/,
@@ -57,6 +57,8 @@ ScratchRegex.getEditProjectTriggers = function() {
     // TODO: address potential complex behavior in line below.
     replaceInStep: /in (?:step|steps|stop|stops|stuff|step) (.*) replace (.*) with (.*)/,
     stopEditing: /stop|i\'m done|that\'s it'/
+    // TODO: some more ideas...
+    // "Everytime you _____ do ______ instead"
   }
 }
 

@@ -1,0 +1,21 @@
+{
+	"linear_create_play_see_inside": [
+		["scratch create a new project", ["what do you want to call it?"]],
+		["say something nice", ["Okay. When you say, Scratch, say something nice, I’ll play the project. What’s the first step?"]],
+		["say something nice", ["I heard you say say something nice", "That doesn't match any Scratch commands"]],
+		["play the meow sound", ["Okay, what’s the next step?"]],
+		["that's it", ["Cool, now you can say, Scratch, say something nice, to play the project."]],
+		["say something nice", ["playing project"]],
+		["scratch see inside", ["Opening project say something nice for editing", "There is 1 step"]],
+		["scratch what is step one", ["Step 1", "play the meow sound"]],
+		["scratch replace step one with play the chomp sound",["replaced step 1"]],
+	  ["scratch play the project", ["Playing current project say something nice", "done playing project"]]
+	],
+	"see_inside_and_edit_existing": [
+		["scratch say something nice", ["playing project"]],
+		["scratch see inside", ["Opening project say something nice for editing", "There is 1 step"]],
+		["scratch what step am I on", ["Step 1", "play the chomp sound"]],
+		["scratch what's my current step", ["Step 1", "play the chomp sound"]],
+		["scratch what step is this", ["Step 1", "play the chomp sound"]]
+	]
+}
