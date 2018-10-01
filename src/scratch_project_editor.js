@@ -5,7 +5,6 @@
 const ScratchInstruction = require('./scratch_instruction.js');
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
-const ScratchStorage = require('./storage.js');
 const ScratchRegex = require('./triggers.js');
 
 /**
@@ -85,7 +84,7 @@ class ScratchProjectEditor {
 
   playStep() {
   	this._describeCurrentStep()
-    this.project.pm.executeCurrentProject('SingleStepWhereILeftOff');
+    this.project.pm.executeCurrentProjectWithVM('SingleStepWhereILeftOff');
   }
 
   insertStepBefore(args) {

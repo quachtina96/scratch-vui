@@ -8,6 +8,11 @@
  Utils = {}
 
 /**
+ * This corresponds to the url where ScratchNLP is hosted.
+ */
+Utils.ScratchNLPEndpointURL = "http://127.0.0.1:5000/"
+
+/**
  * Get all defined matches of string to given regular expression.
  */
 Utils.matchRegex = (utterance, pattern) => {
@@ -115,5 +120,38 @@ Utils.removeFillerWords = function(utterance) {
   var result = tokens.filter(token => filler_words.indexOf(token) == -1);
   return result.join(' ');
 };
+
+Utils.createCORSRequest = function(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr){
+      xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined"){
+      xhr = new XDomainRequest();
+      xhr.open(method, url);
+  } else {
+      xhr = null;
+  }
+  return xhr;
+}
+
+/**
+ * Send an HTTP request to the ScratchNLP endpoint.
+ */
+Utils.requestScratchNLP = function(urlSuffix, method, opt_contents) {
+  return new Promise((resolve,reject) => {
+    var url = Utils.ScratchNLPEndpointURL + urlSuffix;
+    var request = Utils.createCORSRequest(method, url);
+    if (request) {
+      request.onload = () => {
+        resolve(request.responseText);
+      };
+      request.onerror = () => {
+        console.log(request.statusText);
+        reject(null);
+      };
+      request.send(JSON.stringify(opt_contents));
+    }
+  });
+}
 
 module.exports = Utils;

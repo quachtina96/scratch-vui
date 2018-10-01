@@ -5,7 +5,6 @@
  * @author Tina Quach (quacht@mit.edu)
  */
 global.ScratchStateMachine = require('./scratch_state_machine.js');
-
 global.scratch = new ScratchStateMachine();
 
 scratch.observe('onAfterTransition', () => {

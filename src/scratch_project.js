@@ -10,7 +10,6 @@ const ScratchProjectEditor = require('./scratch_project_editor.js');
 const ScratchRegex = require('./triggers.js');
 const Utils = require('./utils.js');
 
-
 // TODO: idea: move the edit commands to the state machine level instead of the
 // scratch project level, since we manage what the currentproject is.
 // to resolve the issue of this referring to the wrong this.
@@ -71,13 +70,29 @@ var ScratchProject = StateMachine.factory({
     },
     /**
      * Return Scratch program.
-     * @return {Array<Array>} Scratch program generated from instructions
+     * @return {!String} Scratch program represented as a JSON or string
+     *    containing the error.
      */
-    getScratchProgram: function() {
-      let steps = this.instructions.map(instruction => instruction.steps[0]);
-      // Everytime you want to execute the program, you add a
-      // when green flag block to start it.
-      return [['whenGreenFlag']].concat(steps);
+    getScratchProgram: function(startIndex, endIndex) {
+      return new Promise((resolve,reject) => {
+        // Batch instructions for the server to translate.
+        let rawInstructions = this.instructions.map(instruction => instruction.raw);
+        var urlSuffix = "user/" + this.ssm.user + "/scratch_program/" + this.name;
+        var method = "post";
+        var payload = {
+              'instructions': rawInstructions,
+              'useGreenFlag': true,
+              'start': startIndex,
+              'end':endIndex
+            };
+        Utils.requestScratchNLP(urlSuffix, method, payload).then(result => {
+          resolve(result);
+        })
+        .catch(error => {
+          console.log(error);
+          reject(error);
+        })
+      })
     },
     _getName: function(utterance) {
       var pattern = /call the project (.*)/;
@@ -117,31 +132,27 @@ var ScratchProject = StateMachine.factory({
           return;
         }
 
-        // Parse instruction to add as a last result.
-        var instruction = new ScratchInstruction(utterance);
-        if (instruction.steps != null) {
-          this.instructions.push(instruction);
-          this.addInstruction();
-        } else {
-          this.pm.say("I heard you say " + utterance);
-          this.pm.say("That doesn't match any Scratch commands.");
-        }
+        ScratchInstruction.parse(utterance).then((result) => {
+          if (result == "I don't understand.") {
+            this.pm.say("I heard you say " + utterance);
+            this.pm.say("That doesn't match any Scratch commands.");
+          } else {
+            var instruction = new ScratchInstruction(utterance);
+            instruction.parse = result
+            this.instructions.push(instruction);
+            this.addInstruction();
+          }
+        })
       }
     },
+    // TODO: the scratch_project should already be handling utterances during
+    // execution if we are using the scratch-vm (for 3.0 projects. We should
+    // be able to remove the following below.
     handleUtteranceDuringExecution: function(utterance) {
-      var scratchProject = this;
-      if (utterance == 'scratch stop') {
-        this.synth.cancel();
-      } else if (utterance == 'scratch pause') {
-        this.synth.pause();
-      } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
-        this.synth.resume();
-      } else {
-        // Utterance should be an argument for the project.
-        if (utterance == this.tempTrigger) {
-          this.pm.say(this.tempResponse)
-          this.pm.executeCurrentProject('WhereItLeftOff');
-        }
+      // Utterance should be an argument for the project.
+      if (utterance == this.tempTrigger) {
+        this.pm.say(this.tempResponse)
+        this.pm.executeCurrentProjectWithVM('WhereItLeftOff');
       }
     },
   }
