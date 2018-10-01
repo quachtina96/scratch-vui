@@ -1,0 +1,159 @@
+ * {
+    font-family: Verdana, Arial, sans-serif;
+  }
+  a:link {
+    color:#000;
+    text-decoration: none;
+  }
+  a:visited {
+    color:#000;
+  }
+  a:hover {
+    color:#33F;
+  }
+  .button {
+    background: -webkit-linear-gradient(top,#008dfd 0,#0370ea 100%);
+    border: 1px solid #076bd2;
+    border-radius: 3px;
+    color: #fff;
+    display: none;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.3;
+    padding: 8px 25px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #076bd2;
+    letter-spacing: normal;
+  }
+  .center {
+    padding: 10px;
+    text-align: center;
+  }
+  .final {
+    color: black;
+    padding-right: 3px;
+  }
+  .interim {
+    color: gray;
+  }
+  .info {
+    font-size: 14px;
+    text-align: center;
+    color: #777;
+    display: none;
+  }
+  .right {
+    float: right;
+  }
+  .sidebyside {
+    display: inline-block;
+    width: 45%;
+    min-height: 40px;
+    text-align: left;
+    vertical-align: top;
+  }
+  #headline {
+    font-size: 40px;
+    font-weight: 300;
+  }
+  #info {
+    clear:both;
+    font-size: 20px;
+    text-align: center;
+    color: #777;
+    visibility: hidden;
+  }
+  #results {
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: left;
+    min-height: 150px;
+    clear: both;
+  }
+  #start_button {
+    border: 0;
+    background-color:transparent;
+    padding: 0;
+  }
+/* Style pulled from the benchmark example in scratch-vm */
+#scratch-stage {
+  border: 5px solid black;
+  display: block;
+  width: 400px;
+  height: 300px;
+  margin: 20px;
+  float: left;
+}
+
+#feedback {
+  clear: both;
+}
+.render #scratch-stage {
+    display: none;
+}
+.loading label, .profile-count label{
+    width: 15em;
+    display: inline-block;
+}
+.render .loading {
+    display: none;
+}
+
+/* Chat containers formatting*/
+.log {
+  float: right;
+  clear:both;
+}
+.container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+/* Clear floats */
+.container::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/* Style images */
+.container img {
+    max-width: 60px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+.scratch-vui {
+  float: left;
+  border-color: #ccc;
+  background-color: #ddd;
+}
+
+.user {
+  float: right;
+}
+
+/* Style the right image */
+.container img.right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+}
+
+/* Style time text */
+.time-right {
+    float: right;
+    color: #aaa;
+}
+
+/* Style time text */
+.time-left {
+    float: left;
+    color: #999;
+}
