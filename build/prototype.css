@@ -104,7 +104,9 @@
 /* Chat containers formatting*/
 .log {
   float: right;
-  clear:both;
+  height: 300px;
+  max-height: 300px;
+  width: 50%;
 }
 .container {
     border: 2px solid #dedede;
