@@ -20,7 +20,7 @@ ScratchRegex.getGeneralTriggers = function() {
 	  'play': /play (.*)/,
 	  'playCurrentProject': /play (?:the)? ?project|start (?:the)? ?project|play (?:the)? ?current project|test (?:the)? ?project/,
 	  'return': /stop|i'm done|go back|quit|exit/,
-	  'getCurrentProject': /get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
+	  'getCurrentProject': /get (?:the)? ?current project|what project am i on|what''s my current project|what is my current project/,
       'getNthProject': /((?:what is|what's)) project (?:number)? ?(.*)/,
 	  'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
 	  'getProjectCount': /how many projects do i have|how many projects have i made/
@@ -29,21 +29,23 @@ ScratchRegex.getGeneralTriggers = function() {
 
 ScratchRegex.getEditProjectTriggers = function() {
 	return {
-	getCurrentStep: /what step am i on|what’s my current step|what step is this/,
+	getCurrentStep: /what step am i on|what's my current step|what step is this/,
     goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
     nextStep: /go to next step|next step|what's next/,
     previousStep: /previous step|go back a step/,
     playStep: /play step|play current step|what does it do/,
+    // TODO:None of the insertStep ommands work. The issue is that the regex is selecting too much?
     insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
     insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
     deleteStep: /delete step (.*)/,
-    // TODO: distinguish between replacing everywhere and replacing in a
-    // specific place.
     replaceStep: /replace step (.*) with (.*)/,
+    // TODO: implement replace sound.
     replaceSound: /replace the (.*) sound with the (.*) sound'/,
-    // TODO: address potential complex behavior in line below.
+    // TODO: implement replace in step address potential complex behavior in line below.
     replaceInStep: /in step (.*) replace (.*) with (.*)/,
     stopEditing: /stop|i\'m done|that\'s it'/
+    // TODO: some more ideas...
+    // "Everytime you _____ do ______ instead"
   }
 }
 

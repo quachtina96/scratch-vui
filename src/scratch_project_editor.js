@@ -101,6 +101,7 @@ class ScratchProjectEditor {
   }
 
   insertStepAfter(args) {
+    var stepToInsert = new ScratchInstruction(args[1]);
     var referenceStepNumber = Utils.text2num(args[2])-1;
     if (referenceStepNumber == null) {
       referenceStepNumber = parseInt(args[2])-1;
