@@ -157,7 +157,7 @@ class ScratchProjectEditor {
       this.project.pm.say('There are no instructions to remove!');
     } else {
       // Get the step number.
-      var index = _getNumber(args[1])-1;
+      var index = this._getNumber(args[1])-1;
 
       // Only remove steps that are in bounds.
       if (Utils.checkBounds(index, this.project.instructions)) {
@@ -170,7 +170,7 @@ class ScratchProjectEditor {
 
   replaceStep(args) {
     // Get the step number to replace.
-    var index = _getNumber(args[1])-1;
+    var index = this._getNumber(args[1])-1;
 
     // Get the new step.
     var utterance = args[2];
@@ -187,7 +187,7 @@ class ScratchProjectEditor {
   }
 
   replaceInStep(args) {
-    var index = _getNumber(args[1])-1;
+    var index = this._getNumber(args[1])-1;
     var oldWord = args[2];
     var newWord = args[3];
     var instructionToModify = this.project.instructions[index];
