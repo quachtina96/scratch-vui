@@ -252,7 +252,7 @@ class ScratchProjectManager {
       // TODO: integrate Scratch, Help!
       console.log('found Scratch in failed utterance');
       this.say("I heard you say " + utterance);
-      this.say("I don't know how to do that.");
+      this.say("I don't understand.");
     }
   }
 
