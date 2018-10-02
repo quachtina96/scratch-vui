@@ -29,11 +29,10 @@ class ScratchInstruction {
     let sentences = instruction.replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|");
     var unknownActions = [];
     for (var i = 0; i < sentences.length; i++) {
-      ScratchInstruction.parse(sentences[i]).then((result) => {
-        if (result == "I don't understand.") {
-          unknownActions.push(sentences[i]);
-        }
-      });
+      var result = ScratchInstruction.parse(sentences[i])
+      if (!result) {
+        unknownActions.push(sentences[i]);
+      }
     }
     return unknownActions;
   }
@@ -44,7 +43,13 @@ class ScratchInstruction {
   static parse(rawInstruction) {
     var urlSuffix = "translate/" + rawInstruction;
     var method = "get";
-    return Utils.requestScratchNLP(urlSuffix, method)
+    return Utils.requestScratchNLP(urlSuffix, method).then((result) => {
+      if (result == "I don't understand.") {
+        return false
+      } else {
+        return result
+      }
+    })
   }
 }
 

@@ -10,10 +10,11 @@ ScratchRegex = {};
 
 ScratchRegex.getGeneralTriggers = function() {
 	return {
+	  'queryState': /what state am i in|where am i/,
 	  'newProject': /new project|create a? new project|create a? project|make a? new project|make a? project/,
 	  'deleteProject': /delete (?:the)? ?(.*) project/,
 	  'renameCurrentProject': /rename current project to (.*)/,
-	  'renameProject': /change name of (.*) project to (.*)|rename (.*) to (?:be)? ?(.*)/,
+	  'renameProject': /change (?:the)? ?name of (?:the)? ?(.*) project to (.*)|rename (?:the)? ?(.*) (?:project)? ?to (?:be)? ?(.*)|call (?:the)? ?(.*) project (.*) instead/,
 	  'editExistingProject': /see inside (.*)|what's inside (.*)/,
 	  'editProject': /see inside|what's inside/,
 	  'finishProject': /i'm done|i'm finished/,
@@ -29,11 +30,14 @@ ScratchRegex.getGeneralTriggers = function() {
 
 ScratchRegex.getEditProjectTriggers = function() {
 	return {
+	getStepCount: /how many steps ?(?:are there)?/,
 	getCurrentStep: /what step am i on|what’s my current step|what step is this/,
     goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
     nextStep: /go to next step|next step|what's next/,
     previousStep: /previous step|go back a step/,
     playStep: /play step|play current step|what does it do/,
+    //TODO: should there be a comma after next step"
+    appendStep: /add the step (.*)|next (.*)|at the end (.*)|(.*) at the end|next (.*)|after all that (.*)|(.*) after all that/,
     insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
     insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
     deleteStep: /delete step (.*)/,

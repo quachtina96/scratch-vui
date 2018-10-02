@@ -404,9 +404,10 @@ class ScratchProjectManager {
           // the project has been executed? (block further execution until the
           // game is complete? How might that affect the ability to listen to
           // the user (starting and stopping a project))
-          pm.executeCurrentProjectWithVM('FromStart')
-          resolve();
-          return;
+          return pm.executeCurrentProjectWithVM('FromStart').then(()=>{
+            //// pm.say('done playing project');
+            resolve();
+          });
         }
       }
 
@@ -421,21 +422,21 @@ class ScratchProjectManager {
     return new Promise(((resolve, reject) => {
       this.storage.save();
       pm._updatePlayRegex();
-      // TODO: cue exiting project
-      // Save project.
+      pm.say("closing project");
       resolve();
     }));
   }
   announceProjectToEdit(project) {
-    this.say('Opening project ' + project.name + ' for editing');
-    var stepCount = project.instructions.length;
-    if (stepCount != 1) {
-      this.say('There are ' + stepCount + ' steps');
-    } else {
-      this.say('There is 1 step');
+    if (project) {
+      this.say('Opening project ' + project.name + ' for editing');
+      var stepCount = project.instructions.length;
+      if (stepCount != 1) {
+        this.say('There are ' + stepCount + ' steps');
+      } else {
+        this.say('There is 1 step');
+      }
     }
   }
-
   editExistingProject(lifecycle, args) {
     var pm = this;
     return new Promise(((resolve, reject) => {
@@ -458,10 +459,21 @@ class ScratchProjectManager {
     return new Promise(((resolve, reject) => {
       this.storage.save();
       pm.say('Playing current project ' + pm.currentProject.name);
-      pm.executeCurrentProjectWithVM('FromStart');
-      pm.say('done playing project');
-      resolve();
+      pm.executeCurrentProjectWithVM('FromStart').then(() => {
+        // pm.say('done playing project');
+        resolve();
+      });
     }));
+  }
+  queryState() {
+    var pm = this;
+    return new Promise((resolve, reject) => {
+        pm.say('You are in the ' + this.ssm.state + ' state');
+        if (pm.currentProject) {
+          pm.say('Your current project is ' + pm.currentProject.name);
+        }
+        resolve();
+      });
   }
 }
 

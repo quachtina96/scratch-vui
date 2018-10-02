@@ -40,10 +40,9 @@ class ScratchProjectEditor {
   }
 
   _describeCurrentStep() {
-    // this does not refer to the state machine, but to the editCommands
-    // object holding these functions.
-    if (0 < this.project.instructionPointer &&
-        this.project.instructionPointer <= this.project.instructions.length) {
+    // Subtract 1 from the instruction pointer because it presents as 1-indexed
+    // to the user.
+    if (Utils.checkBounds(this.project.instructionPointer-1, this.project.instructions)) {
       this.project.pm.say('Step ' + this.project.instructionPointer);
       this.project.pm.say(this.project.instructions[this.project.instructionPointer-1].raw)
       return true;
@@ -87,60 +86,108 @@ class ScratchProjectEditor {
     this.project.pm.executeCurrentProjectWithVM('SingleStepWhereILeftOff');
   }
 
+  // Add new instruction to the end of the project.
+  // Note: Tricky because what is "the end" of the project? In the scoped down
+  // version in Scratch VUI, we don't expect to think about this in terms of
+  // multiple stacks, and this can get tricky with event-based stuff (which
+  // Scratch implements as multiple stacks)
+  appendStep(args) {
+    var stepToInsert = ScratchInstruction.parse(args[1]);
+    if (!stepToInsert) {
+      this.project.pm.say("I heard you say " + args[1]);
+      this.project.pm.say("That doesn't match any Scratch commands.");
+      return false;
+    } else {
+      var newInstruction = new ScratchInstruction(args[1]);
+      this.project.instructions.push(newInstruction)
+      this.project.pm.say("I added " + newInstruction.raw + " to the end of the project");
+      // Induce the state transition in the project.
+      this.project.goto("nonempty");
+      this.project.addInstruction();
+      return true;
+    }
+  }
+
   insertStepBefore(args) {
     // TODO: use try catch to handle inability to convert the Scratch
     // instruction.
-    var stepToInsert = new ScratchInstruction(args[1]);
-    var referenceStepNumber = Utils.text2num(args[2])-1;
-    if (referenceStepNumber == null) {
-      referenceStepNumber = parseInt(args[2])-1;
-    }
-    this.project.instructions.splice(referenceStepNumber, 0, stepToInsert);
-    this.project.instructionPointer = referenceStepNumber;
-    console.log(this.project.instructions);
+        // Get the new step.
+    var utterance = args[1];
+    var step = new ScratchInstruction(utterance);
+    ScratchInstruction.parse(utterance).then((parse) => {
+      if (parse) {
+        var referenceStepNumber = this._getNumber(args[2])-1;
+        this._insertStep(step, referenceStepNumber);
+      }
+    });
   }
 
   insertStepAfter(args) {
-    var referenceStepNumber = Utils.text2num(args[2])-1;
-    if (referenceStepNumber == null) {
-      referenceStepNumber = parseInt(args[2])-1;
-    }
-    this.project.instructions.splice(referenceStepNumber + 1, 0, stepToInsert);
-    this.project.instructionPointer = referenceStepNumber + 1;
+    var utterance = args[1];
+    var step = new ScratchInstruction(utterance);
+    ScratchInstruction.parse(utterance).then((parse) => {
+      var referenceStepNumber = this._getNumber(args[2])-1;
+      this._insertStep(step, referenceStepNumber + 1);
+    });
+  }
+
+  /**
+   * Helper function for inserting.
+   */
+  _insertStep(step, location) {
+    this.project.instructions.splice(location, 0, step);
+    this.project.instructionPointer = location;
     this.project.pm.say('inserted step');
-    console.log(this.project.instructions);
+  }
+
+  /**
+   * Convert string representation of a number to the integer representation.
+   * "one" or "1" to 1 (and likewise for all other numbers).
+   */
+  _getNumber(stringOrInt) {
+    var number = Utils.text2num(stringOrInt);
+    if (number == null) {
+      number = parseInt(stringOrInt);
+    }
+    return number
   }
 
   deleteStep(args) {
-    console.log(this);
-    var index = Utils.text2num(args[1])-1;
-    if (index == null) {
-      index = parseInt(args[1])-1;
+    if (this.project.instructions.length == 0) {
+      this.project.pm.say('There are no instructions to remove!');
+    } else {
+      // Get the step number.
+      var index = _getNumber(args[1])-1;
+
+      // Only remove steps that are in bounds.
+      if (Utils.checkBounds(index, this.project.instructions)) {
+        var removedScratchInstruction = this.project.instructions.splice(index, 1);
+        this.project.pm.say('Removed step ' + (index+1));
+      }
     }
-    var removedScratchInstruction = this.project.instructions.splice(index, 1);
-    this.project.pm.say('Removed step ' + (index+1));
     console.log(this.project.instructions);
   }
 
   replaceStep(args) {
-    var index = Utils.text2num(args[1])-1;
-    if (index == null) {
-      index = parseInt(args[1])-1;
-    }
-    var step = new ScratchInstruction(args[2]);
-    if (!step) {
-      this.project.pm.say(step + 'is not a Scratch command');
-    }
-    this.project.instructions.splice(index, 1, step);
-    this.project.pm.say('replaced step ' + (index+1));
+    // Get the step number to replace.
+    var index = _getNumber(args[1])-1;
+
+    // Get the new step.
+    var utterance = args[2];
+    var step = new ScratchInstruction(utterance);
+    ScratchInstruction.parse(utterance).then((result) => {
+      if (!result) {
+        this.project.pm.say(utterance + 'is not a Scratch command');
+      } else {
+        this.project.instructions.splice(index, 1, step);
+        this.project.pm.say('replaced step ' + (index+1));
+      }
     console.log(this.project.instructions);
+    });
   }
 
   replaceInStep(args) {
-    var index = Utils.text2num(args[1])-1;
-    if (index == null) {
-      index = parseInt(args[1])-1;
-    }
+    var index = _getNumber(args[1])-1;
     var oldWord = args[2];
     var newWord = args[3];
     var instructionToModify = this.project.instructions[index];
@@ -154,11 +201,18 @@ class ScratchProjectEditor {
   }
 
   getCurrentStep() {
+    if (this.project.instructions.length == 0) {
+      this.project.pm.say("There are no steps in " + this.project.name);
+    }
   	// If the user is not currently on a step, put them at step 1 by default.
-  	if (this.project.instructionPointer) {
+  	if (!this.project.instructionPointer) {
   		this.project.instructionPointer = 1;
   	}
   	this._describeCurrentStep();
+  }
+
+  getStepCount() {
+    this.project.announceStepCount();
   }
 }
 

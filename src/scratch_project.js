@@ -32,8 +32,9 @@ var ScratchProject = StateMachine.factory({
       ssm: pm.ssm,
       name: null,
       instructions: [],
-      // TODO: handle word forms of words in referencing steps.
-      instructionPointer: 1, // Use 1-based indexing
+      // Use 1-based indexing so step 1 refers to the first step when
+      // communicating to the user.
+      instructionPointer: 1,
       editor: new ScratchProjectEditor(),
     }
   },
@@ -133,7 +134,7 @@ var ScratchProject = StateMachine.factory({
         }
 
         ScratchInstruction.parse(utterance).then((result) => {
-          if (result == "I don't understand.") {
+          if (!result) {
             this.pm.say("I heard you say " + utterance);
             this.pm.say("That doesn't match any Scratch commands.");
           } else {
@@ -142,7 +143,7 @@ var ScratchProject = StateMachine.factory({
             this.instructions.push(instruction);
             this.addInstruction();
           }
-        })
+        });
       }
     },
     // TODO: the scratch_project should already be handling utterances during
@@ -155,6 +156,14 @@ var ScratchProject = StateMachine.factory({
         this.pm.executeCurrentProjectWithVM('WhereItLeftOff');
       }
     },
+    announceStepCount: function() {
+      var stepCount = this.instructions.length;
+      if (stepCount != 1) {
+        this.pm.say('There are ' + stepCount + ' steps');
+      } else {
+        this.pm.say('There is 1 step');
+      }
+    }
   }
 });
 

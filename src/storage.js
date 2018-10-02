@@ -39,10 +39,10 @@ class ScratchVUIStorage {
 
   removeProject(projectName) {
     if (this.useLocalStorage) {
-      _removeProjectFromLocalStorage(projectName)
+      this._removeProjectFromLocalStorage(projectName)
     }
     if (this.saveToServer = true) {
-      _removeProjectFromServer(projectName)
+      this._removeProjectFromServer(projectName)
     }
   }
 

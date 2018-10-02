@@ -25,8 +25,12 @@ Utils.matchRegex = (utterance, pattern) => {
  */
 Utils.match = (utterance, pattern) => {
   // Be flexible in how you recognize Scratch at the beginning of an utterance.
-  if (Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/)) {
-    return Utils.matchRegex(utterance, pattern);
+  var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+  if (voicedScratch) {
+    // Only match the triggers to the utterance without the voiced scratch.
+    var start = utterance.indexOf(voicedScratch[0]);
+    var end = start + voicedScratch[0].length + 1;
+    return Utils.matchRegex(utterance.substring(end, utterance.length), pattern);
   }
   return null;
 }
@@ -120,6 +124,13 @@ Utils.removeFillerWords = function(utterance) {
   var result = tokens.filter(token => filler_words.indexOf(token) == -1);
   return result.join(' ');
 };
+
+/**
+ * Given an array and an index into the array, return whether the index is valid.
+ */
+Utils.checkBounds = function(index, array) {
+  return index >= 0 && index < array.length;
+}
 
 Utils.createCORSRequest = function(method, url) {
   var xhr = new XMLHttpRequest();
