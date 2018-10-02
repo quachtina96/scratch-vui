@@ -133,17 +133,25 @@ var ScratchProject = StateMachine.factory({
           return;
         }
 
-        ScratchInstruction.parse(utterance).then((result) => {
-          if (!result) {
-            this.pm.say("I heard you say " + utterance);
-            this.pm.say("That doesn't match any Scratch commands.");
-          } else {
-            var instruction = new ScratchInstruction(utterance);
-            instruction.parse = result
-            this.instructions.push(instruction);
-            this.addInstruction();
-          }
-        });
+        // Make sure that Scratch is said before handling the utterance.
+        var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+        if (voicedScratch) {
+          // Only match the triggers to the utterance without the voiced scratch.
+          var start = utterance.indexOf(voicedScratch[0]);
+          var end = start + voicedScratch[0].length + 1;
+          var command = utterance.substring(end, utterance.length);
+          ScratchInstruction.parse(command).then((result) => {
+            if (!result) {
+              this.pm.say("I heard you say " + utterance);
+              this.pm.say("That doesn't match any Scratch commands.");
+            } else {
+              var instruction = new ScratchInstruction(command);
+              instruction.parse = result
+              this.instructions.push(instruction);
+              this.addInstruction();
+            }
+          });
+        }
       }
     },
     // TODO: the scratch_project should already be handling utterances during
