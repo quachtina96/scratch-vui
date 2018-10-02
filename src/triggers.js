@@ -37,7 +37,7 @@ ScratchRegex.getEditProjectTriggers = function() {
     previousStep: /previous step|go back a step/,
     playStep: /play step|play current step|what does it do/,
     //TODO: should there be a comma after next step"
-    appendStep: /add the step (.*)|next (.*)|at the end (.*)|(.*) at the end|next (.*)|after all that (.*)|(.*) after all that/,
+    appendStep: /add (?:the step)? ?(.*)|next (.*)|at the end (.*)|(.*) at the end|next (.*)|after all that (.*)|(.*) after all that/,
     insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
     insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
     deleteStep: /delete step (.*)/,
