@@ -77,7 +77,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getNthProject', from: '*', to: function() { return this.state} },
     { name: 'getProjectNames', from: '*', to: function() { return this.state} },
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
-
+    { name: 'queryState', from: '*', to: function() { return this.state} },
   ],
   data: function() {
     var ssm = this;
@@ -179,6 +179,11 @@ var ScratchStateMachine = new StateMachine.factory({
           }
       });
 
+      // Add event listeners to announce when a project has stopped.
+      this.vm.runtime.on('PROJECT_RUN_STOP', () => {
+        this.pm.say("Stopped playing project");
+      });
+
       // Run threads
       this.vm.start();
     },
@@ -206,6 +211,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onEditExistingProject: (lifecycle, args) => {this.pm.editExistingProject(lifecycle, args)},
         onEditProject: () => {this.pm.editProject()},
         onPlayCurrentProject: () => {this.pm.playCurrentProject()},
+        onQueryState: () => {this.pm.queryState()},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];
