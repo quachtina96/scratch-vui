@@ -104,7 +104,7 @@ var ScratchProject = StateMachine.factory({
         return utterance.trim();
       }
     },
-    handleUtterance: function(utterance) {
+    handleUtterance: function(utterance, opt_scratchVoiced) {
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
 
       // Name project
@@ -123,7 +123,7 @@ var ScratchProject = StateMachine.factory({
       // Add to or finish project.
       } else if (this.state == 'named' || this.state == 'nonempty') {
         // Detect and handle explicit edit commands.
-        var editor_result = this.editor.handleUtterance(utterance, this);
+        var editor_result = this.editor.handleUtterance(utterance, this, opt_scratchVoiced);
         if (editor_result == 'exit') {
           this.finishProject();
           return editor_result;
@@ -155,8 +155,21 @@ var ScratchProject = StateMachine.factory({
     // TODO: the scratch_project should already be handling utterances during
     // execution if we are using the scratch-vm (for 3.0 projects. We should
     // be able to remove the following below.
-    handleUtteranceDuringExecution: function(utterance) {
-      // Utterance should be an argument for the project.
+    handleUtteranceDuringExecution: function(utterance, opt_scratchVoiced) {
+      var scratchProject = this;
+      var match = opt_scratchVoiced ? Utils.matchRegex : Utils.match;
+      // TODO: tina figure out how to handle these high level stop/pause/resume.
+      if (match(utterance,/stop/)) {
+        this.pm.ssm.vm.stopAll()
+        this.pm.synth.cancel();
+      } else if (match(utterance,/pause/)) {
+        // TODO: Figure out how to do this w/ scratch-vm
+        this.pm.synth.pause();
+      } else if (match(utterance, /unpause|resume/)) {
+        // TODO: Figure out how to do this w/ scratch-vm
+        this.pm.synth.resume();
+      }
+      // Utterance sould be an argument for the project.
       if (utterance == this.tempTrigger) {
         this.pm.say(this.tempResponse)
         this.pm.executeCurrentProjectWithVM('WhereItLeftOff');

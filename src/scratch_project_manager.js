@@ -182,7 +182,7 @@ class ScratchProjectManager {
   /**
    * Handle utterance on the general navigation level.
    */
-  handleUtterance(utterance) {
+  old_handleUtterance(utterance) {
     // NOTE: 'this' refers to the ScratchStateMachine that calls this function
     var lowercase = utterance.toLowerCase();
     var utterance = Utils.removeFillerWords(lowercase).trim();
@@ -264,32 +264,34 @@ class ScratchProjectManager {
   /**
    * Handle utterance on the general navigation level.
    */
-  speech_handleUtterance(utterance) {
+  handleUtterance(utterance) {
     // NOTE: 'this' refers to the ScratchStateMachine that calls this function
     var lowercase = utterance.toLowerCase();
     var utterance = Utils.removeFillerWords(lowercase).trim();
     console.log('utterance: ' + utterance)
 
     if (this.yesOrNo) {
+      // Handle response to yes/no question.
       this.handleYesOrNo(utterance, this.yesOrNo.yesCallback, this.yesOrNo.noCallback)
       // Reset yes or no state.
       this.yesOrNo = null;
     }
 
     if (Utils.matchesScratch(utterance)) {
+      // Remember that the use said "Scratch" and give them a queue so they know they've been heard.
       this.scratchVoiced = true;
       this.say("I'm listening.")
       return;
     }
 
-    // Attempt to match utterance to trigger.
+    // Attempt to match utterance to general triggers.
     for (var triggerType in this.triggers) {
 
       // If the user already said Scratch at the end of the previous utterance,
       // do not require the user to say it again.
       var args = this.scratchVoiced ? Utils.matchRegex(utterance, this.triggers[triggerType]) : Utils.match(utterance, this.triggers[triggerType]);
 
-      // The command type was matched attempt to execute.
+      // If trigger was matched, attempt to execute associated command.
       if (args && args.length > 0) {
         if (this.ssm.can(triggerType)) {
           this.triggerAction(triggerType, args, utterance);
@@ -301,25 +303,27 @@ class ScratchProjectManager {
       }
     }
 
+    // Pass the utterance to the project to handle.
     if (this.ssm.state == 'PlayProject') {
-      this.currentProject.handleUtteranceDuringExecution(utterance, this.scratchVoiced);
+        this.currentProject.handleUtteranceDuringExecution(utterance, this.scratchVoiced);
     } else if (this.ssm.state == 'InsideProject') {
-     // Handle utterances in the InsideProject context.
+      // There needs to be a current project to handle the utterance.
       if (this.currentProject) {
         var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
         if (result == 'exit') {
           this.ssm.finishProject();
         }
+      } else {
+        throw "In InsideProject state, but there is no current project"
       }
-    } else if (utterance.toLowerCase().indexOf('scratch') != -1) {
+    } else if (Utils.containsScratch(utterance)) {
       // TODO: integrate Scratch, Help!
-      console.log('found Scratch in failed utterance');
       this.say("I heard you say " + utterance);
 
       // Suggest a close match if there exists one via fuzzy matching.
-      var result = Utils.fuzzyMatch(utterance, Triggers.general())
+      var result = Utils.fuzzyMatch(utterance, this.triggers)
       console.log('fuzzy match result: ' + result)
-      var jaroWinklerScore = result[1] //1 - JaroWinkler Distance
+      var jaroWinklerScore = result[1] // 1 - JaroWinkler Distance
       var triggerType = result[0]
       if (jaroWinklerScore < .25) {
         // TODO: enable the line below.
@@ -333,14 +337,13 @@ class ScratchProjectManager {
           noCallback: () => {this.say("Please try again.")}
         }
       } else {
-        this.say("I don't know how to do that.");
+        this.say("I don't understand.");
       }
     }
 
     this.scratchVoiced = false;
   }
 
-  // TODO: tina
   /**
    * Given callback functions, handle a yes or no response from the user.
    * @param {boolean} yesOrNo - the user's choice or answer to the question
@@ -355,13 +358,13 @@ class ScratchProjectManager {
       noCallback();
     }
   }
-  // TODO: tina
+
   /**
    * Execute action associated with trigger type with given arguments and
    * utterance.
    * @param {!string} triggerType - the kind of action to execute.
    * @param {Array<string>} args - the arguments extracted from utterance using
-   *    the regex associated with the trigger. See Triggers (triggers.js).
+   *    the regex associated with the trigger. See ScratchRegex in triggers.js
    * @param {string} - utterance - user input
    */
   triggerAction(triggerType, opt_args, opt_utterance) {
