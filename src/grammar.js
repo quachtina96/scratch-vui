@@ -52,7 +52,7 @@ ScratchGrammar.commands = `#JSGF V1.0;
 
 	public <replaceInStep> = in step <number> replace  with ;
 
-	public <stopEditing> = stop|i'm done|that's it;`
+	public <stopEditing> = stop|i'm done;`
 
 // TODO: programmatically populate numbers?.
 ScratchGrammar.numbers = `#JSGF V1.0;

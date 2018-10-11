@@ -122,14 +122,12 @@ var ScratchProject = StateMachine.factory({
         this.nameProject();
       // Add to or finish project.
       } else if (this.state == 'named' || this.state == 'nonempty') {
-        // Detect project completion.
-        if (utterance.indexOf("that's it") != -1) {
-          this.finishProject();
-          return 'exit';
-        }
-
         // Detect and handle explicit edit commands.
-        if (this.editor.handleUtterance(utterance, this)) {
+        var editor_result = this.editor.handleUtterance(utterance, this);
+        if (editor_result == 'exit') {
+          this.finishProject();
+          return editor_result;
+        } else if (editor_result) {
           return;
         }
 
