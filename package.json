@@ -18,7 +18,10 @@
     "natural": "^0.5.6",
     "scratch-vm": "latest",
     "url-parse": "^1.4.3",
-    "wordnet-db": "^3.1.6"
+    "wordnet-db": "^3.1.6",
+    "cmu-pronouncing-dictionary": "^1.0.3",
+    "diff-match-patch": "1.0.0",
+    "randexp": "^0.4.9",
   },
   "devDependencies": {
     "copy-webpack-plugin": "4.5.1",

@@ -1,6 +1,11 @@
 /**
  * @fileoverview Utility functions used across files.
  */
+const Triggers = require('./triggers.js');
+const DiffMatchPatch = require('diff-match-patch');
+const natural = require('natural');
+const words = require('cmu-pronouncing-dictionary');
+const dmp = new DiffMatchPatch();
 
 /**
  * Namespace
@@ -12,6 +17,14 @@
  */
 Utils.ScratchNLPEndpointURL = "http://127.0.0.1:5000/"
 
+Utils.startsWithScratch(utterance) {
+  return Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+}
+
+Utils.matchesScratch(utterance) {
+  return Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?$/);
+}
+
 /**
  * Get all defined matches of string to given regular expression.
  */
@@ -21,7 +34,8 @@ Utils.matchRegex = (utterance, pattern) => {
 }
 
 /**
- * Force the utterance to begin with Scratch if triggering a command.
+ * Force the utterance to begin with Scratch if triggering a command, and get
+ * all defined matches of string to given regular expression.
  */
 Utils.match = (utterance, pattern) => {
   // Be flexible in how you recognize Scratch at the beginning of an utterance.
@@ -33,6 +47,24 @@ Utils.match = (utterance, pattern) => {
     return Utils.matchRegex(utterance.substring(end, utterance.length), pattern);
   }
   return null;
+}
+
+/**
+ * Given a grammar list, generate a dictionary of words contained in grammar
+ * mapped to their pronunciations
+ */
+Utils.getRhymes_(grammarList) {
+  var rhymes = {}
+  var tokenizer = new natural.WordTokenizer();
+  for (let source of grammarList.map(x => x.src)) {
+    var tokens = tokenizer.tokenize(decodeURIComponent(source))
+    for (let token of tokens) {
+      if (token in words) {
+        rhymes[token] = words[token];
+      }
+    }
+  }
+  return rhymes;
 }
 
 Utils.text2num = (numberWord) => {

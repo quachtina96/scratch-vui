@@ -8,6 +8,7 @@ const StateMachineHistory = require('javascript-state-machine/lib/history')
 const ScratchVUIStorage = require('./storage.js');
 const ScratchProjectManager = require('./scratch_project_manager.js');
 const Utils = require('./utils.js');
+const ScratchGrammar = require('./grammar.js')
 
 // ScratchVM Dependencies
 const VirtualMachine = require("scratch-vm");
