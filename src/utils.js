@@ -3,7 +3,9 @@
  */
 const Triggers = require('./triggers.js');
 const DiffMatchPatch = require('diff-match-patch');
-const natural = require('natural');
+const WordTokenizer = require('./tokenize.js')
+const LevenshteinDistance = require('./levenshtein_distance.js')
+const get_jarowinkler_distance = require('jaro-winkler');
 const words = require('cmu-pronouncing-dictionary');
 const dmp = new DiffMatchPatch();
 
@@ -64,7 +66,7 @@ Utils.match = (utterance, pattern) => {
  */
 Utils.getRhymes_ = (grammarList) => {
   var rhymes = {}
-  var tokenizer = new natural.WordTokenizer();
+  var tokenizer = new WordTokenizer();
   for (let source of grammarList.map(x => x.src)) {
     var tokens = tokenizer.tokenize(decodeURIComponent(source))
     for (let token of tokens) {
@@ -76,12 +78,12 @@ Utils.getRhymes_ = (grammarList) => {
   return rhymes;
 }
 
- /**
+/**
  * Given text, get list of viable phonetic word matches from grammarList
  */
 Utils.getRhymeMatches = (text, grammarList) => {
   var rhymes = Utils.getRhymes_(grammarList);
-  var tokenizer = new natural.WordTokenizer();
+  var tokenizer = new WordTokenizer();
   var tokens = tokenizer.tokenize(text);
   var phoneticTokens = tokens.map(token => words[token])
   var phoneticText = phoneticTokens.join(' ');
@@ -95,11 +97,11 @@ Utils.getRhymeMatches = (text, grammarList) => {
   var matches = []
 
   for (var word in rhymes) {
-    if (tokenizer.tokenize('what one of it is step six s m in').indexOf(word) != -1) {
+    // if (tokenizer.tokenize('what one of it is step six s m in').indexOf(word) != -1) {
     console.log('word: ' + word)
 
     // a dictionary containing the substring and the distance
-    var levenshtein = natural.LevenshteinDistance(rhymes[word], phoneticText, {search: true});
+    var levenshtein = LevenshteinDistance(rhymes[word], phoneticText, {search: true});
     console.log('levenshtein')
     console.log(levenshtein)
     // Create a score based on a scale from 0-1, where higher is better.
@@ -114,7 +116,7 @@ Utils.getRhymeMatches = (text, grammarList) => {
     if (match_location != -1 && score > .77) {
       matches.push([word, match_location, levenshtein.substring.length])
     }
-    }
+    // }
   }
 
   return this.getOrderedMatchString_(matches)
@@ -171,8 +173,10 @@ Utils.getTargets_ = (triggerMap) => {
       var triggerScores = {}
 
       targets.forEach((target) => {
-        var jaro = natural.JaroWinklerDistance(target, utterance);
-        var leven = natural.LevenshteinDistance(target, utterance);
+        var jaro = get_jarowinkler_distance(target, utterance);
+        var diffs = dmp.diff_main(target, utterance)
+        var leven = dmp.diff_levenshtein(diffs)
+        var leven = LevenshteinDistance(rhymes[word], phoneticText, {search: true});
         triggerScores[target] = {'jaro': jaro, 'leven': leven}
       });
       return triggerScores
