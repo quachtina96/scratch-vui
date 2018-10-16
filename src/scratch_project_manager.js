@@ -190,10 +190,16 @@ class ScratchProjectManager {
    *    regex corresponding to the trigger.
    * @return {Object} representing whether the trigger was valid
    */
+  _validateTrigger(triggerType, args) {
+    // As a certain rules come up, add them here.
+    // the general 'play' should be attempted only on valid project names
+    switch (triggerType) {
+      case 'play':
+        var projectToPlayName = args[1].trim();
+        return projectToPlayName in this.projects;
     }
   }
 
-  // TODO: tina
   /**
    * Handle utterance on the general navigation level.
    */
@@ -226,15 +232,19 @@ class ScratchProjectManager {
 
       // If trigger was matched, attempt to execute associated command.
       if (args && args.length > 0) {
-        if (this.ssm.can(triggerType)) {
-          this.triggerAction(triggerType, args, utterance);
-        } else {
-          this.say('You are current in ' + this.ssm.state + ' mode and cannot '
-            + triggerType + ' from here.');
         DEBUG && console.log('triggerType:' + triggerType)
         DEBUG && console.log('args:' + args)
+
+        // Validate the match.
+        if (_validateTrigger(triggerType, args)) {
+          if (this.ssm.can(triggerType)) {
+            this.triggerAction(triggerType, args, utterance);
+          } else {
+            this.say('You are currently in ' + this.ssm.state + ' mode and cannot '
+              + triggerType + ' from here.');
+          }
+          return;
         }
-        return;
       }
     }
 
@@ -249,6 +259,9 @@ class ScratchProjectManager {
           this.ssm.finishProject();
         }
       } else {
+        // TODO: Instead of throwing error, ask the user for the appropriate
+        // information.
+        // this.say('What project would you like to see inside?')
         throw "In InsideProject state, but there is no current project"
       }
     } else if (Utils.containsScratch(utterance)) {
