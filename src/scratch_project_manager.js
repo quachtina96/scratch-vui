@@ -190,13 +190,18 @@ class ScratchProjectManager {
    *    regex corresponding to the trigger.
    * @return {Object} representing whether the trigger was valid
    */
+  // TODO: rather than encode these rules in a single function, maybe we could
+  // expose them in a single file as a reference that could be checked. (triggers.js)
   _validateTrigger(triggerType, args) {
     // As a certain rules come up, add them here.
-    // the general 'play' should be attempted only on valid project names
     switch (triggerType) {
       case 'play':
+        // argument must be name of an existing project
         var projectToPlayName = args[1].trim();
         return projectToPlayName in this.projects;
+      case 'playCurrentProject':
+        // cannot play nonexisting project
+        return this.currentProject; // TODO: could ask the user what project they want to play.
     }
   }
 
