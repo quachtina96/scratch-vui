@@ -6,6 +6,7 @@
  */
 global.ScratchStateMachine = require('./scratch_state_machine.js');
 global.scratch = new ScratchStateMachine();
+global.DEBUG = true;
 
 scratch.observe('onAfterTransition', () => {
   document.getElementById("current_state").innerHTML = scratch.state;

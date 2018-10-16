@@ -298,6 +298,8 @@ class ScratchProjectManager {
         } else {
           this.say('You are current in ' + this.ssm.state + ' mode and cannot '
             + triggerType + ' from here.');
+        DEBUG && console.log('triggerType:' + triggerType)
+        DEBUG && console.log('args:' + args)
         }
         return;
       }
