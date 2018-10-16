@@ -174,9 +174,7 @@ Utils.getTargets_ = (triggerMap) => {
 
       targets.forEach((target) => {
         var jaro = get_jarowinkler_distance(target, utterance);
-        var diffs = dmp.diff_main(target, utterance)
-        var leven = dmp.diff_levenshtein(diffs)
-        var leven = LevenshteinDistance(rhymes[word], phoneticText, {search: true});
+        var leven = LevenshteinDistance(target, utterance);
         triggerScores[target] = {'jaro': jaro, 'leven': leven}
       });
       return triggerScores
