@@ -180,83 +180,16 @@ class ScratchProjectManager {
   }
 
   /**
-   * Handle utterance on the general navigation level.
+   * Return whether or not this triggerType is valid with the arguments
+   * As the system grows to support a wider range of commands of greater complexity,
+   * false positives become common (w/ the general 'play' trigger for example).
+   * Even if a regular expression successfully extracts arguments from the input
+   * it may not be correct.
+   * @param {String} triggerType
+   * @param {Array<String>} args -- the result of matching an utterance to the
+   *    regex corresponding to the trigger.
+   * @return {Object} representing whether the trigger was valid
    */
-  old_handleUtterance(utterance) {
-    // NOTE: 'this' refers to the ScratchStateMachine that calls this function
-    var lowercase = utterance.toLowerCase();
-    var utterance = Utils.removeFillerWords(lowercase).trim();
-    console.log('utterance: ' + utterance)
-
-    // Address the issue of "You said Scratch. I don't know how to do that".
-    // TODO: remember that Scratch was said and initiate listening mode with
-    // feedback: "yes?"
-    if (utterance == 'Scratch') {
-      return;
-    }
-
-    // Attempt to match utterance to trigger.
-    for (var commandType in this.triggers) {
-      var args = Utils.match(utterance, this.triggers[commandType]);
-      if (args && args.length > 0) {
-        if (this.ssm.can(commandType)) {
-          try {
-            // TODO: HAVING TROUBLE HERE W/ THE REFACTOR...
-            this.ssm[commandType](args, utterance);
-            return true;
-          } catch(e) {
-            // Handle failure based on transition type.
-            console.log(e)
-            switch (commandType) {
-              case 'editExistingProject':
-                // If attempting to open a nonexistent project, stay in
-                // current state.
-                pm.say("There's no project called " + nameOfDesiredProject);
-                commandType = 'stay';
-                break;
-              case 'play':
-                if (this.ssm.state == 'InsideProject') {
-                  if (this.ssm.currentProject.state == 'empty') {
-                    // User is trying to give a project the same name as a previous
-                    // project.
-                    pm.say('You already have a project called that.')
-                  } else {
-                    // User is composing a Scratch program from other Scratch programs.
-                    var result = this.ssm.currentProject.handleUtterance(utterance);
-                  }
-                }
-            }
-          }
-        } else {
-          console.log('could not make transition: ' + commandType);
-          console.log('current state: ' + this.ssm.state);
-        }
-      }
-    }
-
-    if (this.ssm.state == 'PlayProject') {
-      if (utterance == 'scratch stop') {
-        this.ssm.vm.stopAll()
-      } else if (utterance == 'scratch pause') {
-        // TODO: Figure out how to do this w/ scratch-vm
-      } else if (utterance == 'scratch resume' || utterance == 'scratch unpause') {
-        // TODO: Figure out how to do this w/ scratch-vm
-      } else {
-        this.currentProject.handleUtteranceDuringExecution(utterance);
-      }
-    } else if (this.ssm.state == 'InsideProject') {
-     // Handle utterances in the InsideProject context.
-      if (this.currentProject) {
-        var result = this.currentProject.handleUtterance(utterance);
-        if (result == 'exit') {
-          this.ssm.finishProject();
-        }
-      }
-    } else if (utterance.toLowerCase().indexOf('scratch') != -1) {
-      // TODO: integrate Scratch, Help!
-      console.log('found Scratch in failed utterance');
-      this.say("I heard you say " + utterance);
-      this.say("I don't understand.");
     }
   }
 
