@@ -104,6 +104,11 @@ var ScratchProject = StateMachine.factory({
         return utterance.trim();
       }
     },
+    _isValid: function(name) {
+      // The name of a project cannot be the same as an existing project &
+      // it cannot match the form of an existing scratch command.
+      return !(name in this.pm.projects || ScratchInstruction.parse(name))
+    },
     handleUtterance: function(utterance, opt_scratchVoiced) {
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
 
@@ -116,10 +121,16 @@ var ScratchProject = StateMachine.factory({
         }
       }
       if (this.state == 'empty') {
-        this.name = this._getName(utterance);
-        this.pm.projects[this.name] = this.pm.currentProject;
-        delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-        this.nameProject();
+        // Expect the utterance to be the name of the project.
+        var proposedName = this._getName(utterance);
+        if (_isValid(proposedName)) {
+          this.name = this._getName(utterance);
+          this.pm.projects[this.name] = this.pm.currentProject;
+          delete this.pm.projects['Untitled-'+this.pm.untitledCount];
+          this.nameProject();
+        } else {
+          // TODO: Request new name from the user.
+        }
       // Add to or finish project.
       } else if (this.state == 'named' || this.state == 'nonempty') {
         // Detect and handle explicit edit commands.
