@@ -52,14 +52,13 @@ ScratchGrammar.commands = `#JSGF V1.0;
 
 	public <replaceInStep> = in step <number> replace  with ;
 
-	public <stopEditing> = stop|i'm done|that's it;`
+	public <stopEditing> = stop|i'm done;
+	`
 
 // TODO: programmatically populate numbers?.
 ScratchGrammar.numbers = `#JSGF V1.0;
 grammar scratch_state_machine.numbers;
-public <number> =  one | two | three | four | five | six | seven | eight |
-nine | ten | eleven | twelve | thirteen | fourteen | fifteen | sixteen |
-seventeen | eighteen | nineteen | twenty;\n`
+public <number> = zero | one | two | three | four | five | six | seven | eight | nine | ten | eleven | twelve | thirteen | fourteen | fifteen | sixteen | seventeen | eighteen | nineteen | twenty | thirty | forty | fifty | sixty | seventy | eighty | ninety | thousand | million | billion | trillion | quadrillion | quintillion | sextillion | septillion | octillion | nonillion | decillion;\n`
 
 // TODO: programmatically populate with more sounds.
 ScratchGrammar.sounds = `#JSGF V1.0;

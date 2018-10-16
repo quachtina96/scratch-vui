@@ -104,7 +104,12 @@ var ScratchProject = StateMachine.factory({
         return utterance.trim();
       }
     },
-    handleUtterance: function(utterance) {
+    _isValid: function(name) {
+      // The name of a project cannot be the same as an existing project &
+      // it cannot match the form of an existing scratch command.
+      return !(name in this.pm.projects || ScratchInstruction.parse(name))
+    },
+    handleUtterance: function(utterance, opt_scratchVoiced) {
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
 
       // Name project
@@ -116,20 +121,24 @@ var ScratchProject = StateMachine.factory({
         }
       }
       if (this.state == 'empty') {
-        this.name = this._getName(utterance);
-        this.pm.projects[this.name] = this.pm.currentProject;
-        delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-        this.nameProject();
+        // Expect the utterance to be the name of the project.
+        var proposedName = this._getName(utterance);
+        if (_isValid(proposedName)) {
+          this.name = this._getName(utterance);
+          this.pm.projects[this.name] = this.pm.currentProject;
+          delete this.pm.projects['Untitled-'+this.pm.untitledCount];
+          this.nameProject();
+        } else {
+          // TODO: Request new name from the user.
+        }
       // Add to or finish project.
       } else if (this.state == 'named' || this.state == 'nonempty') {
-        // Detect project completion.
-        if (utterance.indexOf("that's it") != -1) {
-          this.finishProject();
-          return 'exit';
-        }
-
         // Detect and handle explicit edit commands.
-        if (this.editor.handleUtterance(utterance, this)) {
+        var editor_result = this.editor.handleUtterance(utterance, this, opt_scratchVoiced);
+        if (editor_result == 'exit') {
+          this.finishProject();
+          return editor_result;
+        } else if (editor_result) {
           return;
         }
 
@@ -157,8 +166,21 @@ var ScratchProject = StateMachine.factory({
     // TODO: the scratch_project should already be handling utterances during
     // execution if we are using the scratch-vm (for 3.0 projects. We should
     // be able to remove the following below.
-    handleUtteranceDuringExecution: function(utterance) {
-      // Utterance should be an argument for the project.
+    handleUtteranceDuringExecution: function(utterance, opt_scratchVoiced) {
+      var scratchProject = this;
+      var match = opt_scratchVoiced ? Utils.matchRegex : Utils.match;
+      // TODO: tina figure out how to handle these high level stop/pause/resume.
+      if (match(utterance,/stop/)) {
+        this.pm.ssm.vm.stopAll()
+        this.pm.synth.cancel();
+      } else if (match(utterance,/pause/)) {
+        // TODO: Figure out how to do this w/ scratch-vm
+        this.pm.synth.pause();
+      } else if (match(utterance, /unpause|resume/)) {
+        // TODO: Figure out how to do this w/ scratch-vm
+        this.pm.synth.resume();
+      }
+      // Utterance sould be an argument for the project.
       if (utterance == this.tempTrigger) {
         this.pm.say(this.tempResponse)
         this.pm.executeCurrentProjectWithVM('WhereItLeftOff');

@@ -34,6 +34,11 @@ class ScratchProjectEditor {
       if (args) {
         this[commandType].call(scratchProject, args);
         this.project.pm.save();
+        // We return 'exit' on executing the finish project command because we
+        // need to signal to the state machine that the project is finished.
+        if (commandType === 'finishProject') {
+          return 'exit';
+        }
         return true;
       }
     }

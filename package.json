@@ -11,12 +11,16 @@
     "test": "npm run test:lint && npm run test:unit"
   },
   "dependencies": {
+    "cmu-pronouncing-dictionary": "^1.0.3",
     "cryptiles": "^4.1.2",
+    "diff-match-patch": "1.0.0",
     "fs": "0.0.1-security",
+    "jaro-winkler": "^0.2.8",
     "javascript-state-machine": "^3.0.1",
     "lapack": "^0.1.0",
-    "natural": "^0.5.6",
+    "randexp": "^0.4.9",
     "scratch-vm": "latest",
+    "underscore": "^1.9.1",
     "url-parse": "^1.4.3",
     "wordnet-db": "^3.1.6"
   },
