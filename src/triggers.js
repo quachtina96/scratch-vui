@@ -51,5 +51,21 @@ ScratchRegex.getEditProjectTriggers = function() {
   }
 }
 
+ScratchRegex._allTriggers = function() {
+    return Object.assign({}, ScratchRegex.getEditProjectTriggers(), ScratchRegex.getGeneralTriggers());
+}
+
+/**
+ * Return whether or not the phrase matches any triggers denoted here.
+ */
+ScratchRegex.contains = function(phrase) {
+	var allTriggers = ScratchRegex._allTriggers;
+	for (triggerType in allTriggers) {
+		if (Utils.matchRegex(utterance, allTriggers[triggerType]))
+			return true;
+	}
+	return false;
+}
+
 module.exports = ScratchRegex;
 

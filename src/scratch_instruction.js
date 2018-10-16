@@ -15,6 +15,9 @@ class ScratchInstruction {
    * @param {!String} rawInstruction - the utterance from the user.
    */
   constructor(rawInstruction) {
+    var punctuationless = rawInstruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var instruction = punctuationless.replace(/\s{2,}/g," ");
+    this.no_punctuation = instruction;
     this.raw = rawInstruction.trim();
     this.parse = null;
   }
@@ -40,8 +43,11 @@ class ScratchInstruction {
   /**
    * Returns a promise representing the result of trying to translate.
    */
-  static parse(rawInstruction) {
-    var urlSuffix = "translate/" + rawInstruction;
+  static parse(instruction) {
+    // Strip punctutation.
+    var punctuationless = instruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var instruction = punctuationless.replace(/\s{2,}/g," ");
+    var urlSuffix = "translate/" + instruction;
     var method = "get";
     return Utils.requestScratchNLP(urlSuffix, method).then((result) => {
       if (result == "I don't understand.") {

@@ -202,6 +202,8 @@ class ScratchProjectManager {
       case 'playCurrentProject':
         // cannot play nonexisting project
         return this.currentProject; // TODO: could ask the user what project they want to play.
+      default:
+        return true;
     }
   }
 
@@ -241,7 +243,7 @@ class ScratchProjectManager {
         DEBUG && console.log('args:' + args)
 
         // Validate the match.
-        if (_validateTrigger(triggerType, args)) {
+        if (this._validateTrigger(triggerType, args)) {
           if (this.ssm.can(triggerType)) {
             this.triggerAction(triggerType, args, utterance);
           } else {
@@ -451,8 +453,11 @@ class ScratchProjectManager {
   }
   getProjectNames() {
     var pm = this;
+    var names = Object.keys(pm.projects);
     return new Promise(((resolve, reject) => {
-      if (Object.keys(pm.projects).length) {
+      if (names.length == 1) {
+        pm.say("One project called " + names[0]);
+      } else if (names.length) {
         var whatToSay = Object.keys(pm.projects);
         whatToSay.splice(whatToSay.length-1, 0, 'and');
         whatToSay.join(',')

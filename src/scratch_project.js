@@ -77,7 +77,7 @@ var ScratchProject = StateMachine.factory({
     getScratchProgram: function(startIndex, endIndex) {
       return new Promise((resolve,reject) => {
         // Batch instructions for the server to translate.
-        let rawInstructions = this.instructions.map(instruction => instruction.raw);
+        let rawInstructions = this.instructions.map(instruction => instruction.no_punctuation);
         var urlSuffix = "user/" + this.ssm.user + "/scratch_program/" + this.name;
         var method = "post";
         var payload = {
@@ -106,8 +106,11 @@ var ScratchProject = StateMachine.factory({
     },
     _isValid: function(name) {
       // The name of a project cannot be the same as an existing project &
-      // it cannot match the form of an existing scratch command.
-      return !(name in this.pm.projects || ScratchInstruction.parse(name))
+      // it cannot match the form of an existing scratch command nor the
+      // form of an existing scratch VUI command.
+      return ScratchInstruction.parse(name).then((parse) => {
+        return !(name in this.pm.projects || parse || ScratchRegex.contains(name))
+      })
     },
     handleUtterance: function(utterance, opt_scratchVoiced) {
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
@@ -123,7 +126,7 @@ var ScratchProject = StateMachine.factory({
       if (this.state == 'empty') {
         // Expect the utterance to be the name of the project.
         var proposedName = this._getName(utterance);
-        if (_isValid(proposedName)) {
+        if (this._isValid(proposedName)) {
           this.name = this._getName(utterance);
           this.pm.projects[this.name] = this.pm.currentProject;
           delete this.pm.projects['Untitled-'+this.pm.untitledCount];
@@ -149,6 +152,8 @@ var ScratchProject = StateMachine.factory({
           var start = utterance.indexOf(voicedScratch[0]);
           var end = start + voicedScratch[0].length + 1;
           var command = utterance.substring(end, utterance.length);
+          var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+          var command = punctuationless.replace(/\s{2,}/g," ");
           ScratchInstruction.parse(command).then((result) => {
             if (!result) {
               this.pm.say("I heard you say " + utterance);

@@ -119,7 +119,7 @@ class ScratchProjectEditor {
         // Get the new step.
     var utterance = args[1];
     var step = new ScratchInstruction(utterance);
-    ScratchInstruction.parse(utterance).then((parse) => {
+    ScratchInstruction.parse(utterance.no_punctuation).then((parse) => {
       if (parse) {
         var referenceStepNumber = this._getNumber(args[2])-1;
         this._insertStep(step, referenceStepNumber);
@@ -130,7 +130,7 @@ class ScratchProjectEditor {
   insertStepAfter(args) {
     var utterance = args[1];
     var step = new ScratchInstruction(utterance);
-    ScratchInstruction.parse(utterance).then((parse) => {
+    ScratchInstruction.parse(utterance.no_punctuation).then((parse) => {
       var referenceStepNumber = this._getNumber(args[2])-1;
       this._insertStep(step, referenceStepNumber + 1);
     });
@@ -180,7 +180,7 @@ class ScratchProjectEditor {
     // Get the new step.
     var utterance = args[2];
     var step = new ScratchInstruction(utterance);
-    ScratchInstruction.parse(utterance).then((result) => {
+    ScratchInstruction.parse(utterance.no_punctuation).then((result) => {
       if (!result) {
         this.project.pm.say(utterance + 'is not a Scratch command');
       } else {
