@@ -24,16 +24,16 @@ Utils.ScratchNLPEndpointURL = "http://127.0.0.1:5000/"
  * like Scratch.
  */
 Utils.startsWithScratch = (utterance) => {
-  return Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+  return Utils.matchRegex(utterance, /^(?:scratch|search|trash|crunch|french)(?:ed)?/);
 }
 
 Utils.matchesScratch = (utterance) => {
-  return Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?$/);
+  return Utils.matchRegex(utterance, /^(?:scratch|search|trash|crunch|french)(?:ed)?$/);
 }
 
 // TODO: utilize this function to provide more flexibility.
 Utils.containsScratch = (utterance) => {
-  return Utils.matchRegex(utterance, /(?:scratch|search)(?:ed)?/)
+  return Utils.matchRegex(utterance, /(?:scratch|search|trash|crunch|french)(?:ed)?/)
 }
 
 /**
