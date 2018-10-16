@@ -24,6 +24,8 @@ class ScratchProjectManager {
     this.projectToPlay = null;
     this.currentProject = null;
     this.synth = window.speechSynthesis;
+    this.audioElement = document.createElement('audio');
+    this.audioElement.type = "audio/wav";
     this.recognition = new webkitSpeechRecognition();
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
@@ -32,6 +34,7 @@ class ScratchProjectManager {
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
     this.scratchVoiced = false;
+
   }
 
   load() {
@@ -510,7 +513,8 @@ class ScratchProjectManager {
           // game is complete? How might that affect the ability to listen to
           // the user (starting and stopping a project))
           return pm.executeCurrentProjectWithVM('FromStart').then(()=>{
-            //// pm.say('done playing project');
+            pm.audioElement.src = 'assets/sound/coin_reverse.wav'
+            pm.audioElement.play();
             resolve();
           });
         }

@@ -6,6 +6,7 @@
  */
 global.ScratchStateMachine = require('./scratch_state_machine.js');
 global.scratch = new ScratchStateMachine();
+
 global.DEBUG = true;
 
 scratch.observe('onAfterTransition', () => {
@@ -32,6 +33,10 @@ global.first_char = /\S/;
 global.capitalize = function(s) {
   return s.replace(first_char, (m) => { return m.toUpperCase(); });
 }
+
+// Audio element for basic audio cues.
+global.audioElement = document.createElement('audio');
+audioElement.type = "audio/wav";
 
 document.getElementById("start_button").onclick =  function(event) {
   if (recognizing) {
@@ -82,6 +87,8 @@ if (!('webkitSpeechRecognition' in window)) {
     recognizing = true;
     showInfo('info_speak_now');
     start_img.src = 'assets/mic-animate.gif';
+    audioElement.src = 'assets/sound/snap.wav'
+    audioElement.play()
   };
 
   recognition.onerror = function(event) {
@@ -108,11 +115,16 @@ if (!('webkitSpeechRecognition' in window)) {
   recognition.onend = function() {
     recognizing = false;
     if (ignore_onend) {
+      audioElement.src = 'assets/sound/coin_reverse.wav';
+      audioElement.play();
+      recognition.start();
       return;
     }
     start_img.src = 'assets/mic.gif';
     if (!final_transcript) {
       showInfo('info_start');
+      // Force speech recognition to always be happening.
+      recognition.start();
       return;
     }
     showInfo('');
