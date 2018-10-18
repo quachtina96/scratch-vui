@@ -123,8 +123,8 @@ if (!('webkitSpeechRecognition' in window)) {
     start_img.src = 'assets/mic.gif';
     if (!final_transcript) {
       showInfo('info_start');
-      // Force speech recognition to always be happening.
-      recognition.start();
+      // NOTE: Force speech recognition to always be happening.
+      // recognition.start();
       return;
     }
     showInfo('');

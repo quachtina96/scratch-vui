@@ -124,6 +124,7 @@ class ScratchProjectManager {
       .then((scratchProgram) => {
         // NOTE: We do not need to JSON.stringify the scratch program before
         // passing it to the vm because it is already a string.
+        console.log(JSON.parse(scratchProgram))
         this.ssm.vm.loadProject(scratchProgram).then(()=> {
           this.ssm.vm.greenFlag();
         });
@@ -508,13 +509,13 @@ class ScratchProjectManager {
         if (Utils.removeFillerWords(projectName) == projectToPlayName) {
           pm.currentProject = pm.projects[projectName];
           pm.say('playing project');
+          pm.audioElement.src = 'assets/sound/coin_reverse.wav'
+          pm.audioElement.play();
           // TODO: Do we need a promise here to ensure that we've waited until
           // the project has been executed? (block further execution until the
           // game is complete? How might that affect the ability to listen to
           // the user (starting and stopping a project))
           return pm.executeCurrentProjectWithVM('FromStart').then(()=>{
-            pm.audioElement.src = 'assets/sound/coin_reverse.wav'
-            pm.audioElement.play();
             resolve();
           });
         }

@@ -182,7 +182,8 @@ var ScratchStateMachine = new StateMachine.factory({
 
       // Add event listeners to announce when a project has stopped.
       this.vm.runtime.on('PROJECT_RUN_STOP', () => {
-        this.pm.say("Stopped playing project");
+        // this.pm.say("Stopped playing project");
+        console.log('VM: PROJECT_RUN_STOP');
       });
 
       // Run threads
