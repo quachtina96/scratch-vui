@@ -183,8 +183,7 @@ var ScratchStateMachine = new StateMachine.factory({
       // Add scratch-vm event listeners.
       this.vm.runtime.on('SCRIPT_GLOW_OFF', () => {
         // Play the sound cue when the project stops playing.
-        this.pm.audioElement.src = 'assets/sound/coin_reverse.wav'
-        this.pm.audioElement.play();
+        this.audio.cueProjectFinished();
       });
 
 

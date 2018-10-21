@@ -8,6 +8,7 @@ const ScratchInstruction = require('./scratch_instruction.js');
 const StateMachine = require('javascript-state-machine');
 const ScratchProjectEditor = require('./scratch_project_editor.js');
 const ScratchRegex = require('./triggers.js');
+const ScratchAudio = require('./audio.js');
 const Utils = require('./utils.js');
 
 // TODO: idea: move the edit commands to the state machine level instead of the
@@ -31,6 +32,7 @@ var ScratchProject = StateMachine.factory({
       pm: pm,
       ssm: pm.ssm,
       name: null,
+      audio: new ScratchAudio(),
       instructions: [],
       // Use 1-based indexing so step 1 refers to the first step when
       // communicating to the user.
@@ -156,8 +158,8 @@ var ScratchProject = StateMachine.factory({
           var command = punctuationless.replace(/\s{2,}/g," ");
           ScratchInstruction.parse(command).then((result) => {
             if (!result) {
+              this.audio.cueMistake();
               this.pm.say("I heard you say " + utterance);
-              this.pm.say("That doesn't match any Scratch commands.");
             } else {
               var instruction = new ScratchInstruction(command);
               instruction.parse = result

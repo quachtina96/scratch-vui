@@ -6,6 +6,7 @@ const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchVUIStorage = require('./storage.js');
 const ScratchRegex = require('./triggers.js');
+const ScratchAudio = require('./audio.js');
 
 /**
  * ScratchProjectManager class
@@ -24,8 +25,6 @@ class ScratchProjectManager {
     this.projectToPlay = null;
     this.currentProject = null;
     this.synth = window.speechSynthesis;
-    this.audioElement = document.createElement('audio');
-    this.audioElement.type = "audio/wav";
     this.recognition = new webkitSpeechRecognition();
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
@@ -34,7 +33,7 @@ class ScratchProjectManager {
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
     this.scratchVoiced = false;
-
+    this.audio = new ScratchAudio();
   }
 
   load() {
@@ -508,8 +507,7 @@ class ScratchProjectManager {
       for (var projectName in pm.projects) {
         if (Utils.removeFillerWords(projectName) == projectToPlayName) {
           pm.currentProject = pm.projects[projectName];
-          pm.audioElement.src = 'assets/sound/coin_reverse.wav'
-          pm.audioElement.play();
+          pm.audio.cueProjectStarted();
           // TODO: Do we need a promise here to ensure that we've waited until
           // the project has been executed? (block further execution until the
           // game is complete? How might that affect the ability to listen to

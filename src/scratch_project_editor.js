@@ -6,6 +6,7 @@ const ScratchInstruction = require('./scratch_instruction.js');
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchRegex = require('./triggers.js');
+const ScratchAudio = require('./audio.js');
 
 /**
  * ScratchProjectEditor class
@@ -17,7 +18,8 @@ class ScratchProjectEditor {
 	 */
 	constructor() {
 		this.triggers = ScratchRegex.getEditProjectTriggers();
-		this.project = null
+		this.project = null;
+    this.audio = new ScratchAudio();
 	}
 
   /**
@@ -99,8 +101,9 @@ class ScratchProjectEditor {
   appendStep(args) {
     var stepToInsert = ScratchInstruction.parse(args[1]);
     if (!stepToInsert) {
+      this.audio.cueMistake();
       this.project.pm.say("I heard you say " + args[1]);
-      this.project.pm.say("That doesn't match any Scratch commands.");
+      // this.project.pm.say("That doesn't match any Scratch commands.");
       return false;
     } else {
       var newInstruction = new ScratchInstruction(args[1]);
