@@ -33,6 +33,7 @@ class ScratchProjectManager {
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
     this.scratchVoiced = false;
+    this.listening = true;
     this.audio = new ScratchAudio();
   }
 
@@ -212,9 +213,20 @@ class ScratchProjectManager {
   }
 
   /**
-   * Handle utterance on the general navigation level.
+   * Handle the utterance only when Scratch should be listening.
    */
   handleUtterance(utterance) {
+    if (this.listening) {
+      return this._handleUtterance(utterance);
+    } else if (Utils.match(utterance, this.triggers['listen'])) {
+      this.listening = true;
+    }
+  }
+
+  /**
+   * Handle utterance on the general navigation level.
+   */
+  _handleUtterance(utterance) {
     // NOTE: 'this' refers to the ScratchStateMachine that calls this function
     var lowercase = utterance.toLowerCase();
     var utterance = Utils.removeFillerWords(lowercase).trim();
@@ -300,6 +312,8 @@ class ScratchProjectManager {
       }
     }
 
+    // TODO: rip out this state variable, because we are no longer requiring
+    // scratch to always be voiced.
     this.scratchVoiced = false;
   }
 
