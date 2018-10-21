@@ -58,6 +58,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'renameCurrentProject', from: '*', to: function() { return this.state} },
     { name: 'renameProject', from: '*', to: function() { return this.state} },
     { name: 'deleteProject', from: '*', to: function() { return this.state} },
+    { name: 'editExistingProject', from: 'PlayProject',  to: 'InsideProject' },
     { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
     { name: 'newProject', from: 'Home',  to: 'InsideProject' },
     // Return should take you back to the last state
