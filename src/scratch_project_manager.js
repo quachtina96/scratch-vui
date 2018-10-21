@@ -96,6 +96,7 @@ class ScratchProjectManager {
    executeCurrentProjectWithVM(mode) {
     var pm = this;
     return new Promise(((resolve, reject) => {
+      pm.audio.stopBackground();
       if (!pm.currentProject) {
         throw Error('pm.currentProject is ' + pm.currentProject);
       }
@@ -547,7 +548,7 @@ class ScratchProjectManager {
   editExistingProject(lifecycle, args) {
     var pm = this;
     return new Promise(((resolve, reject) => {
-      console.log(args);
+      pm.audio.cueInsideProject();
       var projectName = args[1];
       pm.announceProjectToEdit(pm.projects[projectName])
       pm.currentProject = pm.projects[projectName];
@@ -557,6 +558,7 @@ class ScratchProjectManager {
   editProject() {
     var pm = this;
     return new Promise(((resolve, reject) => {
+      pm.audio.cueInsideProject();
       pm.announceProjectToEdit(pm.currentProject)
       resolve();
     }));

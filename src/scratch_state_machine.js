@@ -67,8 +67,10 @@ var ScratchStateMachine = new StateMachine.factory({
     }, {
       name: 'finishProject', from: 'InsideProject', to: 'Home'},
     { name: 'play', from: 'Home', to: 'PlayProject'},
+    { name: 'play', from: 'InsideProject', to: 'PlayProject'},
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
     { name: 'newProject', from: 'PlayProject',  to: 'InsideProject' },
+    { name: 'playCurrentProject', from: 'PlayProject', to: 'PlayProject'},
     { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
     { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
     // Support this.goto(STATE_NAME);
@@ -96,6 +98,7 @@ var ScratchStateMachine = new StateMachine.factory({
   methods: {
     // Initialize the state machine.
     onHome: function() {
+      this.pm.audio.cueHomeState()
       this.setupVM('scratch-stage')
       this.pm.load();
       this.setMethods();
@@ -183,7 +186,7 @@ var ScratchStateMachine = new StateMachine.factory({
       // Add scratch-vm event listeners.
       this.vm.runtime.on('SCRIPT_GLOW_OFF', () => {
         // Play the sound cue when the project stops playing.
-        this.audio.cueProjectFinished();
+        this.pm.audio.cueProjectFinished();
       });
 
 
@@ -215,6 +218,9 @@ var ScratchStateMachine = new StateMachine.factory({
         onEditProject: () => {this.pm.editProject()},
         onPlayCurrentProject: () => {this.pm.playCurrentProject()},
         onQueryState: () => {this.pm.queryState()},
+        onInsideProject: () => {this.pm.audio.cueInsideProject()},
+        onHome: () => {this.pm.audio.cueHomeState()},
+        onPlayProject: () => {this.pm.audio.stopBackground()},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];
