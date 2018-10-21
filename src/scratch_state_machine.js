@@ -84,7 +84,9 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'stopBackground', from: '*', to: function() {return this.state} },
     { name: 'stopCues', from: '*', to: function() {return this.state} },
     { name: 'startBackground', from: '*', to: function() {return this.state} },
-    { name: 'startCues', from: '*', to: function() {return this.state} }
+    { name: 'startCues', from: '*', to: function() {return this.state} },
+    { name: 'holdOn', from: '*', to: function() {return this.state} },
+    { name: 'listen', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -232,6 +234,11 @@ var ScratchStateMachine = new StateMachine.factory({
           this.pm.audio.cueBackground(this.state);
         },
         onStartCues: () => {this.pm.audio.muteCues = false},
+        onHoldOn: () => {this.pm.listening = false},
+        onListen: () => {
+          this.pm.listening = true;
+          this.pm.say("listening!");
+        },
         onHome: () => {this.pm.audio.cueHomeState()},
         onPlayProject: () => {this.pm.audio.stopBackground()},
       }

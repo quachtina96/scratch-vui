@@ -45,8 +45,8 @@ Utils.matchRegex = (utterance, pattern) => {
 }
 
 /**
- * Force the utterance to begin with Scratch if triggering a command, and get
- * all defined matches of string to given regular expression.
+ * Match to triggers with and without Scratch said before and get all defined
+ * matches of string to given regular expression.
  */
 Utils.match = (utterance, pattern) => {
   // Be flexible in how you recognize Scratch at the beginning of an utterance.
@@ -56,8 +56,11 @@ Utils.match = (utterance, pattern) => {
     var start = utterance.indexOf(voicedScratch[0]);
     var end = start + voicedScratch[0].length + 1;
     return Utils.matchRegex(utterance.substring(end, utterance.length), pattern);
+  } else {
+    // Attempt to match to entire utterance
+    var success = Utils.matchRegex(utterance.substring(end, utterance.length), pattern);
+    return success ? success : null;
   }
-  return null;
 }
 
 /**
