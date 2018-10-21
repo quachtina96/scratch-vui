@@ -39,13 +39,13 @@ ScratchRegex.getEditProjectTriggers = function() {
 	getStepCount: /how many steps ?(?:are there)?/,
 	getCurrentStep: /what step am i on|what’s my current step|what step is this/,
     goToStep: /go to step (.*)|what's step (.*)|what is step (.*)/,
-    nextStep: /go to next step|next step|what's next/,
+    nextStep: /go to next step|next step|what's next|next/,
     previousStep: /previous step|go back a step/,
-    playStep: /play step|play current step|what does it do/,
+    playStep: /^play step$|^play current step$|^what does it do$/,
     //TODO: should there be a comma after next step"
     appendStep: /add (?:the step)? ?(.*)|next (.*)|at the end (.*)|(.*) at the end|next (.*)|after all that (.*)|(.*) after all that/,
-    insertStepBefore: /insert (.*) before step (.*)|(.*) before step (.*)/,
-    insertStepAfter: /insert (.*) after step (.*)|(.*) after step (.*)/,
+    insertStepBefore: /(?:insert)? ?(.*) before step (.*)/,
+    insertStepAfter: /(?:insert)? ?(.*) after step (.*)/,
     deleteStep: /delete step (.*)/,
     // TODO: distinguish between replacing everywhere and replacing in a
     // specific place.
