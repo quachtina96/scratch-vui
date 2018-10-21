@@ -137,54 +137,6 @@ class ScratchProjectManager {
   }
 
   /**
-   * Execute current project.
-   * @param {string} mode - 'FromStart' to execute the project from the first
-   *    or 'WhereItLeftOff'.
-   */
-  executeCurrentProject(mode) {
-    if (!this.currentProject) {
-      throw Error('this.currentProject is ' + this.currentProject);
-    }
-
-    var scratchProgram = this.currentProject.getScratchProgram();
-
-    // Set bounds for which steps to execute
-    var endIndex, startIndex;
-    if (mode == 'WhereItLeftOff') {
-      startIndex = this.currentProject.instructionPointer;
-      endIndex = scratchProgram.length;
-    } else if (mode == 'FromStart') {
-      // Start at index 1 to skip the "when green flag clicked instruction"
-      startIndex = 1;
-      endIndex = scratchProgram.length;
-    } else if (mode == 'SingleStepWhereILeftOff') {
-      startIndex = this.currentProject.instructionPointer;
-      endIndex = startIndex + 1;
-    }
-
-    for (var i = startIndex; i < endIndex; i++) {
-      var opcode = scratchProgram[i][0];
-      var args = scratchProgram[i][1];
-      if (opcode == 'say:') {
-          this.say(scratchProgram[i][1]);
-      } else if (Array.isArray(opcode)) {
-        if (opcode[0] == 'doAsk')
-          if (opcode[1] == '') {
-          // Handle 'when i say event'
-          var whatToListenFor = args[1][2];
-          var whatToSay = args[2][0][1];
-          this.currentProject.tempTrigger = whatToListenFor;
-          this.currentProject.tempResponse= whatToSay;
-          this.currentProject.instructionPointer = i + 1;
-          return;
-        }
-      }
-    }
-    // Return whether the project is finished or not.
-    return i == scratchProgram.length - 1;
-  }
-
-  /**
    * Return whether or not this triggerType is valid with the arguments
    * As the system grows to support a wider range of commands of greater complexity,
    * false positives become common (w/ the general 'play' trigger for example).
@@ -564,6 +516,7 @@ class ScratchProjectManager {
     return new Promise(((resolve, reject) => {
       pm.audio.cueInsideProject();
       var projectName = args[1];
+      var projectName = projectName ? projectName : pm.currentProject.name;
       pm.announceProjectToEdit(pm.projects[projectName])
       pm.currentProject = pm.projects[projectName];
       resolve();
