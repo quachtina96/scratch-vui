@@ -67,8 +67,10 @@ var ScratchStateMachine = new StateMachine.factory({
     }, {
       name: 'finishProject', from: 'InsideProject', to: 'Home'},
     { name: 'play', from: 'Home', to: 'PlayProject'},
+    { name: 'play', from: 'InsideProject', to: 'PlayProject'},
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
     { name: 'newProject', from: 'PlayProject',  to: 'InsideProject' },
+    { name: 'playCurrentProject', from: 'PlayProject', to: 'PlayProject'},
     { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
     { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
     // Support this.goto(STATE_NAME);
@@ -79,6 +81,10 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getProjectNames', from: '*', to: function() { return this.state} },
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
     { name: 'queryState', from: '*', to: function() { return this.state} },
+    { name: 'stopBackground', from: '*', to: function() {return this.state} },
+    { name: 'stopCues', from: '*', to: function() {return this.state} },
+    { name: 'startBackground', from: '*', to: function() {return this.state} },
+    { name: 'startCues', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -96,6 +102,7 @@ var ScratchStateMachine = new StateMachine.factory({
   methods: {
     // Initialize the state machine.
     onHome: function() {
+      this.pm.audio.cueHomeState()
       this.setupVM('scratch-stage')
       this.pm.load();
       this.setMethods();
@@ -180,10 +187,12 @@ var ScratchStateMachine = new StateMachine.factory({
           }
       });
 
-      // Add event listeners to announce when a project has stopped.
-      this.vm.runtime.on('PROJECT_RUN_STOP', () => {
-        this.pm.say("Stopped playing project");
+      // Add scratch-vm event listeners.
+      this.vm.runtime.on('SCRIPT_GLOW_OFF', () => {
+        // Play the sound cue when the project stops playing.
+        this.pm.audio.cueProjectFinished();
       });
+
 
       // Run threads
       this.vm.start();
@@ -213,6 +222,18 @@ var ScratchStateMachine = new StateMachine.factory({
         onEditProject: () => {this.pm.editProject()},
         onPlayCurrentProject: () => {this.pm.playCurrentProject()},
         onQueryState: () => {this.pm.queryState()},
+        onStopBackground: () => {
+          this.pm.audio.stopBackground();
+          this.pm.audio.muteBackground = true;
+        },
+        onStopCues: () => {this.pm.audio.muteCues = true},
+        onStartBackground: () => {
+          this.pm.audio.muteBackground = false;
+          this.pm.audio.cueBackground(this.state);
+        },
+        onStartCues: () => {this.pm.audio.muteCues = false},
+        onHome: () => {this.pm.audio.cueHomeState()},
+        onPlayProject: () => {this.pm.audio.stopBackground()},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];

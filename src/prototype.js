@@ -5,7 +5,11 @@
  * @author Tina Quach (quacht@mit.edu)
  */
 global.ScratchStateMachine = require('./scratch_state_machine.js');
+global.ScratchAudio = require('./audio.js');
+
 global.scratch = new ScratchStateMachine();
+global.audio = new ScratchAudio();
+
 global.DEBUG = true;
 
 scratch.observe('onAfterTransition', () => {
@@ -82,6 +86,7 @@ if (!('webkitSpeechRecognition' in window)) {
     recognizing = true;
     showInfo('info_speak_now');
     start_img.src = 'assets/mic-animate.gif';
+    audio.cueListening();
   };
 
   recognition.onerror = function(event) {
@@ -108,11 +113,14 @@ if (!('webkitSpeechRecognition' in window)) {
   recognition.onend = function() {
     recognizing = false;
     if (ignore_onend) {
+      recognition.start();
       return;
     }
     start_img.src = 'assets/mic.gif';
     if (!final_transcript) {
       showInfo('info_start');
+      // NOTE: Force speech recognition to always be happening.
+      // recognition.start();
       return;
     }
     showInfo('');

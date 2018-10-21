@@ -6,6 +6,7 @@ const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchVUIStorage = require('./storage.js');
 const ScratchRegex = require('./triggers.js');
+const ScratchAudio = require('./audio.js');
 
 /**
  * ScratchProjectManager class
@@ -32,6 +33,7 @@ class ScratchProjectManager {
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
     this.scratchVoiced = false;
+    this.audio = new ScratchAudio();
   }
 
   load() {
@@ -94,6 +96,7 @@ class ScratchProjectManager {
    executeCurrentProjectWithVM(mode) {
     var pm = this;
     return new Promise(((resolve, reject) => {
+      pm.audio.stopBackground();
       if (!pm.currentProject) {
         throw Error('pm.currentProject is ' + pm.currentProject);
       }
@@ -121,6 +124,7 @@ class ScratchProjectManager {
       .then((scratchProgram) => {
         // NOTE: We do not need to JSON.stringify the scratch program before
         // passing it to the vm because it is already a string.
+        console.log(JSON.parse(scratchProgram))
         this.ssm.vm.loadProject(scratchProgram).then(()=> {
           this.ssm.vm.greenFlag();
         });
@@ -359,7 +363,7 @@ class ScratchProjectManager {
   _updatePlayRegex() {
     var pattern = this.triggers['play'].toString();
     var prefix = pattern.substring(1,pattern.length-1);
-    var regexString = prefix + '|(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')|(') + ')';
+    var regexString = prefix + '|^(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')$|^(') + ')$';
     this.triggers['play'] = new RegExp(regexString, "i");
   }
 
@@ -504,13 +508,12 @@ class ScratchProjectManager {
       for (var projectName in pm.projects) {
         if (Utils.removeFillerWords(projectName) == projectToPlayName) {
           pm.currentProject = pm.projects[projectName];
-          pm.say('playing project');
+          pm.audio.cueProjectStarted();
           // TODO: Do we need a promise here to ensure that we've waited until
           // the project has been executed? (block further execution until the
           // game is complete? How might that affect the ability to listen to
           // the user (starting and stopping a project))
           return pm.executeCurrentProjectWithVM('FromStart').then(()=>{
-            //// pm.say('done playing project');
             resolve();
           });
         }
@@ -545,7 +548,7 @@ class ScratchProjectManager {
   editExistingProject(lifecycle, args) {
     var pm = this;
     return new Promise(((resolve, reject) => {
-      console.log(args);
+      pm.audio.cueInsideProject();
       var projectName = args[1];
       pm.announceProjectToEdit(pm.projects[projectName])
       pm.currentProject = pm.projects[projectName];
@@ -555,6 +558,7 @@ class ScratchProjectManager {
   editProject() {
     var pm = this;
     return new Promise(((resolve, reject) => {
+      pm.audio.cueInsideProject();
       pm.announceProjectToEdit(pm.currentProject)
       resolve();
     }));
