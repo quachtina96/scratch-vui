@@ -10,6 +10,8 @@ class ScratchAudio {
  		this.cue = this._newChannel();
  		this.background = this._newChannel();
  		this.background.setAttributeNode(document.createAttribute('loop'));
+ 		this.muteCues = false;
+ 		this.muteBackground = false;
 	}
 
 	_newChannel() {
@@ -19,48 +21,53 @@ class ScratchAudio {
  		return channel;
 	}
 
+	_playCue(filepath) {
+		if (!this.muteCues) {
+			this.cue.src = filepath;
+			this.cue.play();
+		}
+	}
+
 	cueMistake() {
-		this.cue.src = 'assets/sound/hightom.wav'
-		this.cue.play();
+		this._playCue('assets/sound/hightom.wav');
 	}
 
 	cueProjectStarted() {
-		this.cue.src = 'assets/sound/coin_reverse.wav'
-		this.cue.play();
+		this._playCue('assets/sound/coin_reverse.wav');
 	}
 
 	cueProjectFinished() {
-    this.cue.src = 'assets/sound/coin_reverse.wav'
-    this.cue.play();
+		this._playCue('assets/sound/coin_reverse.wav');
 	}
 
 	cueListening() {
-    this.cue.src = 'assets/sound/snap.wav'
-    this.cue.play();
+		this._playCue('assets/sound/snap.wav');
 	}
 
 	cueDoneListening() {
-    this.cue.src = 'assets/sound/pop.wav'
-    this.cue.play();
+		this._playCue('assets/sound/pop.wav');
 	}
 
 	// Ambient sounds to characterize different contexts
 	cueInsideProject() {
-		console.log("cue inside project func")
-		this.background.src = "";
-    this.background.src = 'assets/sound/beats.mp3'
-    this.background.play();
+		if (!this.muteBackground) {
+			this.stopBackground();
+	    this.background.src = 'assets/sound/beats.mp3';
+	    this.background.play();
+		}
 	}
 
 	// Ambient sounds to characterize different contexts
 	cueHomeState() {
-		this.background.src = "";
-    this.background.src = 'assets/sound/blipblop.mp3'
-    this.background.play();
+		if (!this.muteBackground) {
+			this.stopBackground();
+	    this.background.src = 'assets/sound/blipblop.mp3';
+	    this.background.play();
+	  }
 	}
 
 	stopBackground() {
-		this.background.pause();
+		this.background.src = '';
 	}
 }
 

@@ -20,11 +20,13 @@ ScratchRegex.getGeneralTriggers = function() {
 	  'finishProject': /i'm done|i'm finished|(?:close|leave) (?:the)? ?project/,
 	  'playCurrentProject': /play (?:the)? ?(?:current)? ?project|start (?:the)? ?(?:current)? ?project|test (?:the)? ?(?:current)? ?project/,
 	  'play': /^play (.*)/,
-	  'return': /stop|go back|quit|exit/,
+	  'return': /stop$|go back$|quit$|exit$|cancel$/,
 	  'getCurrentProject': /get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
       'getNthProject': /((?:what is|what's)) project (?:number)? ?(.*)/,
 	  'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
-	  'getProjectCount': /how many projects do i have|how many projects have i made/
+	  'getProjectCount': /how many projects do i have|how many projects have i made/,
+	  'stopBackground': /^stop the (?:background)? ?(?:music|sounds)$/,
+	  'stopCues': /^stop (?:the)? ?audio cues$/
 	}
 }
 

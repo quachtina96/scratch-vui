@@ -81,6 +81,8 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getProjectNames', from: '*', to: function() { return this.state} },
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
     { name: 'queryState', from: '*', to: function() { return this.state} },
+    { name: 'stopBackground', from: '*', to: function() {return this.state} },
+    { name: 'stopCues', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -218,7 +220,11 @@ var ScratchStateMachine = new StateMachine.factory({
         onEditProject: () => {this.pm.editProject()},
         onPlayCurrentProject: () => {this.pm.playCurrentProject()},
         onQueryState: () => {this.pm.queryState()},
-        onInsideProject: () => {this.pm.audio.cueInsideProject()},
+        onStopBackground: () => {
+          this.pm.audio.stopBackground();
+          this.pm.audio.muteBackground = true;
+        },
+        onStopCues: () => {this.pm.audio.muteCues = true},
         onHome: () => {this.pm.audio.cueHomeState()},
         onPlayProject: () => {this.pm.audio.stopBackground()},
       }

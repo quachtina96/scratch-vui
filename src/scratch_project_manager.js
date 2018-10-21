@@ -363,7 +363,7 @@ class ScratchProjectManager {
   _updatePlayRegex() {
     var pattern = this.triggers['play'].toString();
     var prefix = pattern.substring(1,pattern.length-1);
-    var regexString = prefix + '|(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')|(') + ')';
+    var regexString = prefix + '|^(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')$|^(') + ')$';
     this.triggers['play'] = new RegExp(regexString, "i");
   }
 
