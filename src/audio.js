@@ -49,6 +49,14 @@ class ScratchAudio {
 	}
 
 	// Ambient sounds to characterize different contexts
+	cueBackground(state) {
+		if (state == 'InsideProject') {
+			this.cueInsideProject();
+		} else if (state == 'Home') {
+			this.cueHomeState();
+		}
+	}
+
 	cueInsideProject() {
 		if (!this.muteBackground) {
 			this.stopBackground();

@@ -25,8 +25,10 @@ ScratchRegex.getGeneralTriggers = function() {
       'getNthProject': /((?:what is|what's)) project (?:number)? ?(.*)/,
 	  'getProjectNames': /what projects do i have|what have i made so far|what are my projects called/,
 	  'getProjectCount': /how many projects do i have|how many projects have i made/,
-	  'stopBackground': /^stop the (?:background)? ?(?:music|sounds)$/,
-	  'stopCues': /^stop (?:the)? ?audio cues$/
+	  'stopBackground': /^stop (?:the)? ?(?:background)? ?(?:music|sounds)$/,
+	  'stopCues': /^stop (?:the)? ?audio cues$/,
+	  'startBackground': /^(?:start|give me|turn on) the (?:background)? ?(?:music|sounds|sound)$/,
+	  'startCues': /^(?:start|give me|turn on) (?:the)? ?audio cues$/
 	}
 }
 
