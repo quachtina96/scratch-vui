@@ -508,7 +508,6 @@ class ScratchProjectManager {
       for (var projectName in pm.projects) {
         if (Utils.removeFillerWords(projectName) == projectToPlayName) {
           pm.currentProject = pm.projects[projectName];
-          pm.say('playing project');
           pm.audioElement.src = 'assets/sound/coin_reverse.wav'
           pm.audioElement.play();
           // TODO: Do we need a promise here to ensure that we've waited until

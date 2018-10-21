@@ -180,11 +180,13 @@ var ScratchStateMachine = new StateMachine.factory({
           }
       });
 
-      // Add event listeners to announce when a project has stopped.
-      this.vm.runtime.on('PROJECT_RUN_STOP', () => {
-        // this.pm.say("Stopped playing project");
-        console.log('VM: PROJECT_RUN_STOP');
+      // Add scratch-vm event listeners.
+      this.vm.runtime.on('SCRIPT_GLOW_OFF', () => {
+        // Play the sound cue when the project stops playing.
+        this.pm.audioElement.src = 'assets/sound/coin_reverse.wav'
+        this.pm.audioElement.play();
       });
+
 
       // Run threads
       this.vm.start();
