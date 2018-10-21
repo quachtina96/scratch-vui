@@ -17,7 +17,7 @@ class ScratchAudio {
 	_newChannel() {
 		var channel = document.createElement('audio');
  		channel.type = "audio/wav";
- 		channel.volume -= 0.3
+ 		channel.volume -= 0.5
  		return channel;
 	}
 
