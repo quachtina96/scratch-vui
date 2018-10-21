@@ -497,7 +497,7 @@ class ScratchProjectManager {
   newProject() {
     var pm = this;
     return new Promise(((resolve, reject) => {
-      console.log(pm);
+      pm.audio.cueInsideProject();
       pm.currentProject = new ScratchProject(pm);
       pm.untitledCount++;
       pm.projects['Untitled-' + pm.untitledCount] = pm.currentProject;
