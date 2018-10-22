@@ -41,7 +41,11 @@ Utils.containsScratch = (utterance) => {
  */
 Utils.matchRegex = (utterance, pattern) => {
   var matches = utterance.match(pattern, "i");
-  return matches ? matches.filter(word => word != undefined && word != "") : null
+  matches = matches ? matches.filter(word => word != undefined && word != "") : null;
+  if (matches) {
+    return (matches.length > 0) ? matches : null;
+  }
+  return null;
 }
 
 /**
@@ -50,12 +54,13 @@ Utils.matchRegex = (utterance, pattern) => {
  */
 Utils.match = (utterance, pattern) => {
   // Be flexible in how you recognize Scratch at the beginning of an utterance.
-  var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+  // Allow the user to say "hey" or "okay" and "please".
+  var voicedScratch = Utils.matchRegex(utterance, /^(?:okay|hey|please)? ?(?:scratch|search)?(?:ed)? ?(?:please)?/);
   if (voicedScratch) {
     // Only match the triggers to the utterance without the voiced scratch.
     var start = utterance.indexOf(voicedScratch[0]);
-    var end = start + voicedScratch[0].length + 1;
-    return Utils.matchRegex(utterance.substring(end, utterance.length), pattern);
+    var end = start + voicedScratch[0].length;
+    return Utils.matchRegex(utterance.substring(end, utterance.length).trim(), pattern);
   } else {
     // Attempt to match to entire utterance
     var success = Utils.matchRegex(utterance.substring(end, utterance.length), pattern);
