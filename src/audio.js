@@ -19,7 +19,7 @@ class ScratchAudio {
 	 	this._setMuteFromLocalStorage();
 	}
 
-		/**
+	/**
 	 * Set the property and save it to local storage.
 	 */
 	_setMuteFromLocalStorage() {
