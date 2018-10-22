@@ -87,7 +87,9 @@ class ScratchProjectManager {
       scratch.recognition.stop();
     }
     whatToSay.onend = function(event) {
-      opt_on_end();
+      if (opt_on_end) {
+        opt_on_end();
+      }
       scratch.recognition.start();
     }
 
@@ -564,12 +566,20 @@ class ScratchProjectManager {
       pm.soundLibrary.vm =this.ssm.vm;
     }
     return new Promise((resolve, reject) => {
-      pm.say('I have many sounds. Here is 1')
-      pm.soundLibrary.getNSounds(1, -1).forEach((item) => {
-        pm.say('Here is ' + item.name);
-        pm.soundLibrary.playSound(item);
+      pm.say('I have many sounds. Here are 3');
+      // Build promise chain to present each sound in order.
+      var funcs = pm.soundLibrary.getNSounds(3, -1).map((item) => new Promise((resolve, reject) => {
+        pm.say('Here is ' + item.name, () => {
+          pm.soundLibrary.playSound(item)
+        });
+      }));
+      var promise = funcs[0];
+      for (var i = 1; i < funcs.length; i++) {
+        promise = promise.then(funcs[i]);
+      }
+      return promise.then(() => {
+        resolve();
       });
-      resolve();
     });
   }
   checkSound(lifecycle, args) {
