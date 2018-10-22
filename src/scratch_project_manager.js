@@ -7,6 +7,7 @@ const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchVUIStorage = require('./storage.js');
 const ScratchRegex = require('./triggers.js');
 const ScratchAudio = require('./audio.js');
+const SoundLibrary = require('./sound_library.js');
 
 /**
  * ScratchProjectManager class
@@ -35,6 +36,7 @@ class ScratchProjectManager {
     this.scratchVoiced = false;
     this.listening = true;
     this.audio = new ScratchAudio();
+    this.soundLibrary = new SoundLibrary(this.ssm.vm);
   }
 
   load() {
@@ -544,12 +546,47 @@ class ScratchProjectManager {
   queryState() {
     var pm = this;
     return new Promise((resolve, reject) => {
-        pm.say('You are in the ' + this.ssm.state + ' state');
-        if (pm.currentProject) {
-          pm.say('Your current project is ' + pm.currentProject.name);
-        }
-        resolve();
+      pm.say('You are in the ' + this.ssm.state + ' state');
+      if (pm.currentProject) {
+        pm.say('Your current project is ' + pm.currentProject.name);
+      }
+      resolve();
+    });
+  }
+  getSounds() {
+    var pm = this;
+    return new Promise((resolve, reject) => {
+      if (!pm.soundLibrary.vm) {
+      // Set up the vm for the sound library to play sound previews if the vm
+      // wasn't set in the constructor.
+        pm.soundLibrary.vm =this.ssm.vm;
+      }
+      pm.say('I have many sounds. Here are 3 of them.')
+      pm.soundLibrary.getNSounds(3, -1).forEach((item) => {
+        pm.say('Here is ' + item.name);
+        pm.soundLibrary.playSound(item);
       });
+      resolve();
+    });
+  }
+  checkSound(lifecycle, args) {
+    var pm = this;
+    return new Promise((resolve, reject) => {
+      if (!pm.soundLibrary.vm) {
+      // Set up the vm for the sound library to play sound previews if the vm
+      // wasn't set in the constructor.
+        pm.soundLibrary.vm =this.ssm.vm;
+      }
+      var soundToFind = args[1].trim();
+      if (pm.soundLibrary.has(soundToFind)) {
+        pm.say('Yes! Here is' + item.name);
+        pm.soundLibrary.playSound(pm.soundLibrary.dict[soundToFind]);
+      } else {
+        // TODO: find and present sounds that are similar.
+        pm.say('No');
+      }
+      resolve();
+    });
   }
 }
 

@@ -18,7 +18,7 @@ class SoundLibrary {
      * AudioEngine that will decode and play sounds for us.
      * @type {AudioEngine}
      */
-    this.audioEngine = null;
+    this.audioEngine = new AudioEngine();
     /**
      * A promise for the sound queued to play as soon as it loads and
      * decodes.
@@ -52,7 +52,7 @@ class SoundLibrary {
       while (randomIndexes.size < n) {
         randomIndexes.add(Math.floor(Math.random() * soundCount));
       }
-      var sounds = randomIndexes.map((index) => soundLibraryContent[index]);
+      var sounds = Array.from(randomIndexes).map((index) => soundLibraryContent[index]);
     } else {
       var sounds = soundLibraryContent.slice(opt_index, n);
     }
@@ -139,3 +139,5 @@ class SoundLibrary {
         });
   }
 }
+
+module.exports = SoundLibrary;
