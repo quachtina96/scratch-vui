@@ -227,14 +227,14 @@ var ScratchStateMachine = new StateMachine.factory({
         onQueryState: () => {this.pm.queryState()},
         onStopBackground: () => {
           this.pm.audio.stopBackground();
-          this.pm.audio.muteBackground = true;
+          this.pm.audio.setMute("muteBackground", true);
         },
-        onStopCues: () => {this.pm.audio.muteCues = true},
+        onStopCues: () => {this.pm.audio.setMute("muteCues", true)},
         onStartBackground: () => {
-          this.pm.audio.muteBackground = false;
+          this.pm.audio.setMute("muteBackground", false);
           this.pm.audio.cueBackground(this.state);
         },
-        onStartCues: () => {this.pm.audio.muteCues = false},
+        onStartCues: () => {this.pm.audio.setMute("muteCues", false)},
         onHoldOn: () => {this.pm.listening = false},
         onListen: () => {
           this.pm.listening = true;

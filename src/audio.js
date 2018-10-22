@@ -10,8 +10,34 @@ class ScratchAudio {
  		this.cue = this._newChannel();
  		this.background = this._newChannel();
  		this.background.setAttributeNode(document.createAttribute('loop'));
- 		this.muteCues = false;
- 		this.muteBackground = false;
+ 		if (!window.localStorage.scratchAudioSettings) {
+	 		window.localStorage.scratchAudioSettings = JSON.stringify({
+	 			'muteCues': false,
+	 			'muteBackground': false
+	 		});
+	 	}
+	 	this._setMuteFromLocalStorage();
+	}
+
+		/**
+	 * Set the property and save it to local storage.
+	 */
+	_setMuteFromLocalStorage() {
+ 		if (window.localStorage.scratchAudioSettings) {
+ 			var settings = JSON.parse(window.localStorage.scratchAudioSettings);
+	 		this.muteCues = settings.muteCues;
+	 		this.muteBackground = settings.muteBackground;
+	 	}
+	}
+
+	/**
+	 * Set the property and save it to local storage.
+	 */
+	setMute(property, value) {
+		this[property] = value;
+		var settings = JSON.parse(window.localStorage.scratchAudioSettings);
+		settings[property] = value;
+		window.localStorage.scratchAudioSettings = JSON.stringify(settings);
 	}
 
 	_newChannel() {
