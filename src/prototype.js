@@ -142,6 +142,7 @@ if (!('webkitSpeechRecognition' in window)) {
       if (event.results[i].isFinal) {
         final_transcript = event.results[i][0].transcript;
         console.log(event.results[i][0].transcript)
+        scratch.pm.audio.cueListening();
         // Analyze utterance.
         scratch.handleUtterance(event.results[i][0].transcript)
       } else {

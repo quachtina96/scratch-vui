@@ -75,8 +75,10 @@ class ScratchProjectManager {
   /**
    * Speak aloud given text.
    * @param {!String} whatToSay - text to say aloud.
+   * @param {Function} opt_on_end - optional callback function to run when the
+   *  speech  synthesis is complete.
    */
-  say(whatToSay) {
+  say(whatToSay, opt_on_end) {
     var whatToSay = new SpeechSynthesisUtterance(whatToSay);
 
     // Stop speech recognition during speech synthesis.
@@ -85,6 +87,7 @@ class ScratchProjectManager {
       scratch.recognition.stop();
     }
     whatToSay.onend = function(event) {
+      opt_on_end();
       scratch.recognition.start();
     }
 
@@ -555,12 +558,12 @@ class ScratchProjectManager {
   }
   getSounds() {
     var pm = this;
+    if (!pm.soundLibrary.vm) {
+    // Set up the vm for the sound library to play sound previews if the vm
+    // wasn't set in the constructor.
+      pm.soundLibrary.vm =this.ssm.vm;
+    }
     return new Promise((resolve, reject) => {
-      if (!pm.soundLibrary.vm) {
-      // Set up the vm for the sound library to play sound previews if the vm
-      // wasn't set in the constructor.
-        pm.soundLibrary.vm =this.ssm.vm;
-      }
       pm.say('I have many sounds. Here is 1')
       pm.soundLibrary.getNSounds(1, -1).forEach((item) => {
         pm.say('Here is ' + item.name);
@@ -571,19 +574,21 @@ class ScratchProjectManager {
   }
   checkSound(lifecycle, args) {
     var pm = this;
+    if (!pm.soundLibrary.vm) {
+    // Set up the vm for the sound library to play sound previews if the vm
+    // wasn't set in the constructor.
+      pm.soundLibrary.vm = this.ssm.vm;
+    }
     return new Promise((resolve, reject) => {
-      if (!pm.soundLibrary.vm) {
-      // Set up the vm for the sound library to play sound previews if the vm
-      // wasn't set in the constructor.
-        pm.soundLibrary.vm =this.ssm.vm;
-      }
       var soundToFind = args[1].trim();
-      if (pm.soundLibrary.has(soundToFind)) {
-        pm.say('Yes! Here is' + item.name);
-        pm.soundLibrary.playSound(pm.soundLibrary.dict[soundToFind]);
+      var soundItem = pm.soundLibrary.get(soundToFind)
+      if (soundItem) {
+        pm.soundLibrary.playSound(soundItem);
       } else {
-        // TODO: find and present sounds that are similar.
-        pm.say('No');
+        var randomSound = pm.soundLibrary.getRandomSound();
+        pm.say('No, but here is ' + randomSound.name, () => {
+          pm.soundLibrary.playSound(randomSound);
+        });
       }
       resolve();
     });

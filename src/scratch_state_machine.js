@@ -245,7 +245,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onHome: () => {this.pm.audio.cueHomeState()},
         onPlayProject: () => {this.pm.audio.stopBackground()},
         onGetSounds: () => {this.pm.getSounds()},
-        onCheckSound: () => {this.pm.checkSound()},
+        onCheckSound: (lifecycle, args) => {this.pm.checkSound(lifecycle, args)},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];

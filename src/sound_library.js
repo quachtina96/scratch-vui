@@ -28,9 +28,26 @@ class SoundLibrary {
     this.dict = this._getDict(soundLibraryContent);
   }
 
+  /**
+   * Return the sound item with given name.
+   */
+  get(name) {
+    var title = this._titleCase(name);
+    return this.dict[title];
+  }
+
+  /**
+   * Return the sound item with given name.
+   */
+  getRandomSound(name) {
+    var randomSoundList = this.getNSounds(1, -1);
+    return randomSoundList[0];
+  }
+
+
   _getDict(soundLibraryContent) {
     var dict = {}
-    for (var i; i<soundLibraryContent.length; i++) {
+    for (var i = 0; i<soundLibraryContent.length; i++) {
       var item = soundLibraryContent[i];
       dict[item.name] = item;
     }
@@ -43,6 +60,7 @@ class SoundLibrary {
    * @param {int} n - the number of sound objects to return
    * @param {int} opt_index - optional index to start from; if -1, return random
    *   set.
+   * @return {Array} list of n sound items.
    */
   getNSounds(n, opt_index=0) {
     var soundCount = soundLibraryContent.length;
@@ -59,11 +77,22 @@ class SoundLibrary {
     return sounds;
   }
 
+  _titleCase(str) {
+    var splitStr = str.toLowerCase().split(' ');
+    for (var i = 0; i < splitStr.length; i++) {
+      // You do not need to check if i is larger than splitStr length, as your for does that for you
+      // Assign it back to the array
+      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+    }
+    // Directly return the joined string
+    return splitStr.join(' ');
+  }
+
   /**
    * Return whether or not the sound exists in the sound library.
    */
   has(soundName) {
-    return soundName in this.dict;
+    return this._titleCase(soundName) in this.dict;
   }
 
   /**
