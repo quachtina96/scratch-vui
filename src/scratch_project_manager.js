@@ -561,8 +561,8 @@ class ScratchProjectManager {
       // wasn't set in the constructor.
         pm.soundLibrary.vm =this.ssm.vm;
       }
-      pm.say('I have many sounds. Here are 3 of them.')
-      pm.soundLibrary.getNSounds(3, -1).forEach((item) => {
+      pm.say('I have many sounds. Here is 1')
+      pm.soundLibrary.getNSounds(1, -1).forEach((item) => {
         pm.say('Here is ' + item.name);
         pm.soundLibrary.playSound(item);
       });
