@@ -31,6 +31,8 @@ ScratchRegex.getGeneralTriggers = function() {
 	  'startCues': /^(?:start|give me|turn on) (?:the)? ?audio cues$/,
 	  'holdOn': /^hold on|stop listening$/,
 	  'listen': /^listen|i'm ready$/,
+	  'getSounds': /^what sounds are there|what sounds do you have$/,
+	  'checkSound': /^do you have (?:a|the|this) (.*) sound?$/
 	}
 }
 

@@ -65,8 +65,8 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'return',   from: '*', to: function() {
         return this.history[this.history.length - 2];
       }
-    }, {
-      name: 'finishProject', from: 'InsideProject', to: 'Home'},
+    },
+    {name: 'finishProject', from: 'InsideProject', to: 'Home'},
     { name: 'play', from: 'Home', to: 'PlayProject'},
     { name: 'play', from: 'InsideProject', to: 'PlayProject'},
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
@@ -87,7 +87,9 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'startBackground', from: '*', to: function() {return this.state} },
     { name: 'startCues', from: '*', to: function() {return this.state} },
     { name: 'holdOn', from: '*', to: function() {return this.state} },
-    { name: 'listen', from: '*', to: function() {return this.state} }
+    { name: 'listen', from: '*', to: function() {return this.state} },
+    { name: 'getSounds', from: '*', to: function() {return this.state} },
+    { name: 'checkSound', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -242,6 +244,8 @@ var ScratchStateMachine = new StateMachine.factory({
         },
         onHome: () => {this.pm.audio.cueHomeState()},
         onPlayProject: () => {this.pm.audio.stopBackground()},
+        onGetSounds: () => {this.pm.getSounds()},
+        onCheckSound: (lifecycle, args) => {this.pm.checkSound(lifecycle, args)},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];

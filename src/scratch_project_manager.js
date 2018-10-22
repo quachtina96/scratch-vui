@@ -7,6 +7,7 @@ const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchVUIStorage = require('./storage.js');
 const ScratchRegex = require('./triggers.js');
 const ScratchAudio = require('./audio.js');
+const SoundLibrary = require('./sound_library.js');
 
 /**
  * ScratchProjectManager class
@@ -35,6 +36,7 @@ class ScratchProjectManager {
     this.scratchVoiced = false;
     this.listening = true;
     this.audio = new ScratchAudio();
+    this.soundLibrary = new SoundLibrary(this.ssm.vm);
   }
 
   load() {
@@ -73,8 +75,10 @@ class ScratchProjectManager {
   /**
    * Speak aloud given text.
    * @param {!String} whatToSay - text to say aloud.
+   * @param {Function} opt_on_end - optional callback function to run when the
+   *  speech  synthesis is complete.
    */
-  say(whatToSay) {
+  say(whatToSay, opt_on_end) {
     var whatToSay = new SpeechSynthesisUtterance(whatToSay);
 
     // Stop speech recognition during speech synthesis.
@@ -83,6 +87,9 @@ class ScratchProjectManager {
       scratch.recognition.stop();
     }
     whatToSay.onend = function(event) {
+      if (opt_on_end) {
+        opt_on_end();
+      }
       scratch.recognition.start();
     }
 
@@ -544,12 +551,57 @@ class ScratchProjectManager {
   queryState() {
     var pm = this;
     return new Promise((resolve, reject) => {
-        pm.say('You are in the ' + this.ssm.state + ' state');
-        if (pm.currentProject) {
-          pm.say('Your current project is ' + pm.currentProject.name);
-        }
+      pm.say('You are in the ' + this.ssm.state + ' state');
+      if (pm.currentProject) {
+        pm.say('Your current project is ' + pm.currentProject.name);
+      }
+      resolve();
+    });
+  }
+  getSounds() {
+    var pm = this;
+    if (!pm.soundLibrary.vm) {
+    // Set up the vm for the sound library to play sound previews if the vm
+    // wasn't set in the constructor.
+      pm.soundLibrary.vm =this.ssm.vm;
+    }
+    return new Promise((resolve, reject) => {
+      pm.say('I have many sounds. Here are 3');
+      // Build promise chain to present each sound in order.
+      var funcs = pm.soundLibrary.getNSounds(3, -1).map((item) => new Promise((resolve, reject) => {
+        pm.say('Here is ' + item.name, () => {
+          pm.soundLibrary.playSound(item)
+        });
+      }));
+      var promise = funcs[0];
+      for (var i = 1; i < funcs.length; i++) {
+        promise = promise.then(funcs[i]);
+      }
+      return promise.then(() => {
         resolve();
       });
+    });
+  }
+  checkSound(lifecycle, args) {
+    var pm = this;
+    if (!pm.soundLibrary.vm) {
+    // Set up the vm for the sound library to play sound previews if the vm
+    // wasn't set in the constructor.
+      pm.soundLibrary.vm = this.ssm.vm;
+    }
+    return new Promise((resolve, reject) => {
+      var soundToFind = args[1].trim();
+      var soundItem = pm.soundLibrary.get(soundToFind)
+      if (soundItem) {
+        pm.soundLibrary.playSound(soundItem);
+      } else {
+        var randomSound = pm.soundLibrary.getRandomSound();
+        pm.say('No, but here is ' + randomSound.name, () => {
+          pm.soundLibrary.playSound(randomSound);
+        });
+      }
+      resolve();
+    });
   }
 }
 
