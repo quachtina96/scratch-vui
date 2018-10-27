@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>ScratchVUI Web Speech API Demo</title>
+<title>Talk to Code</title>
 <style>
   * {
     font-family: Verdana, Arial, sans-serif;
@@ -82,7 +82,7 @@
 /* Style pulled from the benchmark example in scratch-vm */
 #scratch-stage {
     border: 5px solid black;
-    display: block;
+    display: block; /*display: none;*/
     width: 400px;
     height: 300px;
 }
@@ -97,9 +97,10 @@
     display: none;
 }
 </style>
+<body>
 <h1 class="center" id="headline">
-  ScratchVUI <a href="http://dvcs.w3.org/hg/speech-api/raw-file/tip/speechapi.html">
-    Web Speech API</a> Demonstration</h1>
+  Talk to Code
+</h1>
 <div id="state_info">
   <p> Current state: <span id="current_state">Home</span></p>
 </div>
@@ -134,3 +135,4 @@
 <!-- Scratch Stage -->
 <canvas id="scratch-stage"></canvas><br />
 <script src='bundle.js'></script>
+</body>
