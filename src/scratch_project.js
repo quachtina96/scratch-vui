@@ -147,27 +147,29 @@ var ScratchProject = StateMachine.factory({
           return;
         }
 
-        // Make sure that Scratch is said before handling the utterance.
         var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+        var command = utterance;
         if (voicedScratch) {
           // Only match the triggers to the utterance without the voiced scratch.
           var start = utterance.indexOf(voicedScratch[0]);
           var end = start + voicedScratch[0].length + 1;
           var command = utterance.substring(end, utterance.length);
-          var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-          var command = punctuationless.replace(/\s{2,}/g," ");
-          ScratchInstruction.parse(command).then((result) => {
-            if (!result) {
-              this.audio.cueMistake();
-              this.pm.say("I heard you say " + utterance);
-            } else {
-              var instruction = new ScratchInstruction(command);
-              instruction.parse = result
-              this.instructions.push(instruction);
-              this.addInstruction();
-            }
-          });
         }
+        var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+        var command = punctuationless.replace(/\s{2,}/g," ");
+        ScratchInstruction.parse(command).then((result) => {
+          if (!result) {
+            // Failed to parse the command using ScratchNLP. Alert failure.
+            this.audio.cueMistake();
+            this.pm.say("I heard you say " + utterance);
+          } else {
+            // Success!
+            var instruction = new ScratchInstruction(command);
+            instruction.parse = result
+            this.instructions.push(instruction);
+            this.addInstruction();
+          }
+        });
       }
     },
     // TODO: the scratch_project should already be handling utterances during

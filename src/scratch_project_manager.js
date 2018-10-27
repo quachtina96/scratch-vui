@@ -123,7 +123,7 @@ class ScratchProjectManager {
         endIndex = totalInstructionCount;
       } else if (mode == 'SingleStepWhereILeftOff') {
         startIndex = pm.currentProject.instructionPointer;
-        endIndex = startIndex + 1;
+        endIndex = startIndex;
       }
 
       // The Scratch program returned includes the code to execute
@@ -541,10 +541,11 @@ class ScratchProjectManager {
     var pm = this;
     return new Promise(((resolve, reject) => {
       this.storage.save();
-      pm.say('Playing current project ' + pm.currentProject.name);
-      pm.executeCurrentProjectWithVM('FromStart').then(() => {
-        // pm.say('done playing project');
-        resolve();
+      pm.say('Playing current project ' + pm.currentProject.name, () => {
+        pm.executeCurrentProjectWithVM('FromStart').then(() => {
+          // pm.say('done playing project');
+          resolve();
+        });
       });
     }));
   }

@@ -58,6 +58,19 @@ class ScratchProjectEditor {
     }
   }
 
+  /**
+   * List all the steps in the project.
+   */
+  getAllSteps(args) {
+    var steps = this.project.instructions.map((instruction) => instruction.raw).join('. ')
+    steps.forEach((step) => {
+      this.project.pm.say(step);
+    });
+    }
+
+  /**
+   * Jump to and describe a single step given index (under 1-based index).
+   */
   goToStep(args) {
     this.project.instructionPointer = Utils.text2num(args[1]);
     if (this.project.instructionPointer == null) {
@@ -89,7 +102,7 @@ class ScratchProjectEditor {
   }
 
   /**
-   * Play the step.
+   * Play the current step.
    */
   playStep() {
     this.project.pm.executeCurrentProjectWithVM('SingleStepWhereILeftOff');

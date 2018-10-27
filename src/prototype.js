@@ -157,4 +157,16 @@ if (!('webkitSpeechRecognition' in window)) {
       showButtons('inline-block');
     }
   };
+
+  document.onkeydown = function(evt) {
+    evt = evt || window.event;
+    if (evt.code == 'Space') {
+      if (recognizing) {
+        recognition.stop();
+        return;
+      } else {
+        recognition.start();
+      }
+    }
+  };
 }
