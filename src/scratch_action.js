@@ -108,6 +108,10 @@ ScratchAction._generateSpecs = (triggers) => {
  */
 ScratchAction.General = {}
 
+ScratchAction.General.getTriggers() = {
+	return Object.keys(ScratchAction.General);
+}
+
 //queryState
 ScratchAction.General.queryState = Action({
 	"trigger": /what state am i in|where am i/,
@@ -475,3 +479,9 @@ ScratchAction.Edit.replaceStep = Action({
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
+
+ScratchAction.Edit.getTriggers() = {
+	return Object.keys(ScratchAction.Edit);
+}
+
+module.exports = ScratchAction;

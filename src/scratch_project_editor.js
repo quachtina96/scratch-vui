@@ -5,7 +5,7 @@
 const ScratchInstruction = require('./scratch_instruction.js');
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
-const ScratchRegex = require('./triggers.js');
+const ScratchAction = require('./scratch_action.js');
 const ScratchAudio = require('./audio.js');
 
 /**
@@ -17,7 +17,7 @@ class ScratchProjectEditor {
 	 * Constructor for ScratchProjectEditor
 	 */
 	constructor() {
-		this.triggers = ScratchRegex.getEditProjectTriggers();
+		this.triggers = ScratchAction.Edit.getTriggers();
 		this.project = null;
     this.audio = new ScratchAudio();
 	}

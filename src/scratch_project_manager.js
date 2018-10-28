@@ -5,7 +5,7 @@
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchVUIStorage = require('./storage.js');
-const ScratchRegex = require('./triggers.js');
+const ScratchAction = require('./scratch_action.js');
 const ScratchAudio = require('./audio.js');
 const SoundLibrary = require('./sound_library.js');
 
@@ -29,7 +29,7 @@ class ScratchProjectManager {
     this.recognition = new webkitSpeechRecognition();
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
-    this.triggers = ScratchRegex.getGeneralTriggers();
+    this.triggers = ScratchAction.General.getTriggers();
     // Whether currently listening for a yes or no answer.
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
