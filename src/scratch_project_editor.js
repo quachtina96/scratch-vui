@@ -114,21 +114,30 @@ class ScratchProjectEditor {
   // multiple stacks, and this can get tricky with event-based stuff (which
   // Scratch implements as multiple stacks)
   appendStep(args) {
-    var stepToInsert = ScratchInstruction.parse(args[1]);
-    if (!stepToInsert) {
-      this.audio.cueMistake();
-      this.project.pm.say("I heard you say " + args[1]);
-      // this.project.pm.say("That doesn't match any Scratch commands.");
-      return false;
-    } else {
-      var newInstruction = new ScratchInstruction(args[1]);
-      this.project.instructions.push(newInstruction)
-      this.project.pm.say("I added " + newInstruction.raw + " to the end of the project");
-      // Induce the state transition in the project.
-      this.project.goto("nonempty");
-      this.project.addInstruction();
-      return true;
+    var step = args[1];
+    var voicedScratch = Utils.matchRegex(step, /^(?:scratch|search)(?:ed)?/);
+    var command = step;
+    if (voicedScratch) {
+      // Only match the triggers to the step without the voiced scratch.
+      var start = step.indexOf(voicedScratch[0]);
+      var end = start + voicedScratch[0].length + 1;
+      var command = step.substring(end, step.length);
     }
+    var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var command = punctuationless.replace(/\s{2,}/g," ");
+    ScratchInstruction.parse(command).then((result) => {
+      if (!result) {
+        // Failed to parse the command using ScratchNLP. Alert failure.
+        this.audio.cueMistake();
+        this.pm.say("I heard you say " + step + ". That's not a Scratch command.");
+      } else {
+        // Success!
+        var instruction = new ScratchInstruction(command);
+        instruction.parse = result
+        this.instructions.push(instruction);
+        this.addInstruction();
+      }
+    });
   }
 
   insertStepBefore(args) {
@@ -215,12 +224,6 @@ class ScratchProjectEditor {
     var newWord = args[3];
     var instructionToModify = this.project.instructions[index];
     // TODO: determine how to replace things w/in a step.
-  }
-
-  replaceSound(args) {
-    var oldSound = args[1];
-    var newSound = args[2];
-    // TODO: how does sound work in Scratch Programs.
   }
 
   getCurrentStep() {

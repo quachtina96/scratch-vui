@@ -48,6 +48,11 @@ class ScratchProjectManager {
     }
   }
 
+  // Return whether it has project of given naem.
+  has(projectName) {
+    return projectName in ssm.pm.projects;
+  }
+
   renameProject(oldName, newName) {
     this.projects[newName] = this.projects[oldName]
     this.projects[newName].name = newName;

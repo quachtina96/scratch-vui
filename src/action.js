@@ -7,15 +7,23 @@
  */
 
 /**
- * The Requirement class provides a representation for arguments needed to
+ * The Argument class provides a representation for arguments needed to
  * accomplish the various actions in the system.
  */
-class Requirement {
-	constructor(name, validator) {
-		this.name = name;
+class Argument {
+	/**
+	 * Create a argument.
+	 * @param {Object} options -
+	 * 	@param {String} name - the argument the argument represents
+	 * 	@param {Function} validator - takes two parameters: ScratchStateMachine
+	 * 		instance and the value to validate. Returns true if value is valid.
+	 * 	@param {String} description - how to describe the desired argument
+	 */
+	constructor(options) {
+		this.name = options.name;
 		this.value = null;
-		this.validator = validator;
-		this.description = description;
+		this.validator = options.validator ? options.validator () => {return true};
+		this.description = options.description ? options.description : "" ;
 	}
 
 	isSatisfied() {
@@ -27,7 +35,7 @@ class Requirement {
 	}
 
 	/**
-	 * If the value is valid for the given requirement, set the value.
+	 * If the value is valid for the given argument, set the value.
 	 */
 	set(value) {
 		var valid = this.validate(value)
@@ -36,7 +44,7 @@ class Requirement {
 	}
 
 	/**
-	 * Get value associated with the requirement.
+	 * Get value associated with the argument.
 	 */
 	get() {
 		return this.value
@@ -47,15 +55,18 @@ class Action {
 	/**
 	 * Create an instance of a Scratch Action.
 	 * @param {Object} params containing
-	 * 		@param {RegExp} trigger - the regular expression representing the ways to
+	 * 		{RegExp} trigger - the regular expression representing the ways to
 	 * 			recognize an action from a user's utterance and where to extract arguments
-	 * 		@param {String} description - how to verbally represent a specific action.
-	 * 		@param {Object} requirements - map of requirement names to requirement objects.
+	 * 		{String} description - how to verbally represent a specific action.
+	 * 		{Object} arguments - map of argument names to argument objects.
+	 * 		{Function} contextValidator - given ssm and other arguments, returns true
+	 * 				if able to execute action given context.
 	 */
 	constructor(options) {
-		this.trigger = options.trigger;
-		this.description = options.description;
-		this.requirements = options.requirements;
+		this.trigger = options.trigger ? options.trigger : /\*/;
+		this.description = options.description ? options.description :  "";
+		this.arguments = options.arguments ? options.arguments : [];
+		this.contextValidator = options.contextValidator ? options.contextValidator : () => {return true};
 	}
 
 	/**
@@ -63,11 +74,11 @@ class Action {
 	 */
 	_getMissingArguments() {
 		var missingArgs = {}
-		for req in this.requirements {
+		this.arguments.forEach((req) => {
 			if (!req.isSatisfied()) {
-				missingArgs[req] = this.requirements[req]
+				missingArgs[req] = this.arguments[req]
 			}
-		}
+		});
 		return missingArgs;
 	}
 
@@ -79,10 +90,10 @@ class Action {
 	}
 
 	/**
-	 * Ask user to satisfy requirement.
+	 * Ask user to satisfy argument.
 	 */
-	_requestArgument(synthesis, requirement) {
-		synthesis.say('What do you want ' + requirement.name + 'to be?')
+	_requestArgument(synthesis, argument) {
+		synthesis.say('What do you want ' + argument.name + 'to be?')
 		// TODO: if the user doesn't know, pick something for them? and/or explain
 		// further what the thing is by giving them a description. Only do this after
 		// introducing the right arrow key as a way to skip the speech. OR maybe
@@ -92,10 +103,11 @@ class Action {
 		// direct speech utterance to the action.
 	}
 
-	modifyRequirement(name, value) {
-		this.requirements[name].set(value)
+	modifyArgument(name, value) {
+		var reqToMod = this.arguments.filter(argument => argument.name == name)
+		reqToMod.set(value)
 	}
 }
 
-export { Requirement }
+export { Argument }
 export { Action }

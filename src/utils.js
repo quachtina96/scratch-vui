@@ -1,7 +1,6 @@
 /**
  * @fileoverview Utility functions used across files.
  */
-const Triggers = require('./triggers.js');
 const DiffMatchPatch = require('diff-match-patch');
 const WordTokenizer = require('./tokenize.js')
 const LevenshteinDistance = require('./levenshtein_distance.js')
