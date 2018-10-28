@@ -604,6 +604,24 @@ class ScratchProjectManager {
       resolve();
     });
   }
+  getPossibleActions(lifecycle, args) {
+    var pm = this;
+    return new Promise((resolve, reject) => {
+      var possibleActions = [];
+      switch(pm.ssm.state) {
+        case 'Home':
+          possibleActions = {}
+          break;
+        case 'PlayProject':
+          possibleActions = {}
+          break;
+        case 'InsideProject':
+          possibleActions = {}
+          break;
+      }
+      resolve();
+    });
+  }
 }
 
 module.exports = ScratchProjectManager;

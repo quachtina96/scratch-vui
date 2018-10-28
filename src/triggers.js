@@ -32,7 +32,9 @@ ScratchRegex.getGeneralTriggers = function() {
 	  'holdOn': /^hold on|stop listening$/,
 	  'listen': /^listen$|^i'm ready$/,
 	  'getSounds': /^what sounds are there|what sounds do you have$/,
-	  'checkSound': /^do you have (?:a|the|this) (.*) sound?$/
+	  'checkSound': /^do you have (?:a|the|this) (.*) sound?$/,
+	  'queryActions': /^what can i do$/,
+	  'queryActionTypes': /^what are the kinds of things i can do$/
 	}
 }
 

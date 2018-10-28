@@ -43,18 +43,19 @@ class Requirement {
 	}
 }
 
-class ScratchAction {
+class Action {
 	/**
 	 * Create an instance of a Scratch Action.
-	 * @param {RegExp} trigger - the regular expression representing the ways to
-	 * 	recognize an action from a user's utterance and where to extract arguments
-	 * @param {String} description - how to verbally represent a specific action.
-	 * @param {Object} requirements - map of requirement names to requirement objects.
+	 * @param {Object} params containing
+	 * 		@param {RegExp} trigger - the regular expression representing the ways to
+	 * 			recognize an action from a user's utterance and where to extract arguments
+	 * 		@param {String} description - how to verbally represent a specific action.
+	 * 		@param {Object} requirements - map of requirement names to requirement objects.
 	 */
-	constructor(trigger, description, requirements) {
-		this.trigger = trigger;
-		this.description = description;
-		this.requirements = requirements;
+	constructor(options) {
+		this.trigger = options.trigger;
+		this.description = options.description;
+		this.requirements = options.requirements;
 	}
 
 	/**
@@ -95,3 +96,6 @@ class ScratchAction {
 		this.requirements[name].set(value)
 	}
 }
+
+export { Requirement }
+export { Action }

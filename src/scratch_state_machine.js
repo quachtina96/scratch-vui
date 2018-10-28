@@ -89,7 +89,8 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'holdOn', from: '*', to: function() {return this.state} },
     { name: 'listen', from: '*', to: function() {return this.state} },
     { name: 'getSounds', from: '*', to: function() {return this.state} },
-    { name: 'checkSound', from: '*', to: function() {return this.state} }
+    { name: 'checkSound', from: '*', to: function() {return this.state} },
+    { name: 'queryActions', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -245,6 +246,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onHome: () => {this.pm.audio.cueHomeState()},
         onPlayProject: () => {this.pm.audio.stopBackground()},
         onGetSounds: () => {this.pm.getSounds()},
+        onQueryActions: () => {this.pm.getPossibleActions()},
         onCheckSound: (lifecycle, args) => {this.pm.checkSound(lifecycle, args)},
       }
       for (var method in methodMap) {
