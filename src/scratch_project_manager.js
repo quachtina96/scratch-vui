@@ -29,7 +29,8 @@ class ScratchProjectManager {
     this.recognition = new webkitSpeechRecognition();
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
-    this.triggers = ScratchAction.General.getTriggers();
+    this.triggers = ScratchRegex.getGeneralTriggers();
+    this.actions = ScratchAction.General;
     // Whether currently listening for a yes or no answer.
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
@@ -182,7 +183,7 @@ class ScratchProjectManager {
   handleUtterance(utterance) {
     if (this.listening) {
       return this._handleUtterance(utterance);
-    } else if (Utils.match(utterance, this.triggers['listen'])) {
+    } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
       this.listening = true;
     }
   }
@@ -211,11 +212,11 @@ class ScratchProjectManager {
     }
 
     // Attempt to match utterance to general triggers.
-    for (var triggerType in this.triggers) {
+    for (var triggerType in this.actions) {
 
       // If the user already said Scratch at the end of the previous utterance,
       // do not require the user to say it again.
-      var args = this.scratchVoiced ? Utils.matchRegex(utterance, this.triggers[triggerType]) : Utils.match(utterance, this.triggers[triggerType]);
+      var args = this.scratchVoiced ? Utils.matchRegex(utterance, this.actions[triggerType].trigger) : Utils.match(utterance, this.actions[triggerType].trigger);
 
       // If trigger was matched, attempt to execute associated command.
       if (args && args.length > 0) {
@@ -609,21 +610,47 @@ class ScratchProjectManager {
       resolve();
     });
   }
-  getPossibleActions(lifecycle, args) {
+  getSuggestedActions(lifecycle, args) {
     var pm = this;
     return new Promise((resolve, reject) => {
-      var possibleActions = [];
+      // For every state, include a curated set of possible actions to take.
+      // These actions are in order.
+      // TODO: consider how to introduce state transition specific verbage to
+      // the system.
+      var suggestedActions = [];
       switch(pm.ssm.state) {
         case 'Home':
-          possibleActions = {}
+          suggestedActions = [
+            ScratchAction.General.play,
+            ScratchAction.General.editExistingProject,
+            ScratchAction.General.newProject,
+          ];
           break;
         case 'PlayProject':
-          possibleActions = {}
+          suggestedActions = [
+            ScratchAction.General.editProject,
+            ScratchAction.General.play,
+          ]
           break;
         case 'InsideProject':
-          possibleActions = {}
+          var suggestedActions = [
+            ScratchAction.Edit.getCurrentStep,
+            ScratchAction.Edit.getStepCount,
+            ScratchAction.Edit.nextStep,
+            ScratchAction.Edit.goToStep,
+            ScratchAction.Edit.playStep,
+            ScratchAction.Edit.insertStepAfter,
+            ScratchAction.General.getSounds,
+            ScratchAction.General.play,
+          ]
           break;
       }
+      // TODO: suggest the actions in the order that they are listed instead of
+      // at random.
+      var action = suggestedActions[Math.floor(Math.random()*suggestedActions.length)];
+
+      // Present action.
+      this.say(action.description);
       resolve();
     });
   }

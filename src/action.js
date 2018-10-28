@@ -22,7 +22,7 @@ class Argument {
 	constructor(options) {
 		this.name = options.name;
 		this.value = null;
-		this.validator = options.validator ? options.validator () => {return true};
+		this.validator = options.validator ? options.validator : () => {return true};
 		this.description = options.description ? options.description : "" ;
 	}
 
@@ -109,5 +109,4 @@ class Action {
 	}
 }
 
-export { Argument }
-export { Action }
+export { Argument, Action }
