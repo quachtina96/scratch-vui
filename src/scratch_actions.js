@@ -11,10 +11,16 @@ import { soundLibraryContent } from './sop  undsp  .js'
  * Define the ScratchAction namespace.
  */
 var ScratchAction = {};
+
+/**
+ * Namespace for validators
+ */
+var ScratchAction.Validator = {};
+
 // Given a scratch state machine, validates the potential project name against
 // existing projects and scratch commands.
 
-ScratchAction.unconflictingProjectName = (ssm, projectName) => {
+ScratchAction.Validator.unconflictingProjectName = (ssm, projectName) => {
   // Should not already be an existing project
   if ssm.pm.has(projectName) {
     return false;
@@ -49,20 +55,20 @@ ScratchAction.unconflictingProjectName = (ssm, projectName) => {
   })
 }
 
-ScratchAction.existingProject = (ssm, projectName) => {
+ScratchAction.Validator.existingProject = (ssm, projectName) => {
   // project must be in user's list of projects
   return ssm.pm.has(projectName);
 }
 
-ScratchAction.currentProjectDefined = (ssm) => {
+ScratchAction.Validator.currentProjectDefined = (ssm) => {
   // project must be in user's list of projects
   if (ssm.pm.currentProject)
   	return true;
 }
 
-ScratchAction.validScratchCommand = (ssm, step) => {
+ScratchAction.Validator.scratchCommand = (ssm, step) => {
 	// Must be a project name OR a Scratch command
-	if (ScratchAction.existingProject(ssm, step)) {
+	if (ScratchAction.Validator.existingProject(ssm, step)) {
 		return true;
 	}
   var punctuationless = step.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
@@ -76,7 +82,7 @@ ScratchAction.validScratchCommand = (ssm, step) => {
   }
 }
 
-ScratchAction.validStepNumberInCurrentProject = (ssm, number) => {
+ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 	return Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)
 }
 
@@ -96,23 +102,27 @@ ScratchAction._generateSpecs = (triggers) => {
 	result = list.join('\n\n')
 };
 
-//////// GENERAL COMMANDS
+
+/**
+ * Namespace for general commands
+ */
+ScratchAction.General = {}
 
 //queryState
-ScratchAction.queryState = Action({
+ScratchAction.General.queryState = Action({
 	"trigger": /what state am i in|where am i/,
 	"description": 'figure out what state you are in',
 });
 
 //newProject
-ScratchAction.newProject = Action({
+ScratchAction.General.newProject = Action({
 	"trigger":/new project|create a? new project|create a? project|make a? new project|make a? project/,
 	"description":"create a new project",
 	"arguments": []
 });
 
 //deleteProject
-ScratchAction.deleteProject = Action({
+ScratchAction.General.deleteProject = Action({
 	"trigger":/delete (?:the)? ?(.*) project/,
 	"description":"delete a project",
 	"arguments":[Argument({
@@ -127,37 +137,37 @@ ScratchAction.deleteProject = Action({
 });
 
 //renameCurrentProject
-ScratchAction.renameCurrentProject = Action({
+ScratchAction.General.renameCurrentProject = Action({
 	"trigger":/rename current project to (.*)/,
 	"description":"rename the current project ",
 	"arguments": [Argument({
 			name:'newName',
-			validator: ScratchAction.unconflictingProjectName,
+			validator: ScratchAction.Validator.unconflictingProjectName,
 			description: 'the new name'
 		})
 	]
 });
 
 //renameProject
-ScratchAction.renameProject = Action({
+ScratchAction.General.renameProject = Action({
 	"trigger":/change (?:the)? ?name of (?:the)? ?(.*) project to (.*)|rename (?:the)? ?(.*) (?:project)? ?to (?:be)? ?(.*)|call (?:the)? ?(.*) project (.*) instead/,
 	"description":"change the name of one of your projects",
 	"arguments": [
 		Argument({
 			name: 'oldName',
-			validator: ScratchAction.existingProject,
+			validator: ScratchAction.Validator.existingProject,
 			description: 'project to rename'
 		}),
 		Argument({
 			name: 'newName',
-			validator: ScratchAction.unconflictingProjectName,
+			validator: ScratchAction.Validator.unconflictingProjectName,
 			description: 'new project name'
 		})
 	]
 });
 
 //editExistingProject
-ScratchAction.editExistingProject = Action({
+ScratchAction.General.editExistingProject = Action({
 	"trigger":/since i said (.*)|see inside (.*)|the inside (.*)|what's inside (.*)|inside|open project/,
 	"description":"check out the inside of the project",
 	"arguments":[Argument({
@@ -171,53 +181,53 @@ ScratchAction.editExistingProject = Action({
 });
 
 //editProject
-ScratchAction.editProject = Action({
+ScratchAction.General.editProject = Action({
 	"trigger":/see inside|what's inside/,
 	"description":"edit the current project",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
 
 //finishProject
-ScratchAction.finishProject = Action({
+ScratchAction.General.finishProject = Action({
 	"trigger":/i'm done|i'm finished|(?:close|leave) (?:the)? ?project/,
 	"description":"leave the project",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
 
 //playCurrentProject
-ScratchAction.playCurrentProject = Action({
+ScratchAction.General.playCurrentProject = Action({
 	"trigger":/play (?:the)? ?(?:current)? ?project|start (?:the)? ?(?:current)? ?project|test (?:the)? ?(?:current)? ?project/,
 	"description":"play the current project",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
 
 //play
-ScratchAction.play = Action({
+ScratchAction.General.play = Action({
 	"trigger":/^play (.*)/,
 	"description":"play a project",
 	"arguments": [
 		Argument({
 			name: 'projectToPlay',
-			validator: ScratchAction.existingProject,
+			validator: ScratchAction.Validator.existingProject,
 			description: 'name of the project to play'
 		}),
 	]
 });
 
 //return
-ScratchAction.return = Action({
+ScratchAction.General.return = Action({
 	"trigger":/stop$|go back$|quit$|exit$|cancel$|nevermind$/,
 	"description":"go back to the last state you were in",
 });
 
 //getCurrentProject
-ScratchAction.getCurrentProject = Action({
+ScratchAction.General.getCurrentProject = Action({
 	"trigger":/get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
 	"description":"ask me what project you are on",
 });
 
 //getNthProject
-ScratchAction.getNthProject = Action({
+ScratchAction.General.getNthProject = Action({
 	"trigger":/((?:what is|what's)) project (?:number)? ?(.*)/,
 	"description":"ask me for the name of project number 1, 2, etcetera",
 	"arguments":[Argument({
@@ -230,61 +240,61 @@ ScratchAction.getNthProject = Action({
 });
 
 //getProjectNames
-ScratchAction.getProjectNames = Action({
+ScratchAction.General.getProjectNames = Action({
 	"trigger":/what projects do i have|what have i made so far|what are my projects called/,
 	"description":"say 'what projects do i have'",
 });
 
 //getProjectCount
-ScratchAction.getProjectCount = Action({
+ScratchAction.General.getProjectCount = Action({
 	"trigger":/how many projects do i have|how many projects have i made/,
 	"description":"say 'how many projects do i have'",
 });
 
 //stopBackground
-ScratchAction.stopBackground = Action({
+ScratchAction.General.stopBackground = Action({
 	"trigger":/^stop (?:the)? ?(?:background)? ?(?:music|sounds)$/,
 	"description":"stop the background music",
 });
 
 //stopCues
-ScratchAction.stopCues = Action({
+ScratchAction.General.stopCues = Action({
 	"trigger":/^stop (?:the)? ?audio cues$/,
 	"description":"stop the audio cues",
 });
 
 //startBackground
-ScratchAction.startBackground = Action({
+ScratchAction.General.startBackground = Action({
 	"trigger":/^(?:start|give me|turn on) the (?:background)? ?(?:music|sounds|sound)$/,
 	"description":"start the background music",
 });
 
 //startCues
-ScratchAction.startCues = Action({
+ScratchAction.General.startCues = Action({
 	"trigger":/^(?:start|give me|turn on) (?:the)? ?audio cues$/,
 	"description":"start the audio cues",
 });
 
 //holdOn
-ScratchAction.holdOn = Action({
+ScratchAction.General.holdOn = Action({
 	"trigger":/^hold on|stop listening$/,
 	"description":"say 'hold on' to make me ignore you until you say 'listen'",
 });
 
 //listen
-ScratchAction.listen = Action({
+ScratchAction.General.listen = Action({
 	"trigger":/^listen$|^i'm ready$/,
 	"description":"say 'listen' to get me to start listening until you say 'hold on'",
 });
 
 //getSounds
-ScratchAction.getSounds = Action({
+ScratchAction.General.getSounds = Action({
 	"trigger":/^what sounds are there|what sounds do you have$/,
 	"description":"ask me what sounds there are",
 });
 
 //checkSound
-ScratchAction.checkSound = Action({
+ScratchAction.General.checkSound = Action({
 	"trigger":/^do you have (?:a|the|this) (.*) sound?$/,
 	"description":"say 'do you have the boing sound?'",
 	"arguments": [
@@ -299,45 +309,49 @@ ScratchAction.checkSound = Action({
 });
 
 //queryActions
-ScratchAction.queryActions = Action({
+ScratchAction.General.queryActions = Action({
 	"trigger":/^what can i do$/,
 	"description":"ask me what you can do",
 });
 
 //queryActionTypes
-ScratchAction.queryActionTypes = Action({
+ScratchAction.General.queryActionTypes = Action({
 	"trigger":/^what are the kinds of things i can do$/,
 	"description":"ask me what kinds of things you can do",
 });
 
 //////// EDIT PROJECT COMMANDS
+/**
+ * Edit command namespace
+ */
+ScratchAction.Edit
 
 //getStepCount
-ScratchAction.getStepCount = Action({
+ScratchAction.Edit.getStepCount = Action({
 	"trigger":/how many steps ?(?:are there)?/,
 	"description":"say 'how many steps' to ask me how many steps are the in the project",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //getAllSteps
-ScratchAction.getAllSteps = Action({
+ScratchAction.Edit.getAllSteps = Action({
 	"trigger":/what are all the steps/,
 	"description":"ask me what all the steps are",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //getCurrentStep
-ScratchAction.getCurrentStep = Action({
+ScratchAction.Edit.getCurrentStep = Action({
 	"trigger":/what (?:step|steps|stop|stops|stuff|step) am i on|what’s my current (?:step|steps|stop|stops|stuff|step)|what (?:step|steps|stop|stops|stuff|step) is this/,
 	"description":"say 'what step am i on' to get the number and description of the current step.",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //goToStep
-ScratchAction.goToStep = Action({
+ScratchAction.Edit.goToStep = Action({
 	"trigger":/go to (?:step|steps|stop|stops|stuff|step) (.*)|what's (?:step|steps|stop|stops|stuff|step) (.*)|what is (?:step|steps|stop|stops|stuff|step) (.*)/,
 	"description":"go to step number BLANK",
 	"arguments": [
@@ -347,117 +361,117 @@ ScratchAction.goToStep = Action({
 			description: 'the name step to go to'
 		})
 	],
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //nextStep
-ScratchAction.nextStep = Action({
+ScratchAction.Edit.nextStep = Action({
 	"trigger":/go to next (?:step|steps|stop|stops|stuff|step)|next (?:step|steps|stop|stops|stuff|step)|what's next|next/,
 	"description":"ask me what's the next step",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //previousStep
-ScratchAction.previousStep = Action({
+ScratchAction.Edit.previousStep = Action({
 	"trigger":/previous (?:step|steps|stop|stops|stuff|step)|go back a (?:step|steps|stop|stops|stuff|step)/,
 	"description":"ask me what's the previous step",
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //playStep
-ScratchAction.playStep = Action({
+ScratchAction.Edit.playStep = Action({
 	"trigger":/^play (?:step|steps|stop|stops|stuff|step)$|^play current (?:step|steps|stop|stops|stuff|step)$|^what does it do$|^try it$/,
 	"description":"play the current step",
 	"arguments": [],
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //appendStep
-ScratchAction.appendStep = Action({
+ScratchAction.Edit.appendStep = Action({
 	"trigger":/add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|next (.*)|at the end (.*)|(.*) at the end|after all that (.*)|(.*) after all that/,
 	"description":"to add a new instruction to the end of the project, say 'next, BLANK'",
 	"arguments": [Argument({
 		'name': 'instruction',
-		'validator': ScratchAction.validScratchCommand,
+		'validator': ScratchAction.Validator.scratchCommand,
 		'description':'the instruction you want to add to the end of the project'
 	})],
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //insertStepBefore
-ScratchAction.insertStepBefore = Action({
+ScratchAction.Edit.insertStepBefore = Action({
 	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (.*)/,
 	"description":"insert a new command before step number BLANK",
 	"arguments": [
 		Argument({
 			'name': 'instruction',
-			'validator': ScratchAction.validScratchCommand,
+			'validator': ScratchAction.Validator.scratchCommand,
 			'description':'the instruction to insert'
 		}),
 		Argument({
 			name: 'stepNumber',
-			validator: ScratchAction.validStepNumberInCurrentProject,
+			validator: ScratchAction.Validator.currentProjectStepNumber,
 			description: 'the step to insert before'
 		})
 	],
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //insertStepAfter
-ScratchAction.insertStepAfter = Action({
+ScratchAction.Edit.insertStepAfter = Action({
 	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step) (.*)/,
 	"description":"insert a new command after step number BLANK",
 	"arguments": [
 		Argument({
 			'name': 'instruction',
-			'validator': ScratchAction.validScratchCommand,
+			'validator': ScratchAction.Validator.scratchCommand,
 			'description':'the instruction to insert'
 		}),
 		Argument({
 			name: 'stepNumber',
-			validator: ScratchAction.validStepNumberInCurrentProject,
+			validator: ScratchAction.Validator.currentProjectStepNumber,
 			description: 'the step to insert after'
 		})
 	],
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //deleteStep
-ScratchAction.deleteStep = Action({
+ScratchAction.Edit.deleteStep = Action({
 	"trigger":/delete (?:step|steps|stop|stops|stuff|step) (.*)/,
 	"description":"delete step number BLANK",
 	"arguments": [
 	Argument({
 		'name': 'stepNumber',
-		'validator': ScratchAction.validScratchCommand,
+		'validator': ScratchAction.Validator.scratchCommand,
 		'description':'the number of the step to delete'
 	})],
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
 });
 
 //replaceStep
-ScratchAction.replaceStep = Action({
+ScratchAction.Edit.replaceStep = Action({
 	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step) (.*) with (.*)/,
 	"description":"replace step with a new instruction",
 	"arguments": [
 		Argument({
 			name: 'stepNumber',
-			validator: ScratchAction.validStepNumberInCurrentProject,
+			validator: ScratchAction.Validator.currentProjectStepNumber,
 			description: 'the number of the step to replace'
 		}),
 		Argument({
 			'name': 'instruction',
-			'validator': ScratchAction.validScratchCommand,
+			'validator': ScratchAction.Validator.scratchCommand,
 			'description':'the new instruction'
 		})
 	],
-	"contextValidator": ScratchAction.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
