@@ -344,6 +344,7 @@ class ScratchProjectManager {
     var prefix = pattern.substring(1,pattern.length-1);
     var regexString = prefix + '|^(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')$|^(') + ')$';
     this.triggers['play'] = new RegExp(regexString, "i");
+    this.actions['play'].trigger = new RegExp(regexString, "i");
   }
 
   _describeProject(projectNumber) {
