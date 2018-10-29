@@ -67,6 +67,7 @@ class Action {
 		this.description = options.description ? options.description :  "";
 		this.arguments = options.arguments ? options.arguments : [];
 		this.contextValidator = options.contextValidator ? options.contextValidator : () => {return true};
+		this.idealTrigger = options.idealTrigger ? options.idealTrigger : () => {return true};
 	}
 
 	/**

@@ -152,6 +152,7 @@ var ScratchProject = StateMachine.factory({
         }
         var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
         var command = punctuationless.replace(/\s{2,}/g," ");
+
         ScratchInstruction.parse(command).then((result) => {
           if (!result) {
             // Failed to parse the command using ScratchNLP. Alert failure.

@@ -651,7 +651,7 @@ class ScratchProjectManager {
       var action = suggestedActions[Math.floor(Math.random()*suggestedActions.length)];
 
       // Present action.
-      this.say(action.description);
+      this.say(`say ${action.idealTrigger} to ${action.description}`);
       resolve();
     });
   }

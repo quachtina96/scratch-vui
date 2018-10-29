@@ -17,7 +17,7 @@ class ScratchProjectEditor {
 	 * Constructor for ScratchProjectEditor
 	 */
 	constructor() {
-		this.triggers = ScratchAction.Edit.getTriggers();
+    this.actions = ScratchAction.Edit;
 		this.project = null;
     this.audio = new ScratchAudio();
 	}
@@ -31,8 +31,8 @@ class ScratchProjectEditor {
     utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
     var scratchProject = this;
-    for (var commandType in this.triggers) {
-      var args = Utils.match(utterance, this.triggers[commandType]);
+    for (var commandType in this.actions) {
+      var args = Utils.match(utterance, this.actions[commandType].trigger);
       if (args && this[commandType]) {
         this[commandType].call(scratchProject, args);
         this.project.pm.save();
