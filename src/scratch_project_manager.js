@@ -674,15 +674,20 @@ class ScratchProjectManager {
       "if statements", "do basic math", "get random numbers",
       "say words out loud in different accents and in different voices",
       "listen for words", "make and modify lists and variables", "control a timer."];
-      // TODO: present paginated results instead of random.
-      // var commandsChunked = someScratchCommands.chunk(3);
-      // console.log(`chunked commands: ${commandsChunked}`);
-      pm.say(`I can do lots of things. Here's 3 ${Utils.getNFromList(someScratchCommands, 3, -1)}`);
-      // TODO: handle if the user asks "how do i tell you  to "scratch command".
 
-      // TODO: another idea for how to approach this feature:
-      // generate or expose examples of different commands.
-      // how do i expose / organize that data
+      pm.say(`I can do ${someScratchCommands.join(', ')}`);
+      // TODO: enable when i can distinguish between and old and new user experience.
+      if (false) {
+        // TODO: present paginated results instead of random.
+        // var commandsChunked = someScratchCommands.chunk(3);
+        // console.log(`chunked commands: ${commandsChunked}`);
+        pm.say(`I can do lots of things. Here's 3 ${Utils.getNFromList(someScratchCommands, 3, -1)}`);
+        // TODO: handle if the user asks "how do i tell you  to "scratch command".
+
+        // TODO: another idea for how to approach this feature:
+        // generate or expose examples of different commands.
+        // how do i expose / organize that data
+      }
       resolve();
     });
   }
