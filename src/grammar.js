@@ -51,8 +51,6 @@ ScratchGrammar.commands = `#JSGF V1.0;
 	public <replaceSound> = replace the <sound_name> sound with the <sound_name> sound;
 
 	public <replaceInStep> = in step <number> replace  with ;
-
-	public <stopEditing> = stop|i'm done;
 	`
 
 // TODO: programmatically populate numbers?.

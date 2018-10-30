@@ -32,7 +32,9 @@ ScratchRegex.getGeneralTriggers = function() {
 	  'holdOn': /^hold on|stop listening$/,
 	  'listen': /^listen$|^i'm ready$/,
 	  'getSounds': /^what sounds are there|what sounds do you have$/,
-	  'checkSound': /^do you have (?:a|the|this) (.*) sound?$/
+	  'checkSound': /^do you have (?:a|the|this) (.*) sound?$/,
+	  'queryActions': /^what can i do$/,
+	  'queryActionTypes': /^what are the kinds of things i can do$/
 	}
 }
 
@@ -50,13 +52,7 @@ ScratchRegex.getEditProjectTriggers = function() {
     insertStepBefore: /(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (.*)/,
     insertStepAfter: /(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step) (.*)/,
     deleteStep: /delete (?:step|steps|stop|stops|stuff|step) (.*)/,
-    // TODO: distinguish between replacing everywhere and replacing in a
-    // specific place.
     replaceStep: /(?:replace|replaced) (?:step|steps|stop|stops|stuff|step) (.*) with (.*)/,
-    replaceSound: /(?:replace|replaced) the (.*) sound with the (.*) sound'/,
-    // TODO: address potential complex behavior in line below.
-    replaceInStep: /in (?:step|steps|stop|stops|stuff|step) (.*) replace (.*) with (.*)/,
-    stopEditing: /stop|i\'m done|that\'s it'/
   }
 }
 
@@ -75,6 +71,8 @@ ScratchRegex.contains = function(phrase) {
 	}
 	return false;
 }
+
+
 
 module.exports = ScratchRegex;
 

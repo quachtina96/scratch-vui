@@ -5,7 +5,7 @@
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchVUIStorage = require('./storage.js');
-const ScratchRegex = require('./triggers.js');
+const ScratchAction = require('./scratch_action.js');
 const ScratchAudio = require('./audio.js');
 const SoundLibrary = require('./sound_library.js');
 
@@ -30,6 +30,7 @@ class ScratchProjectManager {
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
     this.triggers = ScratchRegex.getGeneralTriggers();
+    this.actions = ScratchAction.General;
     // Whether currently listening for a yes or no answer.
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
@@ -46,6 +47,11 @@ class ScratchProjectManager {
       this.projects[name].name = name;
       this.projects[name].instructions = savedProjects[name];
     }
+  }
+
+  // Return whether it has project of given naem.
+  has(projectName) {
+    return projectName in ssm.pm.projects;
   }
 
   renameProject(oldName, newName) {
@@ -177,7 +183,7 @@ class ScratchProjectManager {
   handleUtterance(utterance) {
     if (this.listening) {
       return this._handleUtterance(utterance);
-    } else if (Utils.match(utterance, this.triggers['listen'])) {
+    } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
       this.listening = true;
     }
   }
@@ -206,11 +212,11 @@ class ScratchProjectManager {
     }
 
     // Attempt to match utterance to general triggers.
-    for (var triggerType in this.triggers) {
+    for (var triggerType in this.actions) {
 
       // If the user already said Scratch at the end of the previous utterance,
       // do not require the user to say it again.
-      var args = this.scratchVoiced ? Utils.matchRegex(utterance, this.triggers[triggerType]) : Utils.match(utterance, this.triggers[triggerType]);
+      var args = this.scratchVoiced ? Utils.matchRegex(utterance, this.actions[triggerType].trigger) : Utils.match(utterance, this.actions[triggerType].trigger);
 
       // If trigger was matched, attempt to execute associated command.
       if (args && args.length > 0) {
@@ -338,6 +344,7 @@ class ScratchProjectManager {
     var prefix = pattern.substring(1,pattern.length-1);
     var regexString = prefix + '|^(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')$|^(') + ')$';
     this.triggers['play'] = new RegExp(regexString, "i");
+    this.actions['play'].trigger = new RegExp(regexString, "i");
   }
 
   _describeProject(projectNumber) {
@@ -601,6 +608,50 @@ class ScratchProjectManager {
           pm.soundLibrary.playSound(randomSound);
         });
       }
+      resolve();
+    });
+  }
+  getSuggestedActions(lifecycle, args) {
+    var pm = this;
+    return new Promise((resolve, reject) => {
+      // For every state, include a curated set of possible actions to take.
+      // These actions are in order.
+      // TODO: consider how to introduce state transition specific verbage to
+      // the system.
+      var suggestedActions = [];
+      switch(pm.ssm.state) {
+        case 'Home':
+          suggestedActions = [
+            ScratchAction.General.play,
+            ScratchAction.General.editExistingProject,
+            ScratchAction.General.newProject,
+          ];
+          break;
+        case 'PlayProject':
+          suggestedActions = [
+            ScratchAction.General.editProject,
+            ScratchAction.General.play,
+          ]
+          break;
+        case 'InsideProject':
+          var suggestedActions = [
+            ScratchAction.Edit.getCurrentStep,
+            ScratchAction.Edit.getStepCount,
+            ScratchAction.Edit.nextStep,
+            ScratchAction.Edit.goToStep,
+            ScratchAction.Edit.playStep,
+            ScratchAction.Edit.insertStepAfter,
+            ScratchAction.General.getSounds,
+            ScratchAction.General.play,
+          ]
+          break;
+      }
+      // TODO: suggest the actions in the order that they are listed instead of
+      // at random.
+      var action = suggestedActions[Math.floor(Math.random()*suggestedActions.length)];
+
+      // Present action.
+      this.say(`say ${action.idealTrigger} to ${action.description}`);
       resolve();
     });
   }

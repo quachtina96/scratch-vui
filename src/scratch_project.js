@@ -7,7 +7,7 @@
 const ScratchInstruction = require('./scratch_instruction.js');
 const StateMachine = require('javascript-state-machine');
 const ScratchProjectEditor = require('./scratch_project_editor.js');
-const ScratchRegex = require('./triggers.js');
+const ScratchAction = require('./scratch_action.js');
 const ScratchAudio = require('./audio.js');
 const Utils = require('./utils.js');
 
@@ -107,12 +107,7 @@ var ScratchProject = StateMachine.factory({
       }
     },
     _isValid: function(name) {
-      // The name of a project cannot be the same as an existing project &
-      // it cannot match the form of an existing scratch command nor the
-      // form of an existing scratch VUI command.
-      return ScratchInstruction.parse(name).then((parse) => {
-        return !(name in this.pm.projects || parse || ScratchRegex.contains(name))
-      })
+      return ScratchAction.Validator.unconflictingProjectName(this.ssm, name);
     },
     handleUtterance: function(utterance, opt_scratchVoiced) {
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
@@ -157,6 +152,7 @@ var ScratchProject = StateMachine.factory({
         }
         var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
         var command = punctuationless.replace(/\s{2,}/g," ");
+
         ScratchInstruction.parse(command).then((result) => {
           if (!result) {
             // Failed to parse the command using ScratchNLP. Alert failure.
