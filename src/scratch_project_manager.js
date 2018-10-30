@@ -687,6 +687,9 @@ class ScratchProjectManager {
         // TODO: another idea for how to approach this feature:
         // generate or expose examples of different commands.
         // how do i expose / organize that data
+      } else if (false) {
+        // TODO: explore this?
+        pm.say(`I have Scratch commands organized into N categories...`);
       }
       resolve();
     });
