@@ -165,6 +165,7 @@ if (!('webkitSpeechRecognition' in window)) {
         recognition.stop();
         return;
       } else {
+        scratch.pm.synth.cancel();
         recognition.start();
       }
     }
