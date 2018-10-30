@@ -2,8 +2,8 @@
  * @fileoverview Utility functions used across files.
  */
 const DiffMatchPatch = require('diff-match-patch');
-const WordTokenizer = require('./tokenize.js')
-const LevenshteinDistance = require('./levenshtein_distance.js')
+const WordTokenizer = require('./lib/tokenize.js')
+const LevenshteinDistance = require('./lib/levenshtein_distance.js')
 const get_jarowinkler_distance = require('jaro-winkler');
 const words = require('cmu-pronouncing-dictionary');
 const dmp = new DiffMatchPatch();
