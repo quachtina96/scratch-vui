@@ -1,4 +1,4 @@
-[
+var ScratchCommands = [
     {
         "description": "respond to certain events",
         "example_statement": "when i say goodbye say see you later thats it",
@@ -7,7 +7,6 @@
     {
         "description": "play a sound",
         "example_statement": "play the meow sound",
-
         "example_project_name": ""
     },
     {
@@ -42,7 +41,7 @@
     },
     {
         "description": "make and modify variables",
-        "example_statement": "make a variable called bananas and set bananas to 10"
+        "example_statement": "make a variable called bananas and set bananas to 10",
         "example_project_name": ""
     },
     {
@@ -55,4 +54,6 @@
         "example_statement": "when the timer is greater than 5 play the meow sound and reset the timer thats it",
         "example_project_name": ""
     }
-]
+];
+
+module.exports = ScratchCommands;

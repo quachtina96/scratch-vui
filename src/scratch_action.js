@@ -536,7 +536,7 @@ ScratchAction.General.getKnownCommands = new Action({
 
 
 ScratchAction.General.getScratchCommands = new Action({
-	"trigger":/what are some scratch commands|what are the scratch commands|what (?:kind of) ?scratch commands are there|what are the command categories/,
+	"trigger":/(?:tell me|what are) (?:the|some) scratch commands|what (?:kind of)? ?scratch commands are there/,
 	"idealTrigger":"what scratch commands are there",
 	"description":"learn about what commands you can use in your projects",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
