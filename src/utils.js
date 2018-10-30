@@ -353,7 +353,7 @@ Utils.requestScratchNLP = function(urlSuffix, method, opt_contents) {
  * This function, pulled from SoundLibrary, provides a great utility for pagination
  * and getting random subsets (for the purpose of explorability and discoverability).
  */
-Utils.getNFromList(list, n, opt_index) {
+Utils.getNFromList = (list, n, opt_index) => {
     var soundCount = list.length;
     if (opt_index == -1) {
       // Return n random elements

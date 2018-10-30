@@ -8,6 +8,7 @@ const ScratchVUIStorage = require('./storage.js');
 const ScratchAction = require('./scratch_action.js');
 const ScratchAudio = require('./audio.js');
 const SoundLibrary = require('./sound_library.js');
+const ScratchCommands = require('./scratch_commands.js')
 
 /**
  * ScratchProjectManager class
@@ -661,7 +662,25 @@ class ScratchProjectManager {
     var pm = this;
     return new Promise((resolve, reject) => {
       // Present action.
-      pm.say('I know how to execute projects when you say the name of the project. I also know different Scratch commands.');
+      var scratchCommandAbilities = ["respond to certain events", "play a sound"
+      , "repeat actions", "execute if statements", "do basic math", "get random numbers",
+      "say words out loud in different accents and in different voices",
+      "listen for words", "make and modify lists and variables", "control a timer."]
+      pm.say(`I know how to execute projects when you say the name of the project. I also know different Scratch commands. You can tell me to ${scratchCommandAbilities.join(', ')}`);
+      // if (false) {
+      //   // TODO: present paginated results instead of random.
+      //   // var commandsChunked = someScratchCommands.chunk(3);
+      //   // console.log(`chunked commands: ${commandsChunked}`);
+      //   pm.say(`I can do lots of things. Here's 3 ${Utils.getNFromList(someScratchCommands, 3, -1)}`);
+      //   // TODO: handle if the user asks "how do i tell you  to "scratch command".
+
+      //   // TODO: another idea for how to approach this feature:
+      //   // generate or expose examples of different commands.
+      //   // how do i expose / organize that data
+      // } else if (false) {
+      //   // TODO: explore this?
+      //   pm.say(`I have Scratch commands organized into N categories...`);
+      // }
       resolve();
     });
   }
@@ -669,28 +688,11 @@ class ScratchProjectManager {
   getScratchCommands() {
     var pm = this;
     return new Promise((resolve, reject) => {
-      // Present action.
-      var someScratchCommands = ["respond to certain events", "play a sound", "repeat actions",
-      "if statements", "do basic math", "get random numbers",
-      "say words out loud in different accents and in different voices",
-      "listen for words", "make and modify lists and variables", "control a timer."];
-
-      pm.say(`I can do ${someScratchCommands.join(', ')}`);
-      // TODO: enable when i can distinguish between and old and new user experience.
-      if (false) {
-        // TODO: present paginated results instead of random.
-        // var commandsChunked = someScratchCommands.chunk(3);
-        // console.log(`chunked commands: ${commandsChunked}`);
-        pm.say(`I can do lots of things. Here's 3 ${Utils.getNFromList(someScratchCommands, 3, -1)}`);
-        // TODO: handle if the user asks "how do i tell you  to "scratch command".
-
-        // TODO: another idea for how to approach this feature:
-        // generate or expose examples of different commands.
-        // how do i expose / organize that data
-      } else if (false) {
-        // TODO: explore this?
-        pm.say(`I have Scratch commands organized into N categories...`);
-      }
+      // Pick a random command from the Scratch Commands.
+      let random_command = Utils.getNFromList(ScratchCommands, 1, -1)[0];
+      console.log(random_command)
+      // Present action. pick random thing from scratch_commands.json
+      pm.say(`One thing I can do is ${random_command.description}. Try by saying ${random_command.example_statement}`);
       resolve();
     });
   }

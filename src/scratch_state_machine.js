@@ -90,7 +90,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'listen', from: '*', to: function() {return this.state} },
     { name: 'getSounds', from: '*', to: function() {return this.state} },
     { name: 'checkSound', from: '*', to: function() {return this.state} },
-    { name: 'queryActions', from: '*', to: function() {return this.state} }
+    { name: 'queryActions', from: '*', to: function() {return this.state} },
     { name: 'getScratchCommands', from: '*', to: function() {return this.state} }
   ],
   data: function() {
@@ -249,7 +249,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetSounds: () => {this.pm.getSounds()},
         onQueryActions: () => {this.pm.getSuggestedActions()},
         onCheckSound: (lifecycle, args) => {this.pm.checkSound(lifecycle, args)},
-        onGetScratchCommands: () => {this.pm.onGetScratchCommands()},
+        onGetScratchCommands: () => {this.pm.getScratchCommands()},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];
