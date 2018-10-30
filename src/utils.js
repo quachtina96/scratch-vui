@@ -349,4 +349,35 @@ Utils.requestScratchNLP = function(urlSuffix, method, opt_contents) {
   });
 }
 
+/**
+ * This function, pulled from SoundLibrary, provides a great utility for pagination
+ * and getting random subsets (for the purpose of explorability and discoverability).
+ */
+Utils.getNFromList(list, n, opt_index) {
+    var soundCount = list.length;
+    if (opt_index == -1) {
+      // Return n random elements
+      var randomIndexes = new Set();
+      while (randomIndexes.size < n) {
+        randomIndexes.add(Math.floor(Math.random() * soundCount));
+      }
+      var sounds = Array.from(randomIndexes).map((index) => list[index]);
+    } else {
+      var sounds = list.slice(opt_index, n);
+    }
+    return sounds;
+}
+
+// Also useful for pagination.
+Array.prototype.chunk = function (chunk_size) {
+  var temp = this.slice(0),
+      results = [];
+
+  while (temp.length) {
+    results.push(temp.splice(0, chunk_size));
+  }
+
+  return results;
+};
+
 module.exports = Utils;

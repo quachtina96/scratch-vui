@@ -611,7 +611,8 @@ class ScratchProjectManager {
       resolve();
     });
   }
-  getSuggestedActions(lifecycle, args) {
+  // Communicate what a user can do at a given state.
+  getSuggestedActions() {
     var pm = this;
     return new Promise((resolve, reject) => {
       // For every state, include a curated set of possible actions to take.
@@ -651,7 +652,37 @@ class ScratchProjectManager {
       var action = suggestedActions[Math.floor(Math.random()*suggestedActions.length)];
 
       // Present action.
-      this.say(`say ${action.idealTrigger} to ${action.description}`);
+      pm.say(`say ${action.idealTrigger} to ${action.description}`);
+      resolve();
+    });
+  }
+  // Communicate the kinds of things Scratch can do.
+  getKnownCommands() {
+    var pm = this;
+    return new Promise((resolve, reject) => {
+      // Present action.
+      pm.say('I know how to execute projects when you say the name of the project. I also know different Scratch commands.');
+      resolve();
+    });
+  }
+  // Communicate what Scratch commands are available.
+  getScratchCommands() {
+    var pm = this;
+    return new Promise((resolve, reject) => {
+      // Present action.
+      var someScratchCommands = ["respond to certain events", "play a sound", "repeat actions",
+      "if statements", "do basic math", "get random numbers",
+      "say words out loud in different accents and in different voices",
+      "listen for words", "make and modify lists and variables", "control a timer."];
+      // TODO: present paginated results instead of random.
+      // var commandsChunked = someScratchCommands.chunk(3);
+      // console.log(`chunked commands: ${commandsChunked}`);
+      pm.say(`I can do lots of things. Here's 3 ${Utils.getNFromList(someScratchCommands, 3, -1)}`);
+      // TODO: handle if the user asks "how do i tell you  to "scratch command".
+
+      // TODO: another idea for how to approach this feature:
+      // generate or expose examples of different commands.
+      // how do i expose / organize that data
       resolve();
     });
   }
