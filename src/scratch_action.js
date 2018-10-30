@@ -561,4 +561,27 @@ ScratchAction.Edit.replaceStep = new Action({
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
 
+ScratchAction.General.getKnownCommands = new Action({
+	"trigger": /what can you do|what do you know (?:how to do)/,
+	"idealTrigger": "what can you do",
+	"description": "hear what things I can do"
+});
+
+
+ScratchAction.General.getScratchCommands = new Action({
+	"trigger":/(?:tell me|what are) (?:the|some ?(?:of the)?) scratch commands|what (?:(?:kinds|kind) of)? ?scratch commands are there|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you have)/,
+	"idealTrigger":"what scratch commands are there",
+	"description":"learn about what commands you can use in your projects",
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
+});
+
+// ScratchAction.Project.
+			// "respond to certain events", "play a sound", "repeat actions",
+   //    "if statements", "do basic math", "get random numbers",
+   //    "say words out loud in different accents and in different voices",
+   //    "listen for words", "make and modify lists and variables", "control a timer."
+
+// TODO: Investigate + implement ScratchAction.General.search for searching
+// assets, code, commands, categories, whatever.
+
 module.exports = ScratchAction;
