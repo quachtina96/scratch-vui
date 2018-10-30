@@ -32,19 +32,19 @@ ScratchAction.Validator.unconflictingProjectName = (ssm, projectName) => {
   // Should not match existing UI commands (whether or not they start with Scratch)
   for (var triggerType in ssm.pm.triggers) {
 
-    var args = Utils.matchRegex(projectName, this.triggers[triggerType]);
+    var args = Utils.matchRegex(projectName, ssm.pm.triggers[triggerType]);
     if (args && args.length > 0) {
       return false
     }
 
-    var args = Utils.match(projectName, this.triggers[triggerType]);
+    var args = Utils.match(projectName, ssm.pm.triggers[triggerType]);
     if (args && args.length > 0) {
       return false
     }
   }
 
   // Should not already be a Scratch command
-  const punctuationless = instruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+  const punctuationless = projectName.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
   const instruction = punctuationless.replace(/\s{2,}/g," ");
   const urlSuffix = "translate/" + instruction;
   const method = "get";
