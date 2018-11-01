@@ -62,7 +62,7 @@ class ScratchProjectEditor {
    * List all the steps in the project.
    */
   getAllSteps(args) {
-    var steps = this.project.instructions.map((instruction) => instruction.raw).join('. ')
+    var steps = this.project.instructions.map((instruction) => instruction.raw)
     steps.forEach((step) => {
       this.project.pm.say(step);
     });
