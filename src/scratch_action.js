@@ -200,7 +200,7 @@ ScratchAction.General.editExistingProject = new Action({
 
 //editProject
 ScratchAction.General.editProject = new Action({
-	"trigger":/see inside|what's inside/,
+	"trigger":/see inside|what's inside|open project|since i said|what inside the project|what is inside/,
 	"idealTrigger":"what's inside",
 	"description":"edit the current project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -208,7 +208,7 @@ ScratchAction.General.editProject = new Action({
 
 //finishProject
 ScratchAction.General.finishProject = new Action({
-	"trigger":/i'm done|i'm finished|(?:close|leave) (?:the)? ?project/,
+	"trigger":/i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it/,
 	"idealTrigger":"i'm done",
 	"description":"leave the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -225,8 +225,8 @@ ScratchAction.General.playCurrentProject = new Action({
 //play
 ScratchAction.General.play = new Action({
 	"trigger":/^play (.*)/,
-	"idealTrigger":"the name of a project",
-	"description":"play a project.",
+	"idealTrigger":"give me a compliment",
+	"description":"play a project made by tina called give me a compliment.",
 	"arguments": [
 		new Argument({
 			name: 'projectToPlay',
@@ -245,7 +245,7 @@ ScratchAction.General.return = new Action({
 
 //getCurrentProject
 ScratchAction.General.getCurrentProject = new Action({
-	"trigger":/get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project/,
+	"trigger":/get (?:the)? ?current project|what project am i on|what’s my current project|what is my current project|what is this project ?(?:called)?/,
 	"idealTrigger":"what project am i on",
 	"description":"find out what project you are on",
 });
@@ -266,7 +266,7 @@ ScratchAction.General.getNthProject = new Action({
 
 //getProjectNames
 ScratchAction.General.getProjectNames = new Action({
-	"trigger":/what projects do i have|what have i made so far|what are my projects called/,
+	"trigger":/what (?:projects|project) do i have|what have i made so far|what are my projects called|what are the names of my projects/,
 	"idealTrigger":"what projects do i have",
 	"description":"hear a list of all the projects",
 });
@@ -322,7 +322,7 @@ ScratchAction.General.listen = new Action({
 
 //getSounds
 ScratchAction.General.getSounds = new Action({
-	"trigger":/^what sounds are there|what sounds do you have$/,
+	"trigger":/^what sounds are there|what (?:other)? ?sounds do you have|more sounds|other sounds$/,
 	"idealTrigger":"what sounds are there",
 	"description":"discover what sounds there are",
 });
@@ -472,7 +472,7 @@ ScratchAction.Edit.insertStepBefore = new Action({
 
 //insertStepAfter
 ScratchAction.Edit.insertStepAfter = new Action({
-	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step) (.*)/,
+	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number) ?(.*)/,
 	// TODO: there is so much potential to make these triggers and descriptions
 	// contextual based on the current step.
 	"idealTrigger":"insert 'play the meow sound' after step number '1'",
@@ -495,7 +495,7 @@ ScratchAction.Edit.insertStepAfter = new Action({
 
 //deleteStep
 ScratchAction.Edit.deleteStep = new Action({
-	"trigger":/delete (?:step|steps|stop|stops|stuff|step) (.*)/,
+	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number) ?(.*)/,
 	"idealTrigger":"delete step 1",
 	"description":"delete the first step",
 	"arguments": [
@@ -510,7 +510,7 @@ ScratchAction.Edit.deleteStep = new Action({
 
 //replaceStep
 ScratchAction.Edit.replaceStep = new Action({
-	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step) (.*) with (.*)/,
+	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step|at) (?:number) ?(.*) with (.*)/,
 	"idealTrigger":"replace step 1 with say hello",
 	"description":"change step to say hello",
 	"arguments": [

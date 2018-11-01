@@ -510,7 +510,7 @@ class ScratchProjectManager {
     return new Promise(((resolve, reject) => {
       this.storage.save();
       pm._updatePlayRegex();
-      pm.say("closing project");
+      pm.currentProject.finishProject();
       resolve();
     }));
   }
