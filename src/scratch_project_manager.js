@@ -29,7 +29,7 @@ class ScratchProjectManager {
     this.recognition = new webkitSpeechRecognition();
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
-    this.triggers = ScratchRegex.getGeneralTriggers();
+    this.triggers = ScratchAction.General.getTriggers();
     this.actions = ScratchAction.General;
     // Whether currently listening for a yes or no answer.
     this.yesOrNo = false;

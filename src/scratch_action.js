@@ -6,7 +6,6 @@
 const ActionImport = require('./action.js');
 const Argument = ActionImport.Argument;
 const Action = ActionImport.Action;
-const ScratchRegex = require('./triggers.js');
 const Utils = require('./utils.js');
 const soundLibraryContent = require('./sounds.js');
 
@@ -116,7 +115,7 @@ ScratchAction.General.getTriggers = function() {
 	for (var triggerName in ScratchAction.General) {
 		triggerMap[triggerName] = ScratchAction.General[triggerName].trigger;
 	}
-	return Object.keys(ScratchAction.General).map((triggerName) => ScratchAction.General[triggerName].trigger);
+	return triggerMap;
 }
 
 //queryState
@@ -183,7 +182,7 @@ ScratchAction.General.renameProject = new Action({
 
 //editExistingProject
 ScratchAction.General.editExistingProject = new Action({
-	"trigger":/since i said (.*)|see inside (.*)|the inside (.*)|what's inside (.*)|open project (.*)/,
+	"trigger":/since i said (.*)|see inside (.*)|the inside (.*)|what's inside (.*)|open (?:project)? ?(.*)/,
 	"idealTrigger":"what's inside alarm",
 	"description":"check out what the alarm project is made of",
 	"arguments":[
@@ -208,7 +207,7 @@ ScratchAction.General.editProject = new Action({
 
 //finishProject
 ScratchAction.General.finishProject = new Action({
-	"trigger":/i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it/,
+	"trigger":/i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it|end project|finish project/,
 	"idealTrigger":"i'm done",
 	"description":"leave the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -266,7 +265,7 @@ ScratchAction.General.getNthProject = new Action({
 
 //getProjectNames
 ScratchAction.General.getProjectNames = new Action({
-	"trigger":/what (?:projects|project) do i have|what have i made so far|what are my projects called|what are the names of my projects/,
+	"trigger":/what (?:projects|project) do i have|what have i made so far|what are my projects called|what are (?:the names of)? ?my projects/,
 	"idealTrigger":"what projects do i have",
 	"description":"hear a list of all the projects",
 });
@@ -345,14 +344,14 @@ ScratchAction.General.checkSound = new Action({
 
 //queryActions
 ScratchAction.General.queryActions = new Action({
-	"trigger":/^what can i do|^what do i do/,
+	"trigger":/what can i do|what do i do|help|what can you do/,
 	"idealTrigger":"what can i do",
 	"description":"get a suggestion for what to try next",
 });
 
 //queryActionTypes
 ScratchAction.General.queryActionTypes = new Action({
-	"trigger":/^what are the kinds of things i can do|^inspire me/,
+	"trigger":/what are the kinds of things i can do|inspire me/,
 	"idealTrigger":"what kinds of things can i do",
 	"description":"explore different kinds of actions",
 });
@@ -374,7 +373,7 @@ ScratchAction.Edit.getStepCount = new Action({
 
 //getAllSteps
 ScratchAction.Edit.getAllSteps = new Action({
-	"trigger":/what are all the steps|what does (?:my|the)? ?project do right now/,
+	"trigger":/what are (?:all)? ?the steps|what does (?:my|the)? ?project do right now/,
 	"idealTrigger":"what are all the steps",
 	"description":"hear me say all the steps in the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
