@@ -238,8 +238,8 @@ ScratchAction.General.play = new Action({
 
 //return
 ScratchAction.General.return = new Action({
-	"trigger":/stop$|go back$|quit$|exit$|cancel$|nevermind$/,
-	"idealTrigger":"stop",
+	"trigger":/go back$|quit$|exit$|cancel$|nevermind$|nevermind/,
+	"idealTrigger":"go back",
 	"description":"go back to the last state you were in",
 });
 
@@ -290,6 +290,27 @@ ScratchAction.General.stopCues = new Action({
 	"trigger":/^stop (?:the)? ?audio cues$/,
 	"idealTrigger":"stop audio cues",
 	"description":"stop the audio cues",
+});
+
+//stopProject
+ScratchAction.General.stopProject = newAction({
+	"trigger":/stop playing|stop playing (?:the)? ?project|stop (?:the)? ?project/,
+	"idealTrigger":"stop",
+	"description":"stop playing a project"
+});
+
+//stopTalking
+ScratchAction.General.stopTalking = newAction({
+	"trigger":/stop talking playing|stop playing (?:the)? ?project|stop (?:the)? ?project/,
+	"idealTrigger":"stop the project",
+	"description":"skip what Scratch is saying"
+});
+
+//stop
+ScratchAction.General.stop = newAction({
+	"trigger":/^stop$/,
+	"idealTrigger":"stop",
+	"description":"get scratch to stop talking or playing a project"
 });
 
 //startBackground
