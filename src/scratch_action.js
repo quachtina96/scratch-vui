@@ -88,18 +88,22 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 	return Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)
 }
 
-/**
- * Namespace for general commands
- */
-ScratchAction.General = {};
+ScratchAction.getEditTriggers = () => {
+	return Object.keys(ScratchAction.Edit);
+}
 
-ScratchAction.General.getTriggers = function() {
+ScratchAction.getGeneralTriggers = function() {
 	var triggerMap = {}
 	for (var triggerName in ScratchAction.General) {
 		triggerMap[triggerName] = ScratchAction.General[triggerName].trigger;
 	}
 	return triggerMap;
 }
+
+/**
+ * Namespace for general commands
+ */
+ScratchAction.General = {};
 
 //queryState
 ScratchAction.General.queryState = new Action({
@@ -220,7 +224,7 @@ ScratchAction.General.play = new Action({
 
 //return
 ScratchAction.General.return = new Action({
-	"trigger":/go back$|quit$|exit$|cancel$|nevermind$|nevermind/,
+	"trigger":/go back$|go home|quit$|exit$|cancel$|nevermind$|nevermind/,
 	"idealTrigger":"go back",
 	"description":"go back to the last state you were in",
 });
@@ -424,7 +428,7 @@ ScratchAction.Edit.playStep = new Action({
 
 //appendStep
 ScratchAction.Edit.appendStep = new Action({
-	"trigger":/add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|next (.*)|at the end (.*)|(.*) at the end|after all that (.*)|(.*) after all that/,
+	"trigger":/add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
 	"idealTrigger":"next, play the chomp sound",
 	"description":"to add a new instruction, 'play the chomp sound', to the end of the project",
 	"arguments": [new Argument({
@@ -438,7 +442,7 @@ ScratchAction.Edit.appendStep = new Action({
 
 //insertStepBefore
 ScratchAction.Edit.insertStepBefore = new Action({
-	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (.*)/,
+	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (?:number)? ?(.*)/,
 	// TODO: what are other commands that would be good to try to insert.
 	// could we design these commands to be more exciting.
 	"idealTrigger":"insert 'play the bark sound' before step number '1'",
@@ -456,12 +460,11 @@ ScratchAction.Edit.insertStepBefore = new Action({
 		})
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-
 });
 
 //insertStepAfter
 ScratchAction.Edit.insertStepAfter = new Action({
-	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number) ?(.*)/,
+	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)/,
 	// TODO: there is so much potential to make these triggers and descriptions
 	// contextual based on the current step.
 	"idealTrigger":"insert 'play the meow sound' after step number '1'",
@@ -479,12 +482,53 @@ ScratchAction.Edit.insertStepAfter = new Action({
 		})
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-
 });
+
+ScratchAction.Edit.afterInsertStep = new Action({
+	"trigger":/after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*?) (?:insert)? ?(.*)/,
+	// TODO: there is so much potential to make these triggers and descriptions
+	// contextual based on the current step.
+	"idealTrigger":"after step number '1' insert 'play the meow sound'",
+	"description":"insert a new command after step number 1",
+	"arguments": [
+		new Argument({
+			name: 'stepNumber',
+			validator: ScratchAction.Validator.currentProjectStepNumber,
+			description: 'the step to insert after'
+		}),
+		new Argument({
+			'name': 'instruction',
+			'validator': ScratchAction.Validator.scratchCommand,
+			'description':'the instruction to insert'
+		})
+	],
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
+})
+
+ScratchAction.Edit.beforeInsertStep = new Action({
+	"trigger":/before (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*?) (?:insert)? ?(.*)/,
+	// TODO: what are other commands that would be good to try to insert.
+	// could we design these commands to be more exciting.
+	"idealTrigger":"before step number '1'insert 'play the bark sound'",
+	"description":"insert a new command before step number 1",
+	"arguments": [
+		new Argument({
+			name: 'stepNumber',
+			validator: ScratchAction.Validator.currentProjectStepNumber,
+			description: 'the step to insert before'
+		}),
+		new Argument({
+			'name': 'instruction',
+			'validator': ScratchAction.Validator.scratchCommand,
+			'description':'the instruction to insert'
+		})
+	],
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
+})
 
 //deleteStep
 ScratchAction.Edit.deleteStep = new Action({
-	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number) ?(.*)/,
+	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)/,
 	"idealTrigger":"delete step 1",
 	"description":"delete the first step",
 	"arguments": [
@@ -499,7 +543,7 @@ ScratchAction.Edit.deleteStep = new Action({
 
 //replaceStep
 ScratchAction.Edit.replaceStep = new Action({
-	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step|at) (?:number) ?(.*) with (.*)/,
+	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*) with (.*)/,
 	"idealTrigger":"replace step 1 with say hello",
 	"description":"change step to say hello",
 	"arguments": [
@@ -516,9 +560,5 @@ ScratchAction.Edit.replaceStep = new Action({
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
-
-ScratchAction.Edit.getTriggers = () => {
-	return Object.keys(ScratchAction.Edit);
-}
 
 module.exports = ScratchAction;

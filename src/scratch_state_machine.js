@@ -81,6 +81,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getNthProject', from: '*', to: function() { return this.state} },
     { name: 'getProjectNames', from: '*', to: function() { return this.state} },
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
+    { name: 'queryActions', from: '*', to: function() { return this.state} },
     { name: 'queryState', from: '*', to: function() { return this.state} },
     { name: 'stopBackground', from: '*', to: function() {return this.state} },
     { name: 'stopCues', from: '*', to: function() {return this.state} },
