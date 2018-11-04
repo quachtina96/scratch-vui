@@ -204,8 +204,11 @@ class ScratchProjectManager {
       this.yesOrNo = null;
     }
 
+    // Handle interrupt of speech.
     if (Utils.matchesScratch(utterance)) {
-      // Remember that the use said "Scratch" and give them a queue so they know they've been heard.
+      this.synth.cancel();
+      // Remember that the user said "Scratch" and give them a cue so they know
+      // they've been heard.
       this.scratchVoiced = true;
       this.say("I'm listening.")
       return;
