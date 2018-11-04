@@ -89,23 +89,6 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 	return Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)
 }
 
-// Helper Utility to programmatically generate skeleton for the code below.
-ScratchAction._generateSpecs = (triggers) => {
-	general = getGeneralTriggers();
-	list = [];
-	for (var trigger in general) {
-		console.log(general[trigger])
-		list.push("//"+ trigger + '\nScratchAction.' + trigger + ' = new Action(' +
-				JSON.stringify({
-					trigger: general[trigger].toString(),
-					description: '',
-					arguments: []
-	}) + ');')
-	}
-	result = list.join('\n\n')
-};
-
-
 /**
  * Namespace for general commands
  */
