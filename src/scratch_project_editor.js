@@ -34,6 +34,7 @@ class ScratchProjectEditor {
     for (var commandType in this.actions) {
       var args = Utils.match(utterance, this.actions[commandType].trigger);
       if (args && this[commandType]) {
+        this.pm.audio.cueSuccess();
         this[commandType].call(scratchProject, args);
         this.project.pm.save();
         // We return 'exit' on executing the finish project command because we
@@ -128,8 +129,9 @@ class ScratchProjectEditor {
     ScratchInstruction.parse(command).then((result) => {
       if (!result) {
         // Failed to parse the command using ScratchNLP. Alert failure.
-        this.audio.cueMistake();
-        this.pm.say("I heard you say " + step + ". That's not a Scratch command.");
+        this.audio.cueMistake().then(()=>{
+          this.pm.say("I heard you say " + step + ". That's not a Scratch command.");
+        });
       } else {
         // Success!
         var instruction = new ScratchInstruction(command);

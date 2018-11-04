@@ -117,17 +117,20 @@ var ScratchProject = StateMachine.factory({
         if (this.name) {
           this.goto('named');
         } else {
-          this.startProjectCreation();
+          this.pm.audio.cueSuccess(() => {
+            this.startProjectCreation();
+          });
         }
-      }
-      if (this.state == 'empty') {
+      } else if (this.state == 'empty') {
         // Expect the utterance to be the name of the project.
         var proposedName = this._getName(utterance);
         if (this._isValid(proposedName)) {
           this.name = this._getName(utterance);
           this.pm.projects[this.name] = this.pm.currentProject;
           delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-          this.nameProject();
+          this.pm.audio.cueSuccess(() => {
+            this.nameProject();
+          });
         } else {
           // TODO: Request new name from the user.
         }
@@ -156,14 +159,17 @@ var ScratchProject = StateMachine.factory({
         ScratchInstruction.parse(command).then((result) => {
           if (!result) {
             // Failed to parse the command using ScratchNLP. Alert failure.
-            this.audio.cueMistake();
-            this.pm.say("I heard you say " + utterance);
+            this.audio.cueMistake().then(() => {
+              this.pm.say("I heard you say " + utterance);
+            });
           } else {
             // Success!
-            var instruction = new ScratchInstruction(command);
-            instruction.parse = result
-            this.instructions.push(instruction);
-            this.addInstruction();
+            this.pm.audio.cueSuccess(() => {
+              var instruction = new ScratchInstruction(command);
+              instruction.parse = result
+              this.instructions.push(instruction);
+              this.addInstruction();
+            });
           }
         });
       }

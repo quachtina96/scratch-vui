@@ -47,30 +47,54 @@ class ScratchAudio {
  		return channel;
 	}
 
-	_playCue(filepath) {
+	// @deprecated.
+	_simplePlayCue(url) {
 		if (!this.muteCues) {
-			this.cue.src = filepath;
+			this.cue.src = url;
 			this.cue.play();
 		}
 	}
 
+	_playCue(url) {
+		var scratchAudio = this;
+		return new Promise(function(resolve, reject) {   // return a promise                    // autoplay when loaded
+		   scratchAudio.cue.onerror = reject;                      // on error, reject
+		   scratchAudio.cue.onended = resolve;                     // when done, resolve
+
+			if (!scratchAudio.muteCues) {
+				scratchAudio.cue.src = url;
+				scratchAudio.cue.play();
+			}
+		});
+	}
+
 	cueMistake() {
-		this._playCue('assets/sound/bonk.wav');
+		// https://www.soundboard.com/sb/Hanna_Barbera_sound_effec
+		return this._playCue('assets/sound/bonk.wav');
+	}
+
+	cueSuccess() {
+		// https://freesound.org/people/Mattix/sounds/402288/
+		return this._playCue('assets/sound/coin.wav');
 	}
 
 	cueProjectStarted() {
+		// sound came from reversing the Scratch 3.0 Coin sound
 		this._playCue('assets/sound/coin_reverse.wav');
 	}
 
 	cueProjectFinished() {
+		// sound came from reversing the Scratch 3.0 Coin sound
 		this._playCue('assets/sound/coin_reverse.wav');
 	}
 
 	cueListening() {
+		// sound came from Scratch sound assets
 		this._playCue('assets/sound/snap.wav');
 	}
 
 	cueDoneListening() {
+		// sound came from Scratch sound assets
 		this._playCue('assets/sound/pop.wav');
 	}
 
@@ -103,6 +127,21 @@ class ScratchAudio {
 	stopBackground() {
 		this.background.src = '';
 	}
+}
+
+// Note from Tina: I found this function that wraps an audio element's play
+// function as a promise. Could be useful in the future so it's here for reference.
+// https://stackoverflow.com/questions/30069988/how-can-i-create-a-promise-for-the-end-of-playing-sound
+function play(url) {
+  return new Promise(function(resolve, reject) { // return a promise
+    var audio = new Audio();                     // create audio wo/ src
+    audio.preload = "auto";                      // intend to play through
+    audio.autoplay = true;                       // autoplay when loaded
+    audio.onerror = reject;                      // on error, reject
+    audio.onended = resolve;                     // when done, resolve
+
+    audio.src = url
+  });
 }
 
 module.exports = ScratchAudio;

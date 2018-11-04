@@ -88,18 +88,22 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 	return Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)
 }
 
-/**
- * Namespace for general commands
- */
-ScratchAction.General = {};
+ScratchAction.getEditTriggers = () => {
+	return Object.keys(ScratchAction.Edit);
+}
 
-ScratchAction.General.getTriggers = function() {
+ScratchAction.getGeneralTriggers = function() {
 	var triggerMap = {}
 	for (var triggerName in ScratchAction.General) {
 		triggerMap[triggerName] = ScratchAction.General[triggerName].trigger;
 	}
 	return triggerMap;
 }
+
+/**
+ * Namespace for general commands
+ */
+ScratchAction.General = {};
 
 //queryState
 ScratchAction.General.queryState = new Action({
@@ -220,7 +224,7 @@ ScratchAction.General.play = new Action({
 
 //return
 ScratchAction.General.return = new Action({
-	"trigger":/go back$|quit$|exit$|cancel$|nevermind$|nevermind/,
+	"trigger":/go back$|go home|quit$|exit$|cancel$|nevermind$|nevermind/,
 	"idealTrigger":"go back",
 	"description":"go back to the last state you were in",
 });
@@ -516,9 +520,5 @@ ScratchAction.Edit.replaceStep = new Action({
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
-
-ScratchAction.Edit.getTriggers = () => {
-	return Object.keys(ScratchAction.Edit);
-}
 
 module.exports = ScratchAction;
