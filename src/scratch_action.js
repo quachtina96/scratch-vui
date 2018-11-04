@@ -275,24 +275,10 @@ ScratchAction.General.stopCues = new Action({
 });
 
 //stopProject
-ScratchAction.General.stopProject = newAction({
-	"trigger":/stop playing|stop playing (?:the)? ?project|stop (?:the)? ?project/,
+ScratchAction.General.stopProject = new Action({
+	"trigger":/^stop$|stop playing|stop playing (?:the)? ?project|stop (?:the)? ?project/,
 	"idealTrigger":"stop",
 	"description":"stop playing a project"
-});
-
-//stopTalking
-ScratchAction.General.stopTalking = newAction({
-	"trigger":/stop talking playing|stop playing (?:the)? ?project|stop (?:the)? ?project/,
-	"idealTrigger":"stop the project",
-	"description":"skip what Scratch is saying"
-});
-
-//stop
-ScratchAction.General.stop = newAction({
-	"trigger":/^stop$/,
-	"idealTrigger":"stop",
-	"description":"get scratch to stop talking or playing a project"
 });
 
 //startBackground

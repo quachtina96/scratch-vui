@@ -90,7 +90,10 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'listen', from: '*', to: function() {return this.state} },
     { name: 'getSounds', from: '*', to: function() {return this.state} },
     { name: 'checkSound', from: '*', to: function() {return this.state} },
-    { name: 'queryActions', from: '*', to: function() {return this.state} }
+    { name: 'stopProject', from: 'PlayProject', to: function() {
+        return this.history[this.history.length - 2];
+      }
+    }
   ],
   data: function() {
     var ssm = this;
@@ -233,6 +236,7 @@ var ScratchStateMachine = new StateMachine.factory({
           this.pm.audio.setMute("muteBackground", true);
         },
         onStopCues: () => {this.pm.audio.setMute("muteCues", true)},
+        onStopProject: () => {this.vm.stopAll();},
         onStartBackground: () => {
           this.pm.audio.setMute("muteBackground", false);
           this.pm.audio.cueBackground(this.state);
