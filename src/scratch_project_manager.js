@@ -39,6 +39,9 @@ class ScratchProjectManager {
     this.listening = true;
     this.audio = new ScratchAudio();
     this.soundLibrary = new SoundLibrary(this.ssm.vm);
+    this.lastUserUtterance = null;
+    this.currentUserUtterance = null;
+    this.lastThingSaid = null;
   }
 
   load() {
@@ -86,6 +89,7 @@ class ScratchProjectManager {
    *  speech  synthesis is complete.
    */
   say(whatToSay, opt_on_end) {
+    this.lastThingSaid = whatToSay;
     var whatToSay = new SpeechSynthesisUtterance(whatToSay);
 
     // Stop speech recognition during speech synthesis.
@@ -197,6 +201,10 @@ class ScratchProjectManager {
     var lowercase = utterance.toLowerCase();
     var utterance = Utils.removeFillerWords(lowercase).trim();
     console.log('utterance: ' + utterance)
+
+    // Update our short-term user utterance history.
+    this.lastUserUtterance = this.currentUserUtterance;
+    this.currentUserUtterance =  utterance;
 
     if (this.yesOrNo) {
       // Handle response to yes/no question.
@@ -656,7 +664,7 @@ class ScratchProjectManager {
       var action = suggestedActions[Math.floor(Math.random()*suggestedActions.length)];
 
       // Present action.
-      pm.say(`say ${action.idealTrigger} to ${action.description}`);
+      pm.say(`Here's something you can try. Say ${action.idealTrigger} to ${action.description}`);
       resolve();
     });
   }
@@ -694,9 +702,21 @@ class ScratchProjectManager {
       // Pick a random command from the Scratch Commands.
       let random_command = Utils.getNFromList(ScratchCommands, 1, -1)[0];
       // Present action. pick random thing from scratch_commands.json
-      pm.say(`One thing I can do is ${random_command.description}. Try by saying ${random_command.example_statement}`);
+      let possiblePrefixes = ['One thing I can do is', "Here's one. I can"];
+      let prefix = Utils.getNFromList(possiblePrefixes, 1, -1)[0];
+      pm.say(`${prefix} ${random_command.description}. Try by saying ${random_command.example_statement}`);
       resolve();
     });
+  }
+  getWhatScratchSaid() {
+    this.say(`I said ${this.lastThingSaid}`);
+  }
+  getWhatUserSaid() {
+    if (this.lastUserUtterance) {
+      this.say(`I heard you say ${this.lastUserUtterance}`);
+    } {
+      this.say(`I didn't hear you say anything`);
+    }
   }
 }
 

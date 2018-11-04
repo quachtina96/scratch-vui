@@ -20,8 +20,10 @@ var ScratchCommands = [
         "example_project_name": ""
     },
     {
-        "description": "do math (basic +/-*)",
-        "example_statement": "the length of the fruits list times price",
+        "description": "do math",
+        // TODO: change the example. the current one doesn't imply the range of
+        // possibilities. for example, that you can provide numbers as arguments!
+        "example_statement": "what is 10 times 30", // old_example: "the length of the fruits list times price";
         "example_project_name": ""
     },
     {
@@ -36,12 +38,14 @@ var ScratchCommands = [
     },
     {
         "description": "listen for words",
-        "example_statement": "listen and wait. if the speech equals WHATEVER WORDS YOU WANT, INSERT ACTION HERE",
+        "example_statement": "if i say 'hello', play the meow sound",
         "example_project_name": ""
     },
     {
         "description": "make and modify variables",
-        "example_statement": "make a variable called bananas and set bananas to 10",
+        // TODO: add the following to the example statement when the desired
+        // behavior is supported. "Then ask me what bananas is set to.""
+        "example_statement": "make a variable called bananas and set bananas to 10.",
         "example_project_name": ""
     },
     {
