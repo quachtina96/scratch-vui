@@ -55,7 +55,7 @@ class ScratchAudio {
 	}
 
 	cueMistake() {
-		this._playCue('assets/sound/hightom.wav');
+		this._playCue('assets/sound/bonk.wav');
 	}
 
 	cueProjectStarted() {
