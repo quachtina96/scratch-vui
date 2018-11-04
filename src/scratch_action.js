@@ -338,7 +338,7 @@ ScratchAction.General.checkSound = new Action({
 
 //queryActions
 ScratchAction.General.queryActions = new Action({
-	"trigger":/what can i do|what do i do|help|what can you do/,
+	"trigger":/what can i do|what do i do|help/,
 	"idealTrigger":"what can i do",
 	"description":"get a suggestion for what to try next",
 });
@@ -566,7 +566,6 @@ ScratchAction.General.getKnownCommands = new Action({
 	"idealTrigger": "what can you do",
 	"description": "hear what things I can do"
 });
-
 
 ScratchAction.General.getScratchCommands = new Action({
 	"trigger":/(?:tell me|what are) (?:the|some ?(?:of the)?) scratch commands|what (?:(?:kinds|kind) of)? ?scratch commands are there|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you have)/,
