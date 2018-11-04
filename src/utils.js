@@ -222,7 +222,7 @@ Utils.getTargets_ = (triggerMap) => {
 Utils.text2num = (numberWord) => {
   var parseResult = parseInt(numberWord);
   if (!isNaN(parseResult)) {
-    return numberWord;
+    return parseInt(numberWord);
   }
 
   var a, n, g;

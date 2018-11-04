@@ -34,7 +34,7 @@ class ScratchProjectEditor {
     for (var commandType in this.actions) {
       var args = Utils.match(utterance, this.actions[commandType].trigger);
       if (args && this[commandType]) {
-        this.pm.audio.cueSuccess();
+        this.project.pm.audio.cueSuccess();
         this[commandType].call(scratchProject, args);
         this.project.pm.save();
         // We return 'exit' on executing the finish project command because we
@@ -130,7 +130,7 @@ class ScratchProjectEditor {
       if (!result) {
         // Failed to parse the command using ScratchNLP. Alert failure.
         this.audio.cueMistake().then(()=>{
-          this.pm.say("I heard you say " + step + ". That's not a Scratch command.");
+          this.project.pm.say("I heard you say " + step + ". That's not a Scratch command.");
         });
       } else {
         // Success!
@@ -142,26 +142,19 @@ class ScratchProjectEditor {
     });
   }
 
-  insertStepBefore(args) {
-    // TODO: use try catch to handle inability to convert the Scratch
-    // instruction.
-        // Get the new step.
-    var utterance = args[1];
+  /**
+   * In order to support
+   */
+  insertStep(options) {
+    var direction = options.direction;
+    var referenceStepNumber = options.referenceStepNumber;
+    var utterance = options.utterance;
+
     var step = new ScratchInstruction(utterance);
     ScratchInstruction.parse(step.no_punctuation).then((parse) => {
       if (parse) {
-        var referenceStepNumber = this._getNumber(args[2])-1;
         this._insertStep(step, referenceStepNumber);
       }
-    });
-  }
-
-  insertStepAfter(args) {
-    var utterance = args[1];
-    var step = new ScratchInstruction(utterance);
-    ScratchInstruction.parse(step.no_punctuation).then((parse) => {
-      var referenceStepNumber = this._getNumber(args[2])-1;
-      this._insertStep(step, referenceStepNumber + 1);
     });
   }
 
@@ -171,7 +164,51 @@ class ScratchProjectEditor {
   _insertStep(step, location) {
     this.project.instructions.splice(location, 0, step);
     this.project.instructionPointer = location;
-    this.project.pm.say('inserted step');
+  }
+
+  insertStepBefore(args, invertedArguments=false) {
+    // TODO: use try catch to handle inability to convert the Scratch
+    // instruction.
+    // Get the new step.
+    if (invertedArguments) {
+      var options = {
+        direction: 'before',
+        utterance: args[2],
+        referenceStepNumber: this._getNumber(args[1])-1
+      }
+    } else {
+      var options = {
+        direction: 'before',
+        utterance: args[1],
+        referenceStepNumber: this._getNumber(args[2])-1
+      }
+    }
+    this.insertStep(options);
+  }
+
+  insertStepAfter(args, invertedArguments=false) {
+    if (invertedArguments) {
+      var options = {
+        direction: 'after',
+        utterance: args[2],
+        referenceStepNumber: this._getNumber(args[1])
+      }
+    } else {
+      var options = {
+        direction: 'after',
+        utterance: args[1],
+        referenceStepNumber: this._getNumber(args[2])
+      }
+    }
+    this.insertStep(options);
+  }
+
+  beforeInsertStep(args) {
+    this.insertStepBefore(args, true);
+  }
+
+  afterInsertStep(args) {
+    this.insertStepAfter(args, true);
   }
 
   /**
