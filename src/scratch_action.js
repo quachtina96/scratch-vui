@@ -88,23 +88,6 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 	return Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)
 }
 
-// Helper Utility to programmatically generate skeleton for the code below.
-ScratchAction._generateSpecs = (triggers) => {
-	general = getGeneralTriggers();
-	list = [];
-	for (var trigger in general) {
-		console.log(general[trigger])
-		list.push("//"+ trigger + '\nScratchAction.' + trigger + ' = new Action(' +
-				JSON.stringify({
-					trigger: general[trigger].toString(),
-					description: '',
-					arguments: []
-	}) + ');')
-	}
-	result = list.join('\n\n')
-};
-
-
 /**
  * Namespace for general commands
  */
@@ -237,8 +220,8 @@ ScratchAction.General.play = new Action({
 
 //return
 ScratchAction.General.return = new Action({
-	"trigger":/stop$|go back$|quit$|exit$|cancel$|nevermind$/,
-	"idealTrigger":"stop",
+	"trigger":/go back$|quit$|exit$|cancel$|nevermind$|nevermind/,
+	"idealTrigger":"go back",
 	"description":"go back to the last state you were in",
 });
 
@@ -289,6 +272,13 @@ ScratchAction.General.stopCues = new Action({
 	"trigger":/^stop (?:the)? ?audio cues$/,
 	"idealTrigger":"stop audio cues",
 	"description":"stop the audio cues",
+});
+
+//stopProject
+ScratchAction.General.stopProject = new Action({
+	"trigger":/^stop$|stop playing|stop playing (?:the)? ?project|stop (?:the)? ?project/,
+	"idealTrigger":"stop",
+	"description":"stop playing a project"
 });
 
 //startBackground
