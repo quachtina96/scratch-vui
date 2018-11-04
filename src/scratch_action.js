@@ -315,14 +315,14 @@ ScratchAction.General.listen = new Action({
 
 //getSounds
 ScratchAction.General.getSounds = new Action({
-	"trigger":/^what sounds are there|what (?:other)? ?sounds do you have|more sounds|other sounds$/,
+	"trigger":/^what sounds (?:are there|do you (?:know|have))|what (?:other)? ?sounds do you (?:know|have)|more sounds|other sounds$/,
 	"idealTrigger":"what sounds are there",
 	"description":"discover what sounds there are",
 });
 
 //checkSound
 ScratchAction.General.checkSound = new Action({
-	"trigger":/^do you have (?:a|the|this) (.*) sound?$/,
+	"trigger":/^do you (?:have|know) (?:a|the|this) (.*) sound?$/,
 	"idealTrigger":"do you have a boing sound?",
 	"description":"check if there's a boing sound",
 	"arguments": [
@@ -338,7 +338,7 @@ ScratchAction.General.checkSound = new Action({
 
 //queryActions
 ScratchAction.General.queryActions = new Action({
-	"trigger":/what can i do|what do i do|help|what can you do/,
+	"trigger":/what can i do|what do i do|help|what should i do/,
 	"idealTrigger":"what can i do",
 	"description":"get a suggestion for what to try next",
 });
@@ -560,5 +560,40 @@ ScratchAction.Edit.replaceStep = new Action({
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 });
+
+ScratchAction.General.getKnownCommands = new Action({
+	"trigger": /what can you do|what do you know (?:how to do)/,
+	"idealTrigger": "what can you do",
+	"description": "hear what things I can do"
+});
+
+ScratchAction.General.getScratchCommands = new Action({
+	"trigger":/what scratch commands do you (?:know|have)|(?:tell me|what are) (?:the|some ?(?:of the)?) scratch commands (?:that you know|you know)?|what (?:(?:kinds|kind) of)? ?scratch commands (?:are there|do you know)|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you (?:have|know))/,
+	"idealTrigger":"what scratch commands are there",
+	"description":"learn about what commands you can use in your projects",
+});
+
+// Help users understand what Scratch thought they said.
+ScratchAction.General.getWhatISaid = new Action({
+	"trigger":/what did i say|what did you hear|what did I (?:just)? ?say|what did you think i (?:just)? ?said|can you tell me what you thought I (?:just)? ?said|can you tell me what I (?:just)? ?said/,
+	"idealTrigger":"what did you hear me say",
+	"description":"hear what Scratch thought you said",
+});
+
+// Help users remember what Scratch said (if they didn't catch it)
+ScratchAction.General.getWhatYouSaid = new Action({
+	"trigger":/what did you (?:just)? ?say|(?:can you)? ?repeat (?:that|yourself)|say that again|(?:can you)? ?say what you (?:just)? ?said ?(?:again)?|tell me what you (?:just)? ?said/,
+	"idealTrigger":"say that again",
+	"description":"get Scratch to repeat what they just said",
+});
+
+// ScratchAction.Project.
+			// "respond to certain events", "play a sound", "repeat actions",
+   //    "if statements", "do basic math", "get random numbers",
+   //    "say words out loud in different accents and in different voices",
+   //    "listen for words", "make and modify lists and variables", "control a timer."
+
+// TODO: Investigate + implement ScratchAction.General.search for searching
+// assets, code, commands, categories, whatever.
 
 module.exports = ScratchAction;

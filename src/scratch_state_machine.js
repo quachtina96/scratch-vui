@@ -81,7 +81,6 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getNthProject', from: '*', to: function() { return this.state} },
     { name: 'getProjectNames', from: '*', to: function() { return this.state} },
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
-    { name: 'queryActions', from: '*', to: function() { return this.state} },
     { name: 'queryState', from: '*', to: function() { return this.state} },
     { name: 'stopBackground', from: '*', to: function() {return this.state} },
     { name: 'stopCues', from: '*', to: function() {return this.state} },
@@ -94,7 +93,12 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'stopProject', from: 'PlayProject', to: function() {
         return this.history[this.history.length - 2];
       }
-    }
+    },
+    { name: 'queryActions', from: '*', to: function() {return this.state} },
+    { name: 'getKnownCommands', from: '*', to: function() {return this.state} },
+    { name: 'getScratchCommands', from: '*', to: function() {return this.state} },
+    { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
+    { name: 'getWhatISaid', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -253,6 +257,10 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetSounds: () => {this.pm.getSounds()},
         onQueryActions: () => {this.pm.getSuggestedActions()},
         onCheckSound: (lifecycle, args) => {this.pm.checkSound(lifecycle, args)},
+        onGetKnownCommands: () => {this.pm.getKnownCommands()},
+        onGetScratchCommands: () => {this.pm.getScratchCommands()},
+        onGetWhatYouSaid: () => {this.pm.getWhatScratchSaid()},
+        onGetWhatISaid: () => {this.pm.getWhatUserSaid()},
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];
