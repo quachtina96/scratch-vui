@@ -168,11 +168,20 @@ class ScratchProjectManager {
       if (this._isInterrupt(utterance)) {
         this.currentAction = null;
         this.currentArgument = null;
+        this.say('Canceled action.')
+        return;
+      }
+
+      if (this._handleQuestion(utterance)) {
         return;
       }
 
       // The current argument takes priority.
       if (this.currentArgument) {
+
+        // Handle any questions without mistaking user's question as the argument.
+        utterance
+
         var success = this.currentArgument.handleUtterance(this.ssm, utterance);
         if (success) {
           // The utterance handler already finished its job.
@@ -216,6 +225,31 @@ class ScratchProjectManager {
 
     // If trigger was matched, attempt to execute associated command.
     return (args && args.length > 0)
+  }
+
+  /**
+   * Handle question
+   *
+   * @param {!String} utterance - what the user said
+   * @return {boolean} true if the utterance was handled, false if the utterance
+   *    was not a question.
+   */
+  _handleQuestion(utterance) {
+    var allActions = ScratchAction.allActions();
+    var questionActions = allActions.filter((action) => {
+      action.question
+    });
+
+    for (var action of questionActions) {
+      var trigger = action.trigger;
+      var args = this.scratchVoiced ? Utils.matchRegex(utterance, trigger) : Utils.match(utterance, trigger);
+      // If trigger was matched, attempt to execute associated command.
+      if (args && args.length > 0) {
+        var actionToExecute = new Action(action);
+        actionToExecute.execute(this.ssm, utterance);
+        return true;
+      }
+    }
   }
 
   /**

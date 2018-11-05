@@ -95,6 +95,17 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 	return Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)
 }
 
+ScratchAction.allActions = () => {
+	var actionItems = Object.entries(ScratchAction.General).concat(Object.entries(
+			ScratchAction.Edit));
+	return actionItems.map((b) => b[1]);
+}
+
+ScratchAction.getAllTriggers = () => {
+	return ScratchAction.getEditTriggers().concat(
+			ScratchAction.getGeneralTriggers());
+}
+
 ScratchAction.getEditTriggers = () => {
 	return Object.keys(ScratchAction.Edit);
 }
@@ -127,7 +138,7 @@ ScratchAction.General = {};
 //queryState
 ScratchAction.General.queryState = {
 	"name": "queryState",
-	"trigger": /what state am i in| here am i/,
+	"trigger": /what state am i in|where am i/,
 	"idealTrigger": "what state am i in",
 	"description": "figure out what state you are in",
 };
