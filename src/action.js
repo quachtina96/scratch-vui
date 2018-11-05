@@ -14,31 +14,36 @@ class Argument {
 	/**
 	 * Create a argument.
 	 * @param {Object} options -
-	 * 	@param {String} name - the argument the argument represents
-	 * 	@param {Function} validator - takes two parameters: ScratchStateMachine
-	 * 		instance and the value to validate. Returns true if value is valid.
-	 * 	@param {String} description - how to describe the desired argument
+	 *  @param {String} name - the argument the argument represents
+	 *  @param {Function} validator - takes two parameters: ScratchStateMachine
+	 *      instance and the value to validate. Returns true if value is valid.
+	 *  @param {String} description - how to describe the desired argument
 	 */
 	constructor(options) {
 		this.name = options.name;
 		this.value = null;
 		this.validator = options.validator ? options.validator : () => {return true};
-		this.description = options.description ? options.description : "" ;
+		this.description = options.description ? options.description : "";
 	}
 
 	isSatisfied() {
 		return this.value != null;
 	}
 
-	validate(value) {
-		return this.validator(value)
+	validate(ssm, value) {
+		var result = this.validator(ssm, value);
+		if (result != true) {
+			ssm.pm.say(result);
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * If the value is valid for the given argument, set the value.
 	 */
-	set(value) {
-		var valid = this.validate(value)
+	set(ssm, value) {
+		var valid = this.validate(ssm, value)
 		this.value = valid ? value : this.value;
 		return valid;
 	}
@@ -49,64 +54,118 @@ class Argument {
 	get() {
 		return this.value
 	}
+
+	handleUtterance(ssm, value) {
+		if (this.set(value)) {
+			ssm.pm.synth.say(`set ${this.name} to ${value}`)
+			return true;
+		} else {
+			ssm.pm.synth.say(`could not set ${this.name} to ${value}`)
+			return false;
+		}
+	}
 }
 
+/**
+ * The Action class provides a representation for actions that a user may take
+ * in the Scratch VUI system.
+ */
 class Action {
 	/**
 	 * Create an instance of a Scratch Action.
 	 * @param {Object} params containing
-	 * 		{RegExp} trigger - the regular expression representing the ways to
-	 * 			recognize an action from a user's utterance and where to extract arguments
-	 * 		{String} description - how to verbally represent a specific action.
-	 * 		{Object} arguments - map of argument names to argument objects.
-	 * 		{Function} contextValidator - given ssm and other arguments, returns true
-	 * 				if able to execute action given context.
+	 *      {RegExp} trigger - the regular expression representing the ways to
+	 *          recognize an action from a user's utterance and where to extract arguments
+	 *      {String} description - how to verbally represent a specific action.
+	 *      {Object} arguments - map of argument names to argument objects.
+	 *      {Function} contextValidator - given ssm and other arguments, returns true
+	 *              if able to execute action given context.
 	 */
 	constructor(options) {
+		if (!options.name) {
+			throw "Cannot have an Action without a name";
+		}
+		this.name = options.name
 		this.trigger = options.trigger ? options.trigger : /\*/;
 		this.description = options.description ? options.description :  "";
 		this.arguments = options.arguments ? options.arguments : [];
 		this.contextValidator = options.contextValidator ? options.contextValidator : () => {return true};
 		this.idealTrigger = options.idealTrigger ? options.idealTrigger : () => {return true};
+		this.missingArguments = null;
+		// The current argument that is being set or requested.
+		this.current = null;
+	}
+
+	// /**
+	//  * Given the args and the utterance return whether the arguments meet
+	//  * requirements.
+	//  */
+	// validate(args, utterance) {
+	// 	for (var i=1; i<args.length; i++) {
+	// 		this.arguments[i-1].set(args[i])
+	// 	}
+	// }
+
+	/**
+	 * Set arguments for the action based on the arguments extracted from the regular
+	 * expression.
+	 */
+	setArguments(ssm, args) {
+		for (var i=1; i<args.length; i++) {
+			this.arguments[i-1].set(ssm, args[i])
+		}
 	}
 
 	/**
 	 * Return list of missing arguments needed to execute action.
 	 */
 	_getMissingArguments() {
-		var missingArgs = {}
-		this.arguments.forEach((req) => {
-			if (!req.isSatisfied()) {
-				missingArgs[req] = this.arguments[req]
-			}
-		});
-		return missingArgs;
+		return this.arguments.filter((req) => !req.isSatisfied());
 	}
 
 	/**
 	 * Ask user for arguments and add those arguments to the action.
 	 */
-	requestMissingArguments() {
-		var argsToRequest = this._getMissingArguments
+	getMissingArgument(ssm) {
+		this.missingArguments = this._getMissingArguments()
+		var argument = this.missingArguments.shift();
+		if (!argument) {
+			// Exit early if nothing to request
+			return false;
+		} else {
+			this._requestArgument(ssm.pm, argument)
+			return argument;
+		}
+	}
+
+	/**
+	 *
+	 */
+	handleUtterance(utterance, callback) {
+		console.log('todo: handle utterance in action')
 	}
 
 	/**
 	 * Ask user to satisfy argument.
 	 */
-	_requestArgument(synthesis, argument) {
-		synthesis.say('What do you want ' + argument.name + 'to be?')
-		// TODO: if the user doesn't know, pick something for them? and/or explain
-		// further what the thing is by giving them a description. Only do this after
-		// introducing the right arrow key as a way to skip the speech. OR maybe
-		// pressing the spacebar to start talking (or toggle speech recognition shd
-		// be the way to silence the speech)
+	_requestArgument(pm, argument) {
+		this.current = argument;
+		pm.say(`What do you want the ${argument.description} to be?`)
 
-		// direct speech utterance to the action.
 	}
 
 	modifyArgument(name, value) {
 		var reqToMod = this.arguments.filter(argument => argument.name == name)
 		reqToMod.set(value)
+	}
+
+	execute(ssm, utterance) {
+		// We use a filler in the beginning because arguments extracted via
+		// regex extract more from you.
+		var args = ['filler'].concat(this.arguments.map((arg) => arg.value));
+		// Create a dummy lifecycle.
+		var lifecycle = null;
+		ssm[this.name](lifecycle, args, utterance)
 	}
 }
 

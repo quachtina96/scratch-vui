@@ -42,6 +42,9 @@ class ScratchProjectManager {
     this.lastUserUtterance = null;
     this.currentUserUtterance = null;
     this.lastThingSaid = null;
+    // When you want to short-circuit the utterance to facilitate a follow up
+    // conversation regarding a question, you can use the utteranceHandler.
+    this.utteranceHandler = null;
   }
 
   load() {
@@ -187,6 +190,15 @@ class ScratchProjectManager {
    */
   handleUtterance(utterance) {
     if (this.listening) {
+      if (this.utteranceHandler) {
+        var success = this.utteranceHandler.handleUtterance(utterance);
+        if (success) {
+          // The utterance handler already finished its job.
+          // reset the handler to use the default flow.
+          this.utteranceHandler = null;
+        }
+        return success;
+      }
       return this._handleUtterance(utterance);
     } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
       this.listening = true;
@@ -320,9 +332,30 @@ class ScratchProjectManager {
   triggerAction(triggerType, opt_args, opt_utterance) {
     opt_args = opt_args ? opt_args : [];
     opt_utterance = opt_utterance ? opt_utterance : "";
+    var action = this.actions[triggerType];
+
+    // Validate context
+    var result = action.contextValidator(this.ssm);
+    if (result != true) {
+      // Explain why the context is invalid.
+      this.say(result);
+      return;
+    }
+
+    // Validate arguments
+    action.setArguments(this.ssm, opt_args)
+    var missingArgument = action.getMissingArgument(this.ssm)
+    if (missingArgument) {
+      // Let the argument handle the utterances until the argument is filled.
+      // TODO: provide the user with a way to exit the flow.
+      this.utteranceHandler = missingArgument;
+      return;
+    }
+
     // Attempt action
     try {
-      this.ssm[triggerType](opt_args, opt_utterance);
+      action.execute(this.ssm, opt_utterance);
+      // this.ssm[triggerType](opt_args, opt_utterance);
       return true;
     } catch(e) {
       // Handle failure based on transition type.
