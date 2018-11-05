@@ -18,7 +18,7 @@ const Utils = require('./utils.js');
 var ScratchProject = StateMachine.factory({
   init: 'create',
   transitions: [
-    // Support linear project creation process.
+    // Support linear project creation process: create, empty, named, nonempty
     { name: 'startProjectCreation', from: 'create', to: 'empty'},
     { name: 'nameProject', from: 'empty', to: 'named'},
     { name: 'addInstruction', from: 'named', to: 'nonempty'},
@@ -109,69 +109,102 @@ var ScratchProject = StateMachine.factory({
     _isValid: function(name) {
       return ScratchAction.Validator.unconflictingProjectName(this.ssm, name);
     },
-    handleUtterance: function(utterance, opt_scratchVoiced) {
+    // When the project editor successfully handles an utterance, finish the
+    // project if the intent was for the user to exit.
+    _finishProjectIfNeeded: (editor_result) => {
+      DEBUG && console.log(`[project _finishProjectIfNeeded] editor handled utterance with result: ${editor_result}`)
+
+      if (editor_result == 'exit') {
+        this.finishProject();
+        resolve(editor_result);
+      } else if (editor_result) {
+        resolve();
+      }
+    },
+    // When the project editor could not handle the utterance,
+    _matchToScratchCommand: async (utterance) => {
+      DEBUG && console.log(`[project _matchToScratchCommand] editor rejected handle utterance; now attempting Scratch command`);
+      // If no edit commands work, attempt to match the utterance to a Scratch
+      // command.
+      var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
+      var command = utterance;
+      if (voicedScratch) {
+        // Only match the triggers to the utterance without the voiced scratch.
+        var start = utterance.indexOf(voicedScratch[0]);
+        var end = start + voicedScratch[0].length + 1;
+        var command = utterance.substring(end, utterance.length);
+      }
+      var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+      var command = punctuationless.replace(/\s{2,}/g," ");
+
+      var parseResult = await ScratchInstruction.parse(command);
+      DEBUG && console.log(`[project handleUtterance] scratch command parse result: ${parseResult} `);
+
+      if (!parseResult) {
+
+        // Failed to parse the command using ScratchNLP.
+        throw Error(`[project handleUtterance] failed parse to Scratch command`);
+      } else {
+        // Success!
+        DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
+        await this.pm.audio.cueSuccess();
+        var instruction = new ScratchInstruction(command);
+        instruction.parse = parseResult;
+        this.instructions.push(instruction);
+        this.addInstruction();
+        return;
+      }
+    },
+    /**
+     * Handle utterance. Return true if successful, 'exit' if successfully finishing
+     * project, or false if failed.
+     */
+    handleUtterance: async function(utterance, opt_scratchVoiced) {
+      DEBUG && console.log(`[project handle utterance]`)
+
+      // Preprocess utterance
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
-
-      // Name project
-      if (this.state == 'create') {
-        if (this.name) {
-          this.goto('named');
-        } else {
-          this.pm.audio.cueSuccess(() => {
-            this.startProjectCreation();
-          });
-        }
-      } else if (this.state == 'empty') {
-        // Expect the utterance to be the name of the project.
-        var proposedName = this._getName(utterance);
-        if (this._isValid(proposedName)) {
-          this.name = this._getName(utterance);
-          this.pm.projects[this.name] = this.pm.currentProject;
-          delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-          this.pm.audio.cueSuccess(() => {
-            this.nameProject();
-          });
-        } else {
-          // TODO: Request new name from the user.
-        }
-      // Add to or finish project.
-      } else if (this.state == 'named' || this.state == 'nonempty') {
-        // Detect and handle explicit edit commands.
-        var editor_result = this.editor.handleUtterance(utterance, this, opt_scratchVoiced);
-        if (editor_result == 'exit') {
-          this.finishProject();
-          return editor_result;
-        } else if (editor_result) {
-          return;
-        }
-
-        var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
-        var command = utterance;
-        if (voicedScratch) {
-          // Only match the triggers to the utterance without the voiced scratch.
-          var start = utterance.indexOf(voicedScratch[0]);
-          var end = start + voicedScratch[0].length + 1;
-          var command = utterance.substring(end, utterance.length);
-        }
-        var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-        var command = punctuationless.replace(/\s{2,}/g," ");
-
-        ScratchInstruction.parse(command).then((result) => {
-          if (!result) {
-            // Failed to parse the command using ScratchNLP. Alert failure.
-            this.audio.cueMistake().then(() => {
-              this.pm.say("I heard you say " + utterance);
-            });
+      DEBUG && console.log(`[project handleUtterance] ${this}`)
+      DEBUG && console.log(`[project handleUtterance] ${this.state}`)
+      switch(this.state) {
+        case 'create':
+          // Request project name from user
+          if (this.name) {
+            this.goto('named');
           } else {
-            // Success!
-            this.pm.audio.cueSuccess(() => {
-              var instruction = new ScratchInstruction(command);
-              instruction.parse = result
-              this.instructions.push(instruction);
-              this.addInstruction();
-            });
+            await this.pm.audio.cueSuccess();
+            this.startProjectCreation();
           }
-        });
+          return true;
+        case 'empty':
+          // Expect the utterance to be the name of the project.
+          var proposedName = this._getName(utterance);
+          if (this._isValid(proposedName)) {
+            this.name = this._getName(utterance);
+            this.pm.projects[this.name] = this.pm.currentProject;
+            delete this.pm.projects['Untitled-'+this.pm.untitledCount];
+            await this.pm.audio.cueSuccess();
+            this.nameProject();
+          }
+          return true;
+        case 'named':
+        case 'nonempty':
+          // Detect and handle explicit edit commands.
+          try {
+            var editorResult = await this.editor.handleUtterance(utterance, this);
+            if (editorResult == 'exit') {
+              return this._finishProjectIfNeeded();
+            } else if (!editorResult) {
+              return this._matchToScratchCommand(utterance);
+            } else {
+              return true;
+            }
+          } catch (e) {
+            return false;
+          }
+        default:
+          DEBUG && console.log(`[project handle utterance] Scratch project did not handle utterance ${utterance}`);
+          return false;
       }
     },
     // TODO: the scratch_project should already be handling utterances during
@@ -204,7 +237,18 @@ var ScratchProject = StateMachine.factory({
       } else {
         this.pm.say('There is 1 step');
       }
-    }
+    },
+    // Set the state of the project based on information. Useful for loading
+    // a project from storage.
+    setState: function() {
+      if (!this.name) {
+        this.goto("empty");
+      } else if (this.name && this.instructions.length == 0) {
+        this.goto("named");
+      } else if (this.name && this.instructions.length > 0) {
+        this.goto("nonempty");
+      }
+    },
   }
 });
 

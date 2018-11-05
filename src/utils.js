@@ -126,7 +126,7 @@ Utils.getRhymeMatches = (text, grammarList) => {
     // }
   }
 
-  return this.getOrderedMatchString_(matches)
+  return this._getOrderedMatchString(matches)
 }
 
 /**
@@ -136,7 +136,7 @@ Utils.getRhymeMatches = (text, grammarList) => {
  *    match_location, levenshtein.substring.length]
  * @return {string} the matches strung together
  */
-Utils.getOrderedMatchString_ = (matches) => {
+Utils._getOrderedMatchString = (matches) => {
   matches.sort(function(first, second) {
     return first[1] - second[1];
   });
@@ -150,7 +150,7 @@ Utils.getOrderedMatchString_ = (matches) => {
  * @param {!Object} triggerMap - map of trigger types to regular expressions
  * @return {!String} the grammar rules
  */
-Utils.getTargets_ = (triggerMap) => {
+Utils._getTargets = (triggerMap) => {
   var targets = {}
   for (var triggerType in triggerMap) {
     var regexString = triggerMap[triggerType].toString().replace(/\(\.\*\)/g,"");
@@ -173,7 +173,7 @@ Utils.getTargets_ = (triggerMap) => {
 
     // Rank the trigger types by the shortest distance between its triggers and
     // the utterance
-    var targetMap = Utils.getTargets_(triggers)
+    var targetMap = Utils._getTargets(triggers)
 
     // triggerScores is an array of tuples (trigger, score)
     var getTriggerScoreDict = function(utterance, targets) {
