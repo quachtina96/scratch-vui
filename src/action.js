@@ -56,12 +56,16 @@ class Argument {
 	}
 
 	handleUtterance(ssm, value) {
-		if (this.set(value)) {
-			ssm.pm.synth.say(`set ${this.name} to ${value}`)
-			return true;
+		if (this.set(ssm,value)) {
+			ssm.pm.audio.cueSuccess().then(() => {
+				ssm.pm.say(`set ${this.name} to ${value}`)
+				return true;
+			});
 		} else {
-			ssm.pm.synth.say(`could not set ${this.name} to ${value}`)
-			return false;
+			ssm.pm.audio.cueSuccess().then(()=> {
+				ssm.pm.say(`could not set ${this.name} to ${value}`)
+				return false;
+			});
 		}
 	}
 }
@@ -117,6 +121,15 @@ class Action {
 	}
 
 	/**
+	 * Clear arguments for the action once the action has been complete.
+	 */
+	clearArguments(ssm, args) {
+		for (var i=1; i<args.length; i++) {
+			this.arguments[i-1].set(ssm, null)
+		}
+	}
+
+	/**
 	 * Return list of missing arguments needed to execute action.
 	 */
 	_getMissingArguments() {
@@ -154,18 +167,17 @@ class Action {
 
 	}
 
-	modifyArgument(name, value) {
+	modifyArgument(ssm, name, value) {
 		var reqToMod = this.arguments.filter(argument => argument.name == name)
-		reqToMod.set(value)
+		reqToMod.set(ssm, value)
 	}
 
 	execute(ssm, utterance) {
 		// We use a filler in the beginning because arguments extracted via
 		// regex extract more from you.
 		var args = ['filler'].concat(this.arguments.map((arg) => arg.value));
-		// Create a dummy lifecycle.
-		var lifecycle = null;
-		ssm[this.name](lifecycle, args, utterance)
+		ssm[this.name](args, utterance)
+		// ssm.pm.triggerAction(this.name, args, utterance)
 	}
 }
 

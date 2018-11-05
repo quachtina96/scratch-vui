@@ -191,13 +191,13 @@ class ScratchProjectManager {
   handleUtterance(utterance) {
     if (this.listening) {
       if (this.utteranceHandler) {
-        var success = this.utteranceHandler.handleUtterance(utterance);
+        var success = this.utteranceHandler.handleUtterance(this.ssm, utterance);
         if (success) {
           // The utterance handler already finished its job.
           // reset the handler to use the default flow.
           this.utteranceHandler = null;
         }
-        return success;
+        // return success;
       }
       return this._handleUtterance(utterance);
     } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
@@ -350,6 +350,8 @@ class ScratchProjectManager {
       // TODO: provide the user with a way to exit the flow.
       this.utteranceHandler = missingArgument;
       return;
+    } else {
+      this.utteranceHandler = null;
     }
 
     // Attempt action
