@@ -34,15 +34,16 @@ class ScratchProjectEditor {
     for (var commandType in this.actions) {
       var args = Utils.match(utterance, this.actions[commandType].trigger);
       if (args && this[commandType]) {
-        this.project.pm.audio.cueSuccess();
-        this[commandType].call(scratchProject, args);
-        this.project.pm.save();
-        // We return 'exit' on executing the finish project command because we
-        // need to signal to the state machine that the project is finished.
-        if (commandType === 'finishProject') {
-          return 'exit';
-        }
-        return true;
+        return this.project.pm.audio.cueSuccess().then(()=> {
+          this[commandType].call(scratchProject, args);
+          this.project.pm.save();
+          // We return 'exit' on executing the finish project command because we
+          // need to signal to the state machine that the project is finished.
+          if (commandType === 'finishProject') {
+            return 'exit';
+          }
+          return true;
+        });
       }
     }
   }

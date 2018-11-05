@@ -58,12 +58,12 @@ class Argument {
 	handleUtterance(ssm, value) {
 		if (this.set(ssm,value)) {
 			ssm.pm.audio.cueSuccess().then(() => {
-				ssm.pm.say(`set ${this.name} to ${value}`)
+				console.log(`set ${this.name} to ${value}`);
 				return true;
 			});
 		} else {
-			ssm.pm.audio.cueSuccess().then(()=> {
-				ssm.pm.say(`could not set ${this.name} to ${value}`)
+			ssm.pm.audio.cueMistake().then(()=> {
+				console.log(`could not set ${this.name} to ${value}`);
 				return false;
 			});
 		}
@@ -92,7 +92,7 @@ class Action {
 		this.name = options.name
 		this.trigger = options.trigger ? options.trigger : /\*/;
 		this.description = options.description ? options.description :  "";
-		this.arguments = options.arguments ? options.arguments : [];
+		this.arguments = options.arguments ? options.arguments.map((arg) => new Argument(arg)) : [];
 		this.contextValidator = options.contextValidator ? options.contextValidator : () => {return true};
 		this.idealTrigger = options.idealTrigger ? options.idealTrigger : () => {return true};
 		this.missingArguments = null;
@@ -172,12 +172,14 @@ class Action {
 		reqToMod.set(ssm, value)
 	}
 
-	execute(ssm, utterance) {
+	getArgs() {
 		// We use a filler in the beginning because arguments extracted via
 		// regex extract more from you.
-		var args = ['filler'].concat(this.arguments.map((arg) => arg.value));
-		ssm[this.name](args, utterance)
-		// ssm.pm.triggerAction(this.name, args, utterance)
+		return ['filler'].concat(this.arguments.map((arg) => arg.value));
+	}
+
+	execute(ssm, utterance) {
+		ssm[this.name](this.getArgs(), utterance)
 	}
 }
 
