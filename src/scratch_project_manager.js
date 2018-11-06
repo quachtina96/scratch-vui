@@ -189,6 +189,15 @@ class ScratchProjectManager {
         return;
       }
 
+      // Current project
+      if (this.currentProject) {
+        var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
+        if (result == 'exit') {
+          this.ssm.finishProject();
+        }
+        return;
+      }
+
       // we are creating a new action.
       return this._handleUtterance(utterance);
     } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
@@ -271,20 +280,8 @@ class ScratchProjectManager {
     // Pass the utterance to the project to handle.
     if (this.ssm.state == 'PlayProject') {
         this.currentProject.handleUtteranceDuringExecution(utterance, this.scratchVoiced);
-    } else if (this.ssm.state == 'InsideProject') {
-      // There needs to be a current project to handle the utterance.
-      if (this.currentProject) {
-        var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
-        if (result == 'exit') {
-          this.ssm.finishProject();
-        }
-      } else {
-        // TODO: Instead of throwing error, ask the user for the appropriate
-        // information.
-        // this.say('What project would you like to see inside?')
-        throw "In InsideProject state, but there is no current project"
-      }
-    } else if (Utils.containsScratch(utterance)) {
+    }
+    else if (Utils.containsScratch(utterance)) {
       // TODO: integrate Scratch, Help!
       this.say("I heard you say " + utterance);
 

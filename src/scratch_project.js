@@ -117,7 +117,7 @@ var ScratchProject = StateMachine.factory({
         if (this.name) {
           this.goto('named');
         } else {
-          this.pm.audio.cueSuccess(() => {
+          this.pm.audio.cueSuccess().then(() => {
             this.startProjectCreation();
           });
         }
@@ -128,7 +128,7 @@ var ScratchProject = StateMachine.factory({
           this.name = this._getName(utterance);
           this.pm.projects[this.name] = this.pm.currentProject;
           delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-          this.pm.audio.cueSuccess(() => {
+          this.pm.audio.cueSuccess().then(() => {
             this.nameProject();
           });
         } else {
@@ -164,7 +164,7 @@ var ScratchProject = StateMachine.factory({
             });
           } else {
             // Success!
-            this.pm.audio.cueSuccess(() => {
+            this.pm.audio.cueSuccess().then(() => {
               var instruction = new ScratchInstruction(command);
               instruction.parse = result
               this.instructions.push(instruction);
