@@ -233,9 +233,12 @@ class ScratchProjectManager {
    *    was not a question.
    */
   _handleQuestion(utterance) {
+    // Get all the ScratchActions that are about getting information in any
+    // category (Edit, General, Interrupt, Help)
     var allActions = ScratchAction.allActions();
     var questionActions = allActions.filter((action) => action.question);
 
+    // Handle the question if there is a match to the utterance.
     for (var action of questionActions) {
       var trigger = action.trigger;
       var args = this.scratchVoiced ? Utils.matchRegex(utterance, trigger) : Utils.match(utterance, trigger);
@@ -316,7 +319,8 @@ class ScratchProjectManager {
       this.say("I heard you say " + utterance);
 
       // Suggest a close match if there exists one via fuzzy matching.
-      var result = Utils.fuzzyMatch(utterance, this.triggers)
+      var triggers = ScratchAction.getTriggerMap('General');
+      var result = Utils.fuzzyMatch(utterance, triggers)
       console.log('fuzzy match result: ' + result)
       var jaroWinklerScore = result[1] // 1 - JaroWinkler Distance
       var triggerType = result[0]
@@ -402,10 +406,9 @@ class ScratchProjectManager {
   // In order to properly detect playing projects, add project names to
   // match phrases for the play triggerType.
   _updatePlayRegex() {
-    var pattern = this.triggers['play'].toString();
+    var pattern =this.actions['play'].trigger.toString();
     var prefix = pattern.substring(1,pattern.length-1);
     var regexString = prefix + '|^(' + Object.keys(this.projects).map((projectName) => Utils.removeFillerWords(projectName).trim()).join(')$|^(') + ')$';
-    this.triggers['play'] = new RegExp(regexString, "i");
     this.actions['play'].trigger = new RegExp(regexString, "i");
   }
 
@@ -424,14 +427,14 @@ class ScratchProjectManager {
   }
 
   getNthProject(lifecycle, args) {
-  var numberArg = args.pop();
-  var projectNumber = Utils.text2num(numberArg);
-  if (projectNumber == null) {
-    projectNumber = parseInt(numberArg);
-  }
-  if (!this._describeProject(projectNumber)) {
-    this.say('there is no project number ' + projectNumber.toString());
-  }
+    var numberArg = args.pop();
+    var projectNumber = Utils.text2num(numberArg);
+    if (projectNumber == null) {
+      projectNumber = parseInt(numberArg);
+    }
+    if (!this._describeProject(projectNumber)) {
+      this.say('there is no project number ' + projectNumber.toString());
+    }
   }
 
   getCurrentProject() {

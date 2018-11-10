@@ -103,8 +103,8 @@ ScratchAction.allActions = () => {
 
 ScratchAction.getAllTriggers = () => {
 	return ScratchAction.getTriggers('Edit').concat(
-			ScratchAction.getTriggers('General').concat(
-			ScratchAction.getTriggers('Interrupt').concat(
+			ScratchAction.getTriggers('General')).concat(
+			ScratchAction.getTriggers('Interrupt')).concat(
 			ScratchAction.getTriggers('Help'));
 }
 
@@ -309,7 +309,7 @@ ScratchAction.General.getNthProject = {
 				return projectNumber <= ssm.pm.projects.length_ && 0 < projectNumber
 			},
 			description: 'the project number'
-		}]
+		}],
 	"question": true
 };
 
@@ -410,7 +410,7 @@ ScratchAction.General.checkSound = {
 			},
 			description: 'the name of the sound you want to hear'
 		}
-	]
+	],
 	"question": true
 };
 
@@ -445,7 +445,7 @@ ScratchAction.Edit.getStepCount = {
 	"trigger":/how many steps ?(?:are there)?/,
 	"idealTrigger":"how many steps are there",
 	"description":"get the number of steps in the project",
-	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined,
 	"question": true
 };
 
@@ -455,7 +455,7 @@ ScratchAction.Edit.getAllSteps = {
 	"trigger":/what are (?:all)? ?the steps|what does (?:my|the)? ?project do right now/,
 	"idealTrigger":"what are all the steps",
 	"description":"hear me say all the steps in the project",
-	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined,
 	"question": true
 };
 
@@ -465,7 +465,7 @@ ScratchAction.Edit.getCurrentStep = {
 	"trigger":/what (?:step|steps|stop|stops|stuff|step) am i on|what’s my current (?:step|steps|stop|stops|stuff|step)|what (?:step|steps|stop|stops|stuff|step) is this/,
 	"idealTrigger":"what step am i on",
 	"description":"get the number and description of the current step",
-	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined,
 	"question": true
 };
 
@@ -482,7 +482,7 @@ ScratchAction.Edit.goToStep = {
 			description: 'the name step to go to'
 		}
 	],
-	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined,
 
 };
 
@@ -492,7 +492,7 @@ ScratchAction.Edit.nextStep = {
 	"trigger":/go to next (?:step|steps|stop|stops|stuff|step)|next (?:step|steps|stop|stops|stuff|step)|what's next|next/,
 	"idealTrigger":"next step",
 	"description":"go to the next step",
-	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined,
 	"question": true
 };
 
@@ -502,7 +502,7 @@ ScratchAction.Edit.previousStep = {
 	"trigger":/previous (?:step|steps|stop|stops|stuff|step)|go back a (?:step|steps|stop|stops|stuff|step)/,
 	"idealTrigger":"previous step",
 	"description":"go to the step before",
-	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined,
 	"question": true
 };
 
@@ -513,7 +513,7 @@ ScratchAction.Edit.playStep = {
 	"idealTrigger":"try it",
 	"description":"play the current step",
 	"arguments": [],
-	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"contextValidator": ScratchAction.Validator.currentProjectDefined,
 	"question": true
 };
 
@@ -676,7 +676,7 @@ ScratchAction.Help.getKnownCommands = {
 	"name":"getKnownCommands",
 	"trigger": /what can you do|what do you know (?:how to do)/,
 	"idealTrigger": "what can you do",
-	"description": "hear what things I can do"
+	"description": "hear what things I can do",
 	"question": true
 };
 
