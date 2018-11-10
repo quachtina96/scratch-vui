@@ -218,7 +218,7 @@ ScratchAction.General.editProject = {
 //finishProject
 ScratchAction.General.finishProject = {
 	"name":"finishProject",
-	"trigger":/i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it|end project|finish project/,
+	"trigger":/no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it|end project|finish project/,
 	"idealTrigger":"i'm done",
 	"description":"leave the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
