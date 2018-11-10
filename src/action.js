@@ -179,9 +179,9 @@ class Action {
 	}
 
 	execute(ssm, utterance) {
-		if (this.type == 'General') {
+		if (this.name in ssm.pm.actions) {
 			ssm[this.name](this.getArgs(), utterance)
-		} else if (this.type == 'Edit') {
+		} else if (this.name in ssm.pm.currentProject.editor.actions) {
 			ssm.pm.currentProject.editor.handleUtterance(utterance)
 		}
 	}

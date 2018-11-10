@@ -316,7 +316,7 @@ ScratchAction.General.getNthProject = {
 //getProjectNames
 ScratchAction.General.getProjectNames = {
 	"name":"getProjectNames",
-	"trigger":/what (?:projects|project) do i have|what have i made so far|what are my projects called|what are (?:the names of)? ?my projects/,
+	"trigger":/do you have any projects|what projects are there|what (?:projects|project) do (?:i|you) have|what have i made so far|what are (?:my|the) projects called|what are (?:the names of)? ?my projects/,
 	"idealTrigger":"what projects do i have",
 	"description":"hear a list of all the projects",
 	"question": true
