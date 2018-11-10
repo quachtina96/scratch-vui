@@ -102,14 +102,34 @@ ScratchAction.allActions = () => {
 }
 
 ScratchAction.getAllTriggers = () => {
-	return ScratchAction.getEditTriggers().concat(
-			ScratchAction.getGeneralTriggers());
+	return ScratchAction.getTriggers('Edit').concat(
+			ScratchAction.getTriggers('General').concat(
+			ScratchAction.getTriggers('Interrupt').concat(
+			ScratchAction.getTriggers('Help'));
 }
 
-ScratchAction.getEditTriggers = () => {
-	return Object.keys(ScratchAction.Edit);
+/**
+ * Return a list of trigger types belonging to the given category.
+ */
+ScratchAction.getTriggers = (category) => {
+	return Object.keys(ScratchAction[category]);
 }
 
+/**
+ * Return a map of trigger types to their ScratchAction objects belonging to
+ * the given category.
+ */
+ScratchAction.getTriggerMap = (category) => {
+	var triggerMap = {}
+	for (var triggerName in ScratchAction[category]) {
+		triggerMap[triggerName] = ScratchAction[category][triggerName].trigger;
+	}
+	return triggerMap;
+}
+
+/**
+ * Return a map of trigger types to their ScratchAction objects.
+ */
 ScratchAction.getGeneralTriggers = function() {
 	var triggerMap = {}
 	for (var triggerName in ScratchAction.General) {
@@ -141,6 +161,7 @@ ScratchAction.General.queryState = {
 	"trigger": /what state am i in|where am i/,
 	"idealTrigger": "what state am i in",
 	"description": "figure out what state you are in",
+	"question": true
 };
 
 //newProject
@@ -273,6 +294,7 @@ ScratchAction.General.getCurrentProject = {
 	"trigger":/get (?:the)? ?current project|what project am i on|what's the current project|what is the current project|what's my current project|what is my current project|what is this project ?(?:called)?/,
 	"idealTrigger":"what project am i on",
 	"description":"find out what project you are on",
+	"question": true
 };
 
 //getNthProject
@@ -288,6 +310,7 @@ ScratchAction.General.getNthProject = {
 			},
 			description: 'the project number'
 		}]
+	"question": true
 };
 
 //getProjectNames
@@ -296,6 +319,7 @@ ScratchAction.General.getProjectNames = {
 	"trigger":/what (?:projects|project) do i have|what have i made so far|what are my projects called|what are (?:the names of)? ?my projects/,
 	"idealTrigger":"what projects do i have",
 	"description":"hear a list of all the projects",
+	"question": true
 };
 
 //getProjectCount
@@ -304,6 +328,7 @@ ScratchAction.General.getProjectCount = {
 	"trigger":/how many projects do i have|how many projects have i made/,
 	"idealTrigger":"how many projects do i have'",
 	"description":"hear how many projects there are",
+	"question": true
 };
 
 //stopBackground
@@ -368,6 +393,7 @@ ScratchAction.General.getSounds = {
 	"trigger":/^what sounds (?:are there|do you (?:know|have))|what (?:other)? ?sounds do you (?:know|have)|more sounds|other sounds$/,
 	"idealTrigger":"what sounds are there",
 	"description":"discover what sounds there are",
+	"question": true
 };
 
 //checkSound
@@ -385,6 +411,7 @@ ScratchAction.General.checkSound = {
 			description: 'the name of the sound you want to hear'
 		}
 	]
+	"question": true
 };
 
 //queryActions
@@ -393,6 +420,8 @@ ScratchAction.General.queryActions = {
 	"trigger":/what can i do|what do i do|help|what should i do/,
 	"idealTrigger":"what can i do",
 	"description":"get a suggestion for what to try next",
+	"question": true
+
 };
 
 //queryActionTypes
@@ -401,6 +430,7 @@ ScratchAction.General.queryActionTypes = {
 	"trigger":/what are the kinds of things i can do|inspire me/,
 	"idealTrigger":"what kinds of things can i do",
 	"description":"explore different kinds of actions",
+	"question": true
 };
 
 //////// EDIT PROJECT COMMANDS
@@ -416,7 +446,7 @@ ScratchAction.Edit.getStepCount = {
 	"idealTrigger":"how many steps are there",
 	"description":"get the number of steps in the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-
+	"question": true
 };
 
 //getAllSteps
@@ -426,7 +456,7 @@ ScratchAction.Edit.getAllSteps = {
 	"idealTrigger":"what are all the steps",
 	"description":"hear me say all the steps in the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-
+	"question": true
 };
 
 //getCurrentStep
@@ -436,6 +466,7 @@ ScratchAction.Edit.getCurrentStep = {
 	"idealTrigger":"what step am i on",
 	"description":"get the number and description of the current step",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
+	"question": true
 };
 
 //goToStep
@@ -462,7 +493,7 @@ ScratchAction.Edit.nextStep = {
 	"idealTrigger":"next step",
 	"description":"go to the next step",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-
+	"question": true
 };
 
 //previousStep
@@ -472,7 +503,7 @@ ScratchAction.Edit.previousStep = {
 	"idealTrigger":"previous step",
 	"description":"go to the step before",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-
+	"question": true
 };
 
 //playStep
@@ -483,7 +514,7 @@ ScratchAction.Edit.playStep = {
 	"description":"play the current step",
 	"arguments": [],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-
+	"question": true
 };
 
 //appendStep
@@ -628,34 +659,51 @@ ScratchAction.Edit.replaceStep = {
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 };
 
-ScratchAction.General.getKnownCommands = {
+/**
+ * Namespace for Interrupt commands
+ */
+ScratchAction.Help = {};
+
+ScratchAction.Help.cancel = {
+	"name": "cancel",
+	"trigger": /cancel/,
+	"idealTrigger": "cancel",
+	"description": "stop an action that you were in the middle of",
+};
+
+
+ScratchAction.Help.getKnownCommands = {
 	"name":"getKnownCommands",
 	"trigger": /what can you do|what do you know (?:how to do)/,
 	"idealTrigger": "what can you do",
 	"description": "hear what things I can do"
+	"question": true
 };
 
-ScratchAction.General.getScratchCommands = {
+ScratchAction.Help.getScratchCommands = {
 	"name":"getScratchCommands",
 	"trigger":/what scratch commands do you (?:know|have)|(?:tell me|what are) (?:the|some ?(?:of the)?) scratch commands (?:that you know|you know)?|what (?:(?:kinds|kind) of)? ?scratch commands (?:are there|do you know)|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you (?:have|know))/,
 	"idealTrigger":"what scratch commands are there",
 	"description":"learn about what commands you can use in your projects",
+	"question": true
 };
 
 // Help users understand what Scratch thought they said.
-ScratchAction.General.getWhatISaid = {
+ScratchAction.Help.getWhatISaid = {
 	"name":"getWhatISaid",
 	"trigger":/what did i say|what did you hear|what did I (?:just)? ?say|what did you think i (?:just)? ?said|can you tell me what you thought I (?:just)? ?said|can you tell me what I (?:just)? ?said/,
 	"idealTrigger":"what did you hear me say",
 	"description":"hear what Scratch thought you said",
+	"question": true
 };
 
 // Help users remember what Scratch said (if they didn't catch it)
-ScratchAction.General.getWhatYouSaid = {
+ScratchAction.Help.getWhatYouSaid = {
 	"name":"getWhatYouSaid",
 	"trigger":/what did you (?:just)? ?say|(?:can you)? ?repeat (?:that|yourself)|say that again|(?:can you)? ?say what you (?:just)? ?said ?(?:again)?|tell me what you (?:just)? ?said/,
 	"idealTrigger":"say that again",
 	"description":"get Scratch to repeat what they just said",
+	"question": true
 };
 
 // ScratchAction.Project.

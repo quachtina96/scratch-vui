@@ -32,7 +32,7 @@ class ScratchProjectManager {
     this.recognition = new webkitSpeechRecognition();
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
-    this.triggers = ScratchAction.getGeneralTriggers();
+    this.triggers = ScratchAction.getTriggers('General');
     this.actions = ScratchAction.General;
     // Whether currently listening for a yes or no answer.
     this.yesOrNo = false;
@@ -172,16 +172,14 @@ class ScratchProjectManager {
         return;
       }
 
+      // TODO: we need to provide an avenue for handling the questions + requests
+      // for help before handling the arguments and stuff.
       if (this._handleQuestion(utterance)) {
         return;
       }
 
       // The current argument takes priority.
       if (this.currentArgument) {
-
-        // Handle any questions without mistaking user's question as the argument.
-        utterance
-
         var success = this.currentArgument.handleUtterance(this.ssm, utterance);
         if (success) {
           // The utterance handler already finished its job.
@@ -236,9 +234,7 @@ class ScratchProjectManager {
    */
   _handleQuestion(utterance) {
     var allActions = ScratchAction.allActions();
-    var questionActions = allActions.filter((action) => {
-      action.question
-    });
+    var questionActions = allActions.filter((action) => action.question);
 
     for (var action of questionActions) {
       var trigger = action.trigger;
