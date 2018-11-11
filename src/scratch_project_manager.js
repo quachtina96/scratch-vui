@@ -201,8 +201,8 @@ class ScratchProjectManager {
         var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
         if (result == 'exit') {
           this.ssm.finishProject();
+          return;
         }
-        return;
       }
 
       // we are creating a new action.
