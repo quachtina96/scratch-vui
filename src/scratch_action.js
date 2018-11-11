@@ -198,7 +198,7 @@ ScratchAction.General.renameCurrentProject = {
 	"arguments": [{
 			name:'newName',
 			validator: ScratchAction.Validator.unconflictingProjectName,
-			description: 'the new name'
+			description: 'new name'
 		}
 	]
 };
@@ -308,7 +308,7 @@ ScratchAction.General.getNthProject = {
 			validator: (ssm, projectNumber) => {
 				return projectNumber <= ssm.pm.projects.length_ && 0 < projectNumber
 			},
-			description: 'the project number'
+			description: 'project number'
 		}],
 	"question": true
 };
@@ -408,7 +408,7 @@ ScratchAction.General.checkSound = {
 			validator: (ssm, soundName) => {
 				return ssm.pm.soundLibrary.has(soundName);
 			},
-			description: 'the name of the sound you want to hear'
+			description: 'name of the sound you want to hear'
 		}
 	],
 	"question": true
@@ -479,7 +479,7 @@ ScratchAction.Edit.goToStep = {
 		{
 			name: 'step number',
 			// skip the validator, because _describeCurrentStep already does validation.
-			description: 'the name step to go to'
+			description: 'name step to go to'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined,
@@ -526,7 +526,7 @@ ScratchAction.Edit.appendStep = {
 	"arguments": [{
 		'name': 'instruction',
 		'validator': ScratchAction.Validator.scratchCommand,
-		'description':'the instruction you want to add to the end of the project'
+		'description':'instruction you want to add to the end of the project'
 	}],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
@@ -544,12 +544,12 @@ ScratchAction.Edit.insertStepBefore = {
 		{
 			'name': 'instruction',
 			'validator': ScratchAction.Validator.scratchCommand,
-			'description':'the instruction to insert'
+			'description':'instruction to insert'
 		},
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'the step to insert before'
+			description: 'step to insert before'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -567,12 +567,12 @@ ScratchAction.Edit.insertStepAfter = {
 		{
 			'name': 'instruction',
 			'validator': ScratchAction.Validator.scratchCommand,
-			'description':'the instruction to insert'
+			'description':'instruction to insert'
 		},
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'the step to insert after'
+			description: 'step to insert after'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -589,12 +589,12 @@ ScratchAction.Edit.afterInsertStep = {
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'the step to insert after'
+			description: 'step to insert after'
 		},
 		{
 			'name': 'instruction',
 			'validator': ScratchAction.Validator.scratchCommand,
-			'description':'the instruction to insert'
+			'description':'instruction to insert'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -611,12 +611,12 @@ ScratchAction.Edit.beforeInsertStep = {
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'the step to insert before'
+			description: 'step to insert before'
 		},
 		{
 			'name': 'instruction',
 			'validator': ScratchAction.Validator.scratchCommand,
-			'description':'the instruction to insert'
+			'description':'instruction to insert'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -632,7 +632,7 @@ ScratchAction.Edit.deleteStep = {
 	{
 		'name': 'step number',
 		'validator': ScratchAction.Validator.scratchCommand,
-		'description':'the number of the step to delete'
+		'description':'number of the step to delete'
 	}],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 
@@ -641,19 +641,19 @@ ScratchAction.Edit.deleteStep = {
 //replaceStep
 ScratchAction.Edit.replaceStep = {
 	"name":"replaceStep",
-	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*) with (.*)/,
+	"trigger":/replace step|(?:replace|replaced) (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*) with (.*)/,
 	"idealTrigger":"replace step 1 with say hello",
 	"description":"change step to say hello",
 	"arguments": [
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'the number of the step to replace'
+			description: 'number of the step to replace'
 		},
 		{
 			'name': 'instruction',
 			'validator': ScratchAction.Validator.scratchCommand,
-			'description':'the new instruction'
+			'description':'new instruction'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
