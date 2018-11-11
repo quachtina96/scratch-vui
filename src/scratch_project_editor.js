@@ -30,13 +30,13 @@ class ScratchProjectEditor {
   	this.project = project;
     utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
-    var scratchProject = this;
-    for (var commandType in this.actions) {
-      var args = Utils.match(utterance, this.actions[commandType].trigger);
-      if (args && this[commandType]) {
-        return this.project.pm.audio.cueSuccess().then(()=> {
-          this[commandType].call(scratchProject, args);
-          this.project.pm.save();
+    var editor = this;
+    for (var commandType in editor.actions) {
+      var args = Utils.match(utterance, editor.actions[commandType].trigger);
+      if (args && editor[commandType]) {
+        return editor.project.pm.audio.cueSuccess().then(()=> {
+          editor[commandType].call(editor, args);
+          editor.project.pm.save();
           // We return 'exit' on executing the finish project command because we
           // need to signal to the state machine that the project is finished.
           if (commandType === 'finishProject') {

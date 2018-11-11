@@ -472,7 +472,7 @@ ScratchAction.Edit.getCurrentStep = {
 //goToStep
 ScratchAction.Edit.goToStep = {
 	"name":"goToStep",
-	"trigger":/step (?:number)? ?(.*)|go to (?:step|steps|stop|stops|stuff|step) (.*)|what's (?:step|steps|stop|stops|stuff|step) (.*)|what is (?:step|steps|stop|stops|stuff|step) (.*)/,
+	"trigger":/^step (?:number)? ?(.*)|go to (?:step|steps|stop|stops|stuff|step) (.*)|what's (?:step|steps|stop|stops|stuff|step) (.*)|what is (?:step|steps|stop|stops|stuff|step) (.*)/,
 	"idealTrigger":"go to step number 2",
 	"description":"jump to and hear step number 2 of the project",
 	"arguments": [

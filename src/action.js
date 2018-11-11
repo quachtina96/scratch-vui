@@ -180,9 +180,9 @@ class Action {
 
 	execute(ssm, utterance) {
 		if (this.name in ssm.pm.actions) {
-			ssm[this.name](this.getArgs(), utterance)
+			ssm[this.name](this.getArgs(), utterance);
 		} else if (this.name in ssm.pm.currentProject.editor.actions) {
-			ssm.pm.currentProject.editor.handleUtterance(utterance)
+			ssm.pm.currentProject.editor.handleUtterance(utterance, ssm.pm.currentProject);
 		}
 	}
 }
