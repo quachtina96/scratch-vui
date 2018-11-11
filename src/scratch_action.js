@@ -720,7 +720,7 @@ ScratchAction.Help.getWhatISaid = {
 	"name":"getWhatISaid",
 	"trigger":/what did i say|what did you hear|what did I (?:just)? ?say|what did you think i (?:just)? ?said|can you tell me what you thought I (?:just)? ?said|can you tell me what I (?:just)? ?said/,
 	"idealTrigger":"what did you hear me say",
-	"description":"hear what Scratch thought you said",
+	"description":"hear what I thought you said",
 	"question": true
 };
 
@@ -729,8 +729,14 @@ ScratchAction.Help.getWhatYouSaid = {
 	"name":"getWhatYouSaid",
 	"trigger":/what did you (?:just)? ?say|(?:could you)? ?repeat (?:that|yourself)|(?:can you)? ?repeat (?:that|yourself)|(?:can you)? ?repeat (?:that|yourself)|say that again|(?:can you)? ?say what you (?:just)? ?said ?(?:again)?|tell me what you (?:just)? ?said/,
 	"idealTrigger":"say that again",
-	"description":"get Scratch to repeat what they just said",
+	"description":"get me to repeat what you just said",
 	"question": true
+};
+
+ScratchAction.General.greet = {
+	"trigger":/hello|what's up|hey|hi|yo|sup/,
+	"idealTrigger":"hi",
+	"description":"greet me",
 };
 
 // ScratchAction.Project.

@@ -368,6 +368,10 @@ Utils.getNFromList = (list, n, opt_index) => {
     return sounds;
 }
 
+Utils.randomChoice(list) {
+  return Utils.getNFromList(list, 1, -1)[0];
+}
+
 // Also useful for pagination.
 Array.prototype.chunk = function (chunk_size) {
   var temp = this.slice(0),

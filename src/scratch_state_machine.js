@@ -100,6 +100,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getScratchCommands', from: '*', to: function() {return this.state} },
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
     { name: 'getWhatISaid', from: '*', to: function() {return this.state} }
+    { name: 'greet', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -127,6 +128,7 @@ var ScratchStateMachine = new StateMachine.factory({
       this.pm.load();
       this.setMethods();
       this.pm._updatePlayRegex();
+      this.introduceSelf();
     },
     setupVM: function(scratch_stage_canvas_id) {
       const storage = new ScratchStorage(); /* global ScratchStorage */
@@ -277,6 +279,17 @@ var ScratchStateMachine = new StateMachine.factory({
       for (var method in methodMap) {
         this[method] = methodMap[method];
       }
+    },
+    introduceSelf() {
+      this.pm.say("Hi, I’m Scratch, a tool for you to build and interact with \
+        Scratch projects. Scratch projects are computer programs that you can \
+        play, interact with, and share. You can create Scratch projects by \
+        telling me instructions. I keep track of these instructions and when \
+        you say the name of the project, I will follow the instructions step \
+        by step. Any time you need help or don't know what to do, you can say \
+        'Scratch help' or ask 'what can i do'. I will try to answer any \
+        questions you have. To start, why don't you say 'alarm' to play the alarm project");
+      this.pm.recognition.start();
     }
   }
 });
