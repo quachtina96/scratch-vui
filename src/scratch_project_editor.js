@@ -6,6 +6,7 @@ const ScratchInstruction = require('./scratch_instruction.js');
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchAction = require('./scratch_action.js');
+const Action = require('./action.js').Action;
 const ScratchAudio = require('./audio.js');
 
 /**
@@ -31,15 +32,30 @@ class ScratchProjectEditor {
     utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
     var editor = this;
-    for (var commandType in editor.actions) {
-      var args = Utils.match(utterance, editor.actions[commandType].trigger);
-      if (args && editor[commandType]) {
-        return editor.project.pm.audio.cueSuccess().then(()=> {
-          editor[commandType].call(editor, args);
-          editor.project.pm.save();
+    var pm = editor.project.pm;
+    for (var triggerType in editor.actions) {
+
+      var args = Utils.match(utterance, editor.actions[triggerType].trigger);
+      if (args && args.length > 0) {
+        var action = new Action(editor.actions[triggerType]);
+        // The current actions and arguments are maintained at the project manager
+        // level to simplify management since there can only be one current action
+        // and argument to focus on.
+        pm.currentAction = action;
+
+        return pm.audio.cueSuccess().then(()=> {
+          if (pm.triggerAction(action, args, utterance)) {
+            // Successfully triggered action.
+            pm.currentAction = null;
+            pm.currentArgument = null;
+          } else {
+            console.log('[PROJECT EDITOR] You are currently in ' + editor.project.state + ' mode and cannot '
+              + triggerType + ' from here.');
+          }
+          pm.save();
           // We return 'exit' on executing the finish project command because we
           // need to signal to the state machine that the project is finished.
-          if (commandType === 'finishProject') {
+          if (triggerType === 'finishProject') {
             return 'exit';
           }
           return true;

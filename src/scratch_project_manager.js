@@ -180,33 +180,40 @@ class ScratchProjectManager {
 
       // The current argument takes priority.
       if (this.currentArgument) {
-        var success = this.currentArgument.handleUtterance(this.ssm, utterance);
-        if (success) {
-          // The utterance handler already finished its job.
-          // reset the handler to use the default flow.
-          this.triggerAction(this.currentAction, this.currentAction.getArgs(), opt_utterance);
-          return;
-        }
-        this.currentArgument = null;
-      }
-      // The current action takes priority after arguments are satisfied.
-      if (this.currentAction) {
-        this.currentAction.execute(this.ssm, utterance)
-        this.currentAction = null;
-        return;
+        // TODO: the problem is that handle utterance is returnign a promise... but t
+        this.currentArgument.handleUtterance(this.ssm, utterance).then((success) => {
+          if (success) {
+            // The utterance handler already finished its job.
+            // reset the handler to use the default flow.
+            this.triggerAction(this.currentAction, this.currentAction.getArgs(), opt_utterance);
+            this.currentArgument = null;
+            return;
+          }
+        });
       }
 
-      // Current project
-      if (this.currentProject) {
-        var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
-        if (result == 'exit') {
-          this.ssm.finishProject();
+      var finishUtterance = (utterance) => {
+        // The current action takes priority after arguments are satisfied.
+        if (this.currentAction) {
+          this.currentAction.execute(this.ssm, utterance)
+          this.currentAction = null;
           return;
         }
-      }
 
-      // we are creating a new action.
-      return this._handleUtterance(utterance);
+        // Current project
+        if (this.currentProject) {
+          var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
+          if (result == 'exit') {
+            this.ssm.finishProject();
+            return;
+          }
+        }
+
+        // we are creating a new action.
+        return this._handleUtterance(utterance);
+      };
+
+      return finishUtterance(utterance)
     } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
       // If Scratch wasn't listening before and the command is to tell Scratch
       // to listen, start listening!

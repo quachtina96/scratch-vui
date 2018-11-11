@@ -56,17 +56,20 @@ class Argument {
 	}
 
 	handleUtterance(ssm, value) {
-		if (this.set(ssm,value)) {
-			ssm.pm.audio.cueSuccess().then(() => {
-				console.log(`set ${this.name} to ${value}`);
-				return true;
-			});
-		} else {
-			ssm.pm.audio.cueMistake().then(()=> {
-				console.log(`could not set ${this.name} to ${value}`);
-				return false;
-			});
-		}
+    return new Promise((resolve, reject) => {
+    	if (this.set(ssm,value)) {
+				ssm.pm.audio.cueSuccess().then(() => {
+					// TODO(quacht)
+					console.log(`set ${this.name} to ${value}`);
+					resolve(true);
+				});
+			} else {
+				ssm.pm.audio.cueMistake().then(()=> {
+					console.log(`could not set ${this.name} to ${value}`);
+				  resolve(false);
+				});
+			}
+	  });
 	}
 }
 
@@ -182,7 +185,8 @@ class Action {
 		if (this.name in ssm.pm.actions) {
 			ssm[this.name](this.getArgs(), utterance);
 		} else if (this.name in ssm.pm.currentProject.editor.actions) {
-			ssm.pm.currentProject.editor.handleUtterance(utterance, ssm.pm.currentProject);
+			var editor = ssm.pm.currentProject.editor;
+			editor[this.name].call(editor, this.getArgs());
 		}
 	}
 }
