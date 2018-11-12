@@ -29,15 +29,21 @@ class ScratchProjectEditor {
    */
   handleUtterance(utterance, project) {
     return new Promise((resolve,reject) => {
+      DEBUG && console.log(`[editor handleUtterance]`);
+
       this.project = project;
       utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
       var editor = this;
       var pm = editor.project.pm;
+      DEBUG && console.log(`[editor handleUtterance] matching trigger types`);
+
       for (var triggerType in editor.actions) {
 
         var args = Utils.match(utterance, editor.actions[triggerType].trigger);
         if (args && args.length > 0) {
+          DEBUG && console.log(`[editor handleUtterance] trigger type matched and action created`);
+
           var action = new Action(editor.actions[triggerType]);
           // The current actions and arguments are maintained at the project manager
           // level to simplify management since there can only be one current action
@@ -46,6 +52,8 @@ class ScratchProjectEditor {
 
           return pm.audio.cueSuccess().then(()=> {
             if (pm.triggerAction(action, args, utterance)) {
+              DEBUG && console.log(`[editor handleUtterance] Successfully triggered action.`);
+
               // Successfully triggered action.
               pm.currentAction = null;
               pm.currentArgument = null;
@@ -57,8 +65,10 @@ class ScratchProjectEditor {
             // We return 'exit' on executing the finish project command because we
             // need to signal to the state machine that the project is finished.
             if (triggerType === 'finishProject') {
+              DEBUG && console.log(`[editor handleUtterance] finish project.`);
               resolve('exit');
             }
+            DEBUG && console.log(`[editor handleUtterance] resolving true at end.`);
             return resolve('true');
           });
         }

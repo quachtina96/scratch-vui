@@ -18,7 +18,7 @@ const Utils = require('./utils.js');
 var ScratchProject = StateMachine.factory({
   init: 'create',
   transitions: [
-    // Support linear project creation process.
+    // Support linear project creation process: create, empty, named, nonempty
     { name: 'startProjectCreation', from: 'create', to: 'empty'},
     { name: 'nameProject', from: 'empty', to: 'named'},
     { name: 'addInstruction', from: 'named', to: 'nonempty'},
@@ -110,50 +110,53 @@ var ScratchProject = StateMachine.factory({
       return ScratchAction.Validator.unconflictingProjectName(this.ssm, name);
     },
     handleUtterance: function(utterance, opt_scratchVoiced) {
-        return new Promise((resolve, reject) => {
+      DEBUG && console.log(`[project handle utterance]`)
 
-          // Preprocess utterance
-          utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
+      return new Promise((resolve, reject) => {
 
-          switch(this.state) {
-            case 'create':
-              // Request project name from user
-              if (this.name) {
-                this.goto('named');
-              } else {
-                this.pm.audio.cueSuccess().then(() => {
-                this.startProjectCreation();
-                });
-              }
-              resolve();
-              break;
-            case 'empty':
-              // Expect the utterance to be the name of the project.
-              var proposedName = this._getName(utterance);
-              if (this._isValid(proposedName)) {
-                this.name = this._getName(utterance);
-                this.pm.projects[this.name] = this.pm.currentProject;
-                delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-                this.pm.audio.cueSuccess().then(() => {
-                  this.nameProject();
-                });
-              }
-              resolve();
-              break;
-            case 'named':
-            case 'nonempty':
-              // Detect and handle explicit edit commands.
-              this.editor.handleUtterance(utterance, this, opt_scratchVoiced).then((editor_result) => {
-                if (editor_result == 'exit') {
-                  this.finishProject();
-                  resolve(editor_result);
-                } else if (editor_result) {
-                  resolve();
-                }
+        // Preprocess utterance
+        utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
+        DEBUG && console.log(`[project handleUtterance] ${this}`)
+        DEBUG && console.log(`[project handleUtterance] ${this.state}`)
+        switch(this.state) {
+          case 'create':
+            // Request project name from user
+            if (this.name) {
+              this.goto('named');
+            } else {
+              this.pm.audio.cueSuccess().then(() => {
+              this.startProjectCreation();
               });
+            }
+            resolve();
+            break;
+          case 'empty':
+            // Expect the utterance to be the name of the project.
+            var proposedName = this._getName(utterance);
+            if (this._isValid(proposedName)) {
+              this.name = this._getName(utterance);
+              this.pm.projects[this.name] = this.pm.currentProject;
+              delete this.pm.projects['Untitled-'+this.pm.untitledCount];
+              this.pm.audio.cueSuccess().then(() => {
+                this.nameProject();
+              });
+            }
+            resolve();
+            break;
+          case 'named':
+          case 'nonempty':
+            // Detect and handle explicit edit commands.
+            this.editor.handleUtterance(utterance, this, opt_scratchVoiced).then((editor_result) => {
+              DEBUG && console.log(`[project handleUtterance] editor handled utterance with result: ${editor_result}`)
 
-              // TODO: does the code below need to be included INSIDE The promise handler
-
+              if (editor_result == 'exit') {
+                this.finishProject();
+                resolve(editor_result);
+              } else if (editor_result) {
+                resolve();
+              }
+            }, () => {
+              DEBUG && console.log(`[project handleUtterance] editor rejected handle utterance; now attempting Scratch command`);
               // If no edit commands work, attempt to match the utterance to a Scratch
               // command.
               var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
@@ -169,10 +172,13 @@ var ScratchProject = StateMachine.factory({
 
               ScratchInstruction.parse(command).then((result) => {
                 if (!result) {
+                  DEBUG && console.log(`[project handleUtterance] failed parse to Scratch command`);
+
                   // Failed to parse the command using ScratchNLP.
-                    reject();
+                  reject();
                 } else {
                   // Success!
+                  DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
                   return this.pm.audio.cueSuccess().then(() => {
                     var instruction = new ScratchInstruction(command);
                     instruction.parse = result
@@ -182,11 +188,13 @@ var ScratchProject = StateMachine.factory({
                   });
                 }
               });
-            default:
-              reject();
-          }
-        });
-      },
+            });
+            break;
+          default:
+            reject();
+        }
+      });
+    },
     // TODO: the scratch_project should already be handling utterances during
     // execution if we are using the scratch-vm (for 3.0 projects. We should
     // be able to remove the following below.
@@ -217,7 +225,18 @@ var ScratchProject = StateMachine.factory({
       } else {
         this.pm.say('There is 1 step');
       }
-    }
+    },
+    // Set the state of the project based on information. Useful for loading
+    // a project from storage.
+    setState: function() {
+      if (!this.name) {
+        this.goto("empty");
+      } else if (this.name && this.instructions.length == 0) {
+        this.goto("named");
+      } else if (this.name && this.instructions.length > 0) {
+        this.goto("nonempty");
+      }
+    },
   }
 });
 

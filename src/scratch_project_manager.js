@@ -56,6 +56,7 @@ class ScratchProjectManager {
       this.projects[name] = new ScratchProject(this);
       this.projects[name].name = name;
       this.projects[name].instructions = savedProjects[name];
+      this.projects[name].setState();
     }
   }
 
@@ -173,8 +174,7 @@ class ScratchProjectManager {
         return;
       }
 
-      // TODO: we need to provide an avenue for handling the questions + requests
-      // for help before handling the arguments and stuff.
+      // Handle questions + requests before answer questions to arguments and stuff.
       if (this._handleQuestion(utterance)) {
         DEBUG && console.log(`[pm handle utterance] handled question`)
         return;
@@ -193,12 +193,13 @@ class ScratchProjectManager {
         // Current project
         if (this.currentProject) {
           DEBUG && console.log(`[pm handle utterance][_finishUtterance] current project handling utterance`)
-          this.currentProject.handleUtterance(utterance, this.scratchVoiced).then((result) => {
+          return this.currentProject.handleUtterance(utterance, this.scratchVoiced).then((result) => {
             if (result == 'exit') {
               DEBUG && console.log(`[pm handle utterance][_finishUtterance] finish project`)
               this.ssm.finishProject();
               return;
             } else if (result == true) {
+              DEBUG && console.log(`[pm handle utterance][_finishUtterance] current project successfully handled`)
               // current project successfully handled it.
               return;
             }
@@ -211,12 +212,10 @@ class ScratchProjectManager {
 
       // The current argument takes priority.
       if (this.currentArgument) {
-        // TODO: the problem is that handle utterance is returnign a promise... but t
         this.currentArgument.handleUtterance(this.ssm, utterance).then(() => {
             // The utterance handler already finished its job.
             // reset the handler to use the default flow.
             this.triggerAction(this.currentAction, this.currentAction.getArgs(), utterance);
-            // this.currentArgument = null;
             return;
         }, () => {
           // TODO: upon failure, don't try to execute the action.

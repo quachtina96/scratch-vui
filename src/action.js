@@ -57,14 +57,16 @@ class Argument {
 
 	handleUtterance(ssm, value) {
     return new Promise((resolve, reject) => {
+    	DEBUG && console.log(`[argument handleUtterance]`);
     	if (this.set(ssm,value)) {
 				ssm.pm.audio.cueSuccess().then(() => {
-					// TODO(quacht)
+					DEBUG && console.log(`[argument handleUtterance] set value`);
 					console.log(`set ${this.name} to ${value}`);
 					resolve();
 				});
 			} else {
 				ssm.pm.audio.cueMistake().then(()=> {
+					DEBUG && console.log(`[argument handleUtterance] could not value`);
 					console.log(`could not set ${this.name} to ${value}`);
 				  reject();
 				});
@@ -102,16 +104,6 @@ class Action {
 		// The current argument that is being set or requested.
 		this.current = null;
 	}
-
-	// /**
-	//  * Given the args and the utterance return whether the arguments meet
-	//  * requirements.
-	//  */
-	// validate(args, utterance) {
-	// 	for (var i=1; i<args.length; i++) {
-	// 		this.arguments[i-1].set(args[i])
-	// 	}
-	// }
 
 	/**
 	 * Set arguments for the action based on the arguments extracted from the regular
@@ -182,10 +174,14 @@ class Action {
 	}
 
 	execute(ssm, utterance) {
+    DEBUG && console.log(`[action execute]`);
 		if (this.name in ssm.pm.actions) {
+			DEBUG && console.log(`[action execute] general`);
 			ssm[this.name](this.getArgs(), utterance);
 		} else if (this.name in ssm.pm.currentProject.editor.actions) {
+			DEBUG && console.log(`[action execute] editor`);
 			var editor = ssm.pm.currentProject.editor;
+			editor.project = editor.project ? editor.project : ssm.pm.currentProject;
 			editor[this.name].call(editor, this.getArgs());
 		}
 	}
