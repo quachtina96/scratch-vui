@@ -645,7 +645,7 @@ ScratchAction.Edit.deleteStep = {
 //replaceStep
 ScratchAction.Edit.replaceStep = {
 	"name":"replaceStep",
-	"trigger":/replace step|(?:replace|replaced) (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*) with (.*)/,
+	"trigger":/replace (?:step|steps|stop|stops|stuff)|replace steps|(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*) with (.*)/,
 	"idealTrigger":"replace step 1 with say hello",
 	"description":"change step to say hello",
 	"arguments": [
