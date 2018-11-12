@@ -28,40 +28,42 @@ class ScratchProjectEditor {
    * command, execute the command.
    */
   handleUtterance(utterance, project) {
-  	this.project = project;
-    utterance = Utils.removeFillerWords(utterance.toLowerCase());
+    return new Promise((resolve,reject) => {
+      this.project = project;
+      utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
-    var editor = this;
-    var pm = editor.project.pm;
-    for (var triggerType in editor.actions) {
+      var editor = this;
+      var pm = editor.project.pm;
+      for (var triggerType in editor.actions) {
 
-      var args = Utils.match(utterance, editor.actions[triggerType].trigger);
-      if (args && args.length > 0) {
-        var action = new Action(editor.actions[triggerType]);
-        // The current actions and arguments are maintained at the project manager
-        // level to simplify management since there can only be one current action
-        // and argument to focus on.
-        pm.currentAction = action;
+        var args = Utils.match(utterance, editor.actions[triggerType].trigger);
+        if (args && args.length > 0) {
+          var action = new Action(editor.actions[triggerType]);
+          // The current actions and arguments are maintained at the project manager
+          // level to simplify management since there can only be one current action
+          // and argument to focus on.
+          pm.currentAction = action;
 
-        return pm.audio.cueSuccess().then(()=> {
-          if (pm.triggerAction(action, args, utterance)) {
-            // Successfully triggered action.
-            pm.currentAction = null;
-            pm.currentArgument = null;
-          } else {
-            console.log('[PROJECT EDITOR] You are currently in ' + editor.project.state + ' mode and cannot '
-              + triggerType + ' from here.');
-          }
-          pm.save();
-          // We return 'exit' on executing the finish project command because we
-          // need to signal to the state machine that the project is finished.
-          if (triggerType === 'finishProject') {
-            return 'exit';
-          }
-          return true;
-        });
+          return pm.audio.cueSuccess().then(()=> {
+            if (pm.triggerAction(action, args, utterance)) {
+              // Successfully triggered action.
+              pm.currentAction = null;
+              pm.currentArgument = null;
+            } else {
+              console.log('[PROJECT EDITOR] You are currently in ' + editor.project.state + ' mode and cannot '
+                + triggerType + ' from here.');
+            }
+            pm.save();
+            // We return 'exit' on executing the finish project command because we
+            // need to signal to the state machine that the project is finished.
+            if (triggerType === 'finishProject') {
+              resolve('exit');
+            }
+            return resolve('true');
+          });
+        }
       }
-    }
+    });
   }
 
   _describeCurrentStep() {

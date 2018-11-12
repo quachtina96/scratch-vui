@@ -193,21 +193,20 @@ class ScratchProjectManager {
         // Current project
         if (this.currentProject) {
           DEBUG && console.log(`[pm handle utterance][_finishUtterance] current project handling utterance`)
-          var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
-          if (result == 'exit') {
-            DEBUG && console.log(`[pm handle utterance][_finishUtterance] finish project`)
-            this.ssm.finishProject();
-            return;
-          } else if (result == true) {
-            // current project successfully handled it.
-            return;
-          }
+          this.currentProject.handleUtterance(utterance, this.scratchVoiced).then((result) => {
+            if (result == 'exit') {
+              DEBUG && console.log(`[pm handle utterance][_finishUtterance] finish project`)
+              this.ssm.finishProject();
+              return;
+            } else if (result == true) {
+              // current project successfully handled it.
+              return;
+            }
+          }, () => this._handleUtterance(utterance));
+        } else {
+          DEBUG && console.log(`[pm handle utterance][_finishUtterance] no action or project to handle `)
+          return this._handleUtterance(utterance);
         }
-
-        DEBUG && console.log(`[pm handle utterance][_finishUtterance] no action or project to handle `)
-
-        // we are creating a new action.
-        return this._handleUtterance(utterance);
       };
 
       // The current argument takes priority.
@@ -360,6 +359,7 @@ class ScratchProjectManager {
       } else {
         this.say("I don't understand.");
       }
+      return;
     }
 
     // Alert failure.
