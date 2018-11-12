@@ -84,7 +84,7 @@ ScratchAction.Validator.scratchCommand = (ssm, step) => {
 	var step = punctuationless.replace(/\s{2,}/g," ");
 	return ScratchInstruction.parse(step).then((result) => {
 		if (!result) {
-			return false;
+			return "That is not a Scratch command";
 		} else {
 			return true;
 		}
@@ -92,7 +92,11 @@ ScratchAction.Validator.scratchCommand = (ssm, step) => {
 }
 
 ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
-	return Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)
+	if (Utils.checkBounds(number - 1, ssm.pm.currentProject.instructions)) {
+		return true;
+	} else {
+		return `There is no step ${number}`;
+	}
 }
 
 ScratchAction.allActions = () => {

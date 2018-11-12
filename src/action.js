@@ -61,12 +61,12 @@ class Argument {
 				ssm.pm.audio.cueSuccess().then(() => {
 					// TODO(quacht)
 					console.log(`set ${this.name} to ${value}`);
-					resolve(true);
+					resolve();
 				});
 			} else {
 				ssm.pm.audio.cueMistake().then(()=> {
 					console.log(`could not set ${this.name} to ${value}`);
-				  resolve(false);
+				  reject();
 				});
 			}
 	  });

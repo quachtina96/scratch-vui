@@ -166,6 +166,7 @@ class ScratchProjectManager {
   handleUtterance(utterance) {
     if (this.listening) {
       if (this._isInterrupt(utterance)) {
+        DEBUG && console.log(`[pm handle utterance] is interrupt`)
         this.currentAction = null;
         this.currentArgument = null;
         this.say('Canceled action.')
@@ -175,26 +176,15 @@ class ScratchProjectManager {
       // TODO: we need to provide an avenue for handling the questions + requests
       // for help before handling the arguments and stuff.
       if (this._handleQuestion(utterance)) {
+        DEBUG && console.log(`[pm handle utterance] handled question`)
         return;
       }
 
-      // The current argument takes priority.
-      if (this.currentArgument) {
-        // TODO: the problem is that handle utterance is returnign a promise... but t
-        this.currentArgument.handleUtterance(this.ssm, utterance).then((success) => {
-          if (success) {
-            // The utterance handler already finished its job.
-            // reset the handler to use the default flow.
-            this.triggerAction(this.currentAction, this.currentAction.getArgs(), opt_utterance);
-            this.currentArgument = null;
-            return;
-          }
-        });
-      }
-
-      var finishUtterance = (utterance) => {
+      var _finishUtterance = (utterance) => {
+        DEBUG && console.log(`[pm handle utterance][_finishUtterance]`)
         // The current action takes priority after arguments are satisfied.
         if (this.currentAction) {
+          DEBUG && console.log(`[pm handle utterance][_finishUtterance] executing current action`)
           this.currentAction.execute(this.ssm, utterance)
           this.currentAction = null;
           return;
@@ -202,18 +192,43 @@ class ScratchProjectManager {
 
         // Current project
         if (this.currentProject) {
+          DEBUG && console.log(`[pm handle utterance][_finishUtterance] current project handling utterance`)
           var result = this.currentProject.handleUtterance(utterance, this.scratchVoiced);
           if (result == 'exit') {
+            DEBUG && console.log(`[pm handle utterance][_finishUtterance] finish project`)
             this.ssm.finishProject();
+            return;
+          } else if (result == true) {
+            // current project successfully handled it.
             return;
           }
         }
+
+        DEBUG && console.log(`[pm handle utterance][_finishUtterance] no action or project to handle `)
 
         // we are creating a new action.
         return this._handleUtterance(utterance);
       };
 
-      return finishUtterance(utterance)
+      // The current argument takes priority.
+      if (this.currentArgument) {
+        // TODO: the problem is that handle utterance is returnign a promise... but t
+        this.currentArgument.handleUtterance(this.ssm, utterance).then(() => {
+            // The utterance handler already finished its job.
+            // reset the handler to use the default flow.
+            this.triggerAction(this.currentAction, this.currentAction.getArgs(), utterance);
+            // this.currentArgument = null;
+            return;
+        }, () => {
+          // TODO: upon failure, don't try to execute the action.
+          DEBUG && console.log(`[pm handle utterance] failed to satisfy current argument. call _finishUtterance`)
+          return _finishUtterance(utterance);
+        });
+      } else {
+        DEBUG && console.log(`[pm handle utterance] no current argument. call _finishUtterance`)
+        return _finishUtterance(utterance)
+      }
+
     } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
       // If Scratch wasn't listening before and the command is to tell Scratch
       // to listen, start listening!
@@ -322,7 +337,7 @@ class ScratchProjectManager {
         this.currentProject.handleUtteranceDuringExecution(utterance, this.scratchVoiced);
     }
     else if (Utils.containsScratch(utterance)) {
-      // TODO: integrate Scratch, Help!
+      // TODO: figure out whether i should force this section to contain Scratch or not!
       this.say("I heard you say " + utterance);
 
       // Suggest a close match if there exists one via fuzzy matching.
@@ -346,6 +361,11 @@ class ScratchProjectManager {
         this.say("I don't understand.");
       }
     }
+
+    // Alert failure.
+    this.audio.cueMistake().then(() => {
+      this.say("I heard you say " + utterance);
+    });
 
     // TODO: rip out this state variable, because we are no longer requiring
     // scratch to always be voiced.

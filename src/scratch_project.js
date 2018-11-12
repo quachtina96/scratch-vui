@@ -110,17 +110,20 @@ var ScratchProject = StateMachine.factory({
       return ScratchAction.Validator.unconflictingProjectName(this.ssm, name);
     },
     handleUtterance: function(utterance, opt_scratchVoiced) {
+      // Preprocess utterance
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
 
-      // Name project
+      // Handle utterance based on the project's current state.
       if (this.state == 'create') {
+        // Request project name from user
         if (this.name) {
           this.goto('named');
         } else {
           this.pm.audio.cueSuccess().then(() => {
-            this.startProjectCreation();
+          this.startProjectCreation();
           });
         }
+        return true;
       } else if (this.state == 'empty') {
         // Expect the utterance to be the name of the project.
         var proposedName = this._getName(utterance);
@@ -131,9 +134,8 @@ var ScratchProject = StateMachine.factory({
           this.pm.audio.cueSuccess().then(() => {
             this.nameProject();
           });
-        } else {
-          // TODO: Request new name from the user.
         }
+        return true;
       // Add to or finish project.
       } else if (this.state == 'named' || this.state == 'nonempty') {
         // Detect and handle explicit edit commands.
@@ -142,9 +144,11 @@ var ScratchProject = StateMachine.factory({
           this.finishProject();
           return editor_result;
         } else if (editor_result) {
-          return;
+          return true;
         }
 
+        // If no edit commands work, attempt to match the utterance to a Scratch
+        // command.
         var voicedScratch = Utils.matchRegex(utterance, /^(?:scratch|search)(?:ed)?/);
         var command = utterance;
         if (voicedScratch) {
@@ -158,21 +162,21 @@ var ScratchProject = StateMachine.factory({
 
         ScratchInstruction.parse(command).then((result) => {
           if (!result) {
-            // Failed to parse the command using ScratchNLP. Alert failure.
-            this.audio.cueMistake().then(() => {
-              this.pm.say("I heard you say " + utterance);
-            });
+            // Failed to parse the command using ScratchNLP.
+              return false;
           } else {
             // Success!
-            this.pm.audio.cueSuccess().then(() => {
+            return this.pm.audio.cueSuccess().then(() => {
               var instruction = new ScratchInstruction(command);
               instruction.parse = result
               this.instructions.push(instruction);
               this.addInstruction();
+              return true;
             });
           }
         });
       }
+      return false;
     },
     // TODO: the scratch_project should already be handling utterances during
     // execution if we are using the scratch-vm (for 3.0 projects. We should
