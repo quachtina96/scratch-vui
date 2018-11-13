@@ -539,7 +539,7 @@ ScratchAction.Edit.appendStep = {
 //insertStepBefore
 ScratchAction.Edit.insertStepBefore = {
 	"name":"insertStepBefore",
-	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (?:number)? ?(.*)/,
+	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (?:number)? ?(.*)|insert (?:step|steps|stop|stops|stuff|step)/,
 	// TODO: what are other commands that would be good to try to insert.
 	// could we design these commands to be more exciting.
 	"idealTrigger":"insert 'play the bark sound' before step number '1'",
@@ -553,7 +553,7 @@ ScratchAction.Edit.insertStepBefore = {
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'step to insert before'
+			description: 'step number to insert before'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -562,7 +562,7 @@ ScratchAction.Edit.insertStepBefore = {
 //insertStepAfter
 ScratchAction.Edit.insertStepAfter = {
 	"name":"insertStepAfter",
-	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)/,
+	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|insert (?:step|steps|stop|stops|stuff|step)/,
 	// TODO: there is so much potential to make these triggers and descriptions
 	// contextual based on the current step.
 	"idealTrigger":"insert 'play the meow sound' after step number '1'",
@@ -576,7 +576,7 @@ ScratchAction.Edit.insertStepAfter = {
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'step to insert after'
+			description: 'step number to insert after'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -593,7 +593,7 @@ ScratchAction.Edit.afterInsertStep = {
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'step to insert after'
+			description: 'step number to insert after'
 		},
 		{
 			'name': 'instruction',
@@ -615,7 +615,7 @@ ScratchAction.Edit.beforeInsertStep = {
 		{
 			name: 'step number',
 			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'step to insert before'
+			description: 'step number to insert before'
 		},
 		{
 			'name': 'instruction',
@@ -629,7 +629,7 @@ ScratchAction.Edit.beforeInsertStep = {
 //deleteStep
 ScratchAction.Edit.deleteStep = {
 	"name":"deleteStep",
-	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)/,
+	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|delete (?:step|steps|stop|stops|stuff|step)/,
 	"idealTrigger":"delete step 1",
 	"description":"delete the first step",
 	"arguments": [
