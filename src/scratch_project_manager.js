@@ -408,7 +408,9 @@ class ScratchProjectManager {
     }
 
     // Validate arguments
+    console.log(`[pm triggerAction] set arguments: ${opt_args}`)
     action.setArguments(this.ssm, opt_args)
+    console.log(`[pm triggerAction] result: ${action.arguments}`)
     // TINA: what happens when one argument has been satisfied.
     var missingArgument = action.getMissingArgument(this.ssm);
     if (missingArgument) {

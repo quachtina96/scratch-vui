@@ -51,6 +51,7 @@ class ScratchProjectEditor {
           pm.currentAction = action;
 
           return pm.audio.cueSuccess().then(()=> {
+            DEBUG && console.log(`[editor handleUtterance] triggering action with args: ${args} and utterance ${utterance}`);
             if (pm.triggerAction(action, args, utterance)) {
               DEBUG && console.log(`[editor handleUtterance] Successfully triggered action.`);
 
