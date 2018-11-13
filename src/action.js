@@ -55,23 +55,22 @@ class Argument {
 		return this.value
 	}
 
-	handleUtterance(ssm, value) {
-    return new Promise((resolve, reject) => {
-    	DEBUG && console.log(`[argument handleUtterance]`);
-    	if (this.set(ssm, value)) {
-				ssm.pm.audio.cueSuccess().then(() => {
-					DEBUG && console.log(`[argument handleUtterance] set value`);
-					console.log(`set ${this.name} to ${value}`);
-					resolve();
-				});
-			} else {
-				ssm.pm.audio.cueMistake().then(()=> {
-					DEBUG && console.log(`[argument handleUtterance] could not value`);
-					console.log(`could not set ${this.name} to ${value}`);
-				  reject();
-				});
-			}
-	  });
+	/**
+	 * Return whether successfully.
+	 */
+	async handleUtterance(ssm, value) {
+  	DEBUG && console.log(`[argument handleUtterance]`);
+  	if (this.set(ssm,value)) {
+			await ssm.pm.audio.cueSuccess();
+			DEBUG && console.log(`[argument handleUtterance] set value`);
+			console.log(`set ${this.name} to ${value}`);
+			return true;
+		} else {
+			await ssm.pm.audio.cueMistake();
+			DEBUG && console.log(`[argument handleUtterance] could not value`);
+			console.log(`could not set ${this.name} to ${value}`);
+			return false;
+		}
 	}
 }
 

@@ -180,6 +180,23 @@ class ScratchProjectManager {
         return;
       }
 
+      // The current argument takes priority.
+      if (this.currentArgument) {
+        this.currentArgument.handleUtterance(this.ssm, utterance).then(() => {
+            // The utterance handler already finished its job.
+            // reset the handler to use the default flow.
+            this.triggerAction(this.currentAction, this.currentAction.getArgs(), utterance);
+            return;
+        }, () => {
+          // TODO: upon failure, don't try to execute the action.
+          DEBUG && console.log(`[pm handle utterance] failed to satisfy current argument. call _finishUtterance`)
+          return _finishUtterance(utterance);
+        });
+      } else {
+        DEBUG && console.log(`[pm handle utterance] no current argument. call _finishUtterance`)
+        return _finishUtterance(utterance)
+      }
+
       var _finishUtterance = (utterance) => {
         DEBUG && console.log(`[pm handle utterance][_finishUtterance]`)
         // The current action takes priority after arguments are satisfied.
@@ -209,23 +226,6 @@ class ScratchProjectManager {
           return this._handleUtterance(utterance);
         }
       };
-
-      // The current argument takes priority.
-      if (this.currentArgument) {
-        this.currentArgument.handleUtterance(this.ssm, utterance).then(() => {
-            // The utterance handler already finished its job.
-            // reset the handler to use the default flow.
-            this.triggerAction(this.currentAction, this.currentAction.getArgs(), utterance);
-            return;
-        }, () => {
-          // TODO: upon failure, don't try to execute the action.
-          DEBUG && console.log(`[pm handle utterance] failed to satisfy current argument. call _finishUtterance`)
-          return _finishUtterance(utterance);
-        });
-      } else {
-        DEBUG && console.log(`[pm handle utterance] no current argument. call _finishUtterance`)
-        return _finishUtterance(utterance)
-      }
 
     } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
       // If Scratch wasn't listening before and the command is to tell Scratch
@@ -274,7 +274,7 @@ class ScratchProjectManager {
   /**
    * Handle utterance on the general navigation level.
    */
-  _handleUtterance(utterance) {
+  async _handleUtterance(utterance) {
     // NOTE: 'this' refers to the ScratchStateMachine that calls this function
     var lowercase = utterance.toLowerCase();
     var utterance = Utils.removeFillerWords(lowercase).trim();
@@ -362,9 +362,8 @@ class ScratchProjectManager {
     }
 
     // Alert failure.
-    this.audio.cueMistake().then(() => {
-      this.say("I heard you say " + utterance);
-    });
+    await this.audio.cueMistake();
+    this.say("I heard you say " + utterance);
 
     // TODO: rip out this state variable, because we are no longer requiring
     // scratch to always be voiced.
