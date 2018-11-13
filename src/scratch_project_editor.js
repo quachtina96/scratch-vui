@@ -24,57 +24,71 @@ class ScratchProjectEditor {
 	}
 
   /**
-   * If the utterance matches the form of a supported program editing
-   * command, execute the command.
+   * Handle action. Return true if successful, 'exit' if successfully finishing
+   * project, or false if unable to trigger action.
    */
-  handleUtterance(utterance, project) {
-    return new Promise((resolve,reject) => {
-      DEBUG && console.log(`[editor handleUtterance]`);
+  async handleUtterance(utterance, project) {
+    var action = await this._getAction(utterance, project);
+    return this._handleAction(action, utterance);
+  }
 
-      this.project = project;
-      utterance = Utils.removeFillerWords(utterance.toLowerCase());
+  /**
+   * Return action and arguments corresponding to utterance if there's a match.
+   */
+  async _getAction(utterance, project) {
+    DEBUG && console.log(`[editor handleUtterance]`);
 
-      var editor = this;
-      var pm = editor.project.pm;
-      DEBUG && console.log(`[editor handleUtterance] matching trigger types`);
+    this.project = project;
+    utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
-      for (var triggerType in editor.actions) {
+    var editor = this;
+    var pm = editor.project.pm;
+    DEBUG && console.log(`[editor handleUtterance] matching trigger types`);
 
-        var args = Utils.match(utterance, editor.actions[triggerType].trigger);
-        if (args && args.length > 0) {
-          DEBUG && console.log(`[editor handleUtterance] trigger type matched and action created`);
+    for (var triggerType in editor.actions) {
+      var args = Utils.match(utterance, editor.actions[triggerType].trigger);
+      if (args && args.length > 0) {
+        DEBUG && console.log(`[editor handleUtterance] trigger type matched and action created`);
 
-          var action = new Action(editor.actions[triggerType]);
-          // The current actions and arguments are maintained at the project manager
-          // level to simplify management since there can only be one current action
-          // and argument to focus on.
-          pm.currentAction = action;
+        var action = new Action(editor.actions[triggerType]);
+        action.setArguments(pm.ssm, args);
 
-          return pm.audio.cueSuccess().then(()=> {
-            DEBUG && console.log(`[editor handleUtterance] triggering action with args: ${args} and utterance ${utterance}`);
-            if (pm.triggerAction(action, args, utterance)) {
-              DEBUG && console.log(`[editor handleUtterance] Successfully triggered action.`);
+        // The current actions and arguments are maintained at the project manager
+        // level to simplify management since there can only be one current action
+        // and argument to focus on.
+        pm.currentAction = action;
 
-              // Successfully triggered action.
-              pm.currentAction = null;
-              pm.currentArgument = null;
-            } else {
-              console.log('[PROJECT EDITOR] You are currently in ' + editor.project.state + ' mode and cannot '
-                + triggerType + ' from here.');
-            }
-            pm.save();
-            // We return 'exit' on executing the finish project command because we
-            // need to signal to the state machine that the project is finished.
-            if (triggerType === 'finishProject') {
-              DEBUG && console.log(`[editor handleUtterance] finish project.`);
-              resolve('exit');
-            }
-            DEBUG && console.log(`[editor handleUtterance] resolving true at end.`);
-            return resolve('true');
-          });
-        }
+        // Await the synchronous audio cue
+        await pm.audio.cueSuccess();
+
+        return action;
       }
-    });
+    }
+  }
+
+  /**
+   * Handle action. Return true if successful, 'exit' if successfully finishing
+   * project, or false if unable to trigger action.
+   */
+  _handleAction(action, utterance) {
+    if (pm.triggerAction(action, action.getArgs(), utterance)) {
+
+      // Successfully triggered action.
+      pm.currentAction = null;
+      pm.currentArgument = null;
+    } else {
+      console.log(`You are currently in editor state ${editor.project.state} and failed to ${triggerType}`);
+      return false;
+    }
+    // Save project.
+    pm.save();
+
+    // We return 'exit' on executing the finish project command because we
+    // need to signal to the state machine that the project is finished.
+    if (triggerType === 'finishProject') {
+      return 'exit';
+    }
+    return true;
   }
 
   _describeCurrentStep() {

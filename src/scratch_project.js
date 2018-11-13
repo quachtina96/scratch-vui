@@ -159,58 +159,53 @@ var ScratchProject = StateMachine.factory({
         DEBUG && console.log(`[project handleUtterance] break in parse promise handler`);
       });
     },
-    handleUtterance: function(utterance, opt_scratchVoiced) {
+    /**
+     * Handle utterance. Return true if successful, 'exit' if successfully finishing
+     * project, or false if failed.
+     */
+    handleUtterance: async function(utterance, opt_scratchVoiced) {
       DEBUG && console.log(`[project handle utterance]`)
 
-      return new Promise((resolve, reject) => {
-
-        // Preprocess utterance
-        utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
-        DEBUG && console.log(`[project handleUtterance] ${this}`)
-        DEBUG && console.log(`[project handleUtterance] ${this.state}`)
-        switch(this.state) {
-          case 'create':
-            // Request project name from user
-            if (this.name) {
-              this.goto('named');
-            } else {
-              this.pm.audio.cueSuccess().then(() => {
-              this.startProjectCreation();
-              });
-            }
-            resolve();
-            break;
-          case 'empty':
-            // Expect the utterance to be the name of the project.
-            var proposedName = this._getName(utterance);
-            if (this._isValid(proposedName)) {
-              this.name = this._getName(utterance);
-              this.pm.projects[this.name] = this.pm.currentProject;
-              delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-              this.pm.audio.cueSuccess().then(() => {
-                this.nameProject();
-              });
-            }
-            resolve();
-            break;
-          case 'named':
-          case 'nonempty':
-            // Detect and handle explicit edit commands.
-            this.editor.handleUtterance(utterance, this, opt_scratchVoiced)
-              .then(this._finishProjectIfNeeded, this._matchToScratchCommand)
-              .catch((e) => {
-                DEBUG && console.log(`[project handleUtterance] ${this.state} caught error: ${e}`)
-                DEBUG && console.log(`TINA really hoping that this catch thing gets hit when the match to scratch command is hit`)
-              });
-
-            DEBUG && console.log(`[project handleUtterance] breaking out of nonempty outside a then`);
-            // TODO: Ask about why this break causes the system to mishandle "play project".
-            break;
-          default:
-            DEBUG && console.log(`[project handleUtterance] reject by default`);
-            reject();
-        }
-      });
+      // Preprocess utterance
+      utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
+      DEBUG && console.log(`[project handleUtterance] ${this}`)
+      DEBUG && console.log(`[project handleUtterance] ${this.state}`)
+      switch(this.state) {
+        case 'create':
+          // Request project name from user
+          if (this.name) {
+            this.goto('named');
+          } else {
+            await this.pm.audio.cueSuccess();
+            this.startProjectCreation();
+          }
+          return true;
+        case 'empty':
+          // Expect the utterance to be the name of the project.
+          var proposedName = this._getName(utterance);
+          if (this._isValid(proposedName)) {
+            this.name = this._getName(utterance);
+            this.pm.projects[this.name] = this.pm.currentProject;
+            delete this.pm.projects['Untitled-'+this.pm.untitledCount];
+            await this.pm.audio.cueSuccess();
+            this.nameProject();
+          }
+          return true;
+        case 'named':
+        case 'nonempty':
+          // Detect and handle explicit edit commands.
+          var editorResult = await this.editor.handleUtterance(utterance, this);
+          if (editorResult == 'exit') {
+            return this._finishProjectIfNeeded();
+          } else if (!editorResult) {
+            return this._matchToScratchCommand();
+          } else {
+            return true;
+          }
+        default:
+          DEBUG && console.log(`[project handle utterance] Scratch project did not handle utterance ${utterance}`);
+          return false;
+      }
     },
     // TODO: the scratch_project should already be handling utterances during
     // execution if we are using the scratch-vm (for 3.0 projects. We should
