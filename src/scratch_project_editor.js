@@ -52,6 +52,7 @@ class ScratchProjectEditor {
 
         var action = new Action(editor.actions[triggerType]);
         action.setArguments(pm.ssm, args);
+        console.log(`set arguments for action ${action.arguments.map((argument) => argument.value)}`)
 
         // The current actions and arguments are maintained at the project manager
         // level to simplify management since there can only be one current action
@@ -71,13 +72,15 @@ class ScratchProjectEditor {
    * project, or false if unable to trigger action.
    */
   _handleAction(action, utterance) {
+    var pm = this.project.pm;
+
     if (pm.triggerAction(action, action.getArgs(), utterance)) {
 
       // Successfully triggered action.
       pm.currentAction = null;
       pm.currentArgument = null;
     } else {
-      console.log(`You are currently in editor state ${editor.project.state} and failed to ${triggerType}`);
+      console.log(`You are currently in editor state ${this.project.state} and failed to ${action.name}`);
       return false;
     }
     // Save project.

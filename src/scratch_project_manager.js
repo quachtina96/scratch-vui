@@ -400,16 +400,13 @@ class ScratchProjectManager {
     this.action = action;
 
     // Validate context
-    var result = action.contextValidator(this.ssm);
-    if (result != true) {
-      // Explain why the context is invalid.
-      this.say(result);
+    if (!action.validInContext(this.ssm)) {
       return;
     }
 
     // Validate arguments
     console.log(`[pm triggerAction] set arguments: ${opt_args}`)
-    action.setArguments(this.ssm, opt_args)
+    action.setArguments(this.ssm, opt_args);
     console.log(`[pm triggerAction] result: ${action.arguments}`)
     // TINA: what happens when one argument has been satisfied.
     var missingArgument = action.getMissingArgument(this.ssm);

@@ -58,7 +58,7 @@ class Argument {
 	handleUtterance(ssm, value) {
     return new Promise((resolve, reject) => {
     	DEBUG && console.log(`[argument handleUtterance]`);
-    	if (this.set(ssm,value)) {
+    	if (this.set(ssm, value)) {
 				ssm.pm.audio.cueSuccess().then(() => {
 					DEBUG && console.log(`[argument handleUtterance] set value`);
 					console.log(`set ${this.name} to ${value}`);
@@ -103,6 +103,16 @@ class Action {
 		this.missingArguments = null;
 		// The current argument that is being set or requested.
 		this.current = null;
+	}
+
+	validInContext(ssm) {
+		var result = this.contextValidator(ssm);
+    if (result != true) {
+      // Explain why the context is invalid.
+      ssm.pm.say(result);
+      result = false;
+    }
+    return result;
 	}
 
 	/**
@@ -170,7 +180,7 @@ class Action {
 	getArgs() {
 		// We use a filler in the beginning because arguments extracted via
 		// regex extract more from you.
-		return ['filler'].concat(this.arguments.map((arg) => arg.value));
+		return ['filler'].concat(this.arguments.map((arg) => arg.value).filter((arg) => arg != null));
 	}
 
 	execute(ssm, utterance) {
