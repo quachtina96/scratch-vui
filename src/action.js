@@ -69,7 +69,7 @@ class Argument {
 			await ssm.pm.audio.cueMistake();
 			DEBUG && console.log(`[argument handleUtterance] could not value`);
 			console.log(`could not set ${this.name} to ${value}`);
-			return false;
+			throw Error(`could not set argument ${this.name} to ${value}`);
 		}
 	}
 }

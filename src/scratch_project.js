@@ -122,7 +122,7 @@ var ScratchProject = StateMachine.factory({
       }
     },
     // When the project editor could not handle the utterance,
-    _matchToScratchCommand: () => {
+    _matchToScratchCommand: async (utterance) => {
       DEBUG && console.log(`[project _matchToScratchCommand] editor rejected handle utterance; now attempting Scratch command`);
       // If no edit commands work, attempt to match the utterance to a Scratch
       // command.
@@ -137,27 +137,23 @@ var ScratchProject = StateMachine.factory({
       var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
       var command = punctuationless.replace(/\s{2,}/g," ");
 
-      ScratchInstruction.parse(command).then((result) => {
-        DEBUG && console.log(`[project handleUtterance] scratch command parse result: ${result} `);
+      var parseResult = await ScratchInstruction.parse(command);
+      DEBUG && console.log(`[project handleUtterance] scratch command parse result: ${parseResult} `);
 
-        if (!result) {
-          DEBUG && console.log(`[project handleUtterance] failed parse to Scratch command`);
+      if (!parseResult) {
 
-          // Failed to parse the command using ScratchNLP.
-          reject();
-        } else {
-          // Success!
-          DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
-          return this.pm.audio.cueSuccess().then(() => {
-            var instruction = new ScratchInstruction(command);
-            instruction.parse = result
-            this.instructions.push(instruction);
-            this.addInstruction();
-            resolve();
-          });
-        }
-        DEBUG && console.log(`[project handleUtterance] break in parse promise handler`);
-      });
+        // Failed to parse the command using ScratchNLP.
+        throw Error(`[project handleUtterance] failed parse to Scratch command`);
+      } else {
+        // Success!
+        DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
+        await this.pm.audio.cueSuccess();
+        var instruction = new ScratchInstruction(command);
+        instruction.parse = parseResult;
+        this.instructions.push(instruction);
+        this.addInstruction();
+        return;
+      }
     },
     /**
      * Handle utterance. Return true if successful, 'exit' if successfully finishing
@@ -194,13 +190,17 @@ var ScratchProject = StateMachine.factory({
         case 'named':
         case 'nonempty':
           // Detect and handle explicit edit commands.
-          var editorResult = await this.editor.handleUtterance(utterance, this);
-          if (editorResult == 'exit') {
-            return this._finishProjectIfNeeded();
-          } else if (!editorResult) {
-            return this._matchToScratchCommand();
-          } else {
-            return true;
+          try {
+            var editorResult = await this.editor.handleUtterance(utterance, this);
+            if (editorResult == 'exit') {
+              return this._finishProjectIfNeeded();
+            } else if (!editorResult) {
+              return this._matchToScratchCommand(utterance);
+            } else {
+              return true;
+            }
+          } catch (e) {
+            return false;
           }
         default:
           DEBUG && console.log(`[project handle utterance] Scratch project did not handle utterance ${utterance}`);

@@ -29,6 +29,9 @@ class ScratchProjectEditor {
    */
   async handleUtterance(utterance, project) {
     var action = await this._getAction(utterance, project);
+    if (!action) {
+      throw Error('Editor could not get action from utterance');
+    }
     return this._handleAction(action, utterance);
   }
 
@@ -88,7 +91,7 @@ class ScratchProjectEditor {
 
     // We return 'exit' on executing the finish project command because we
     // need to signal to the state machine that the project is finished.
-    if (triggerType === 'finishProject') {
+    if (action.name === 'finishProject') {
       return 'exit';
     }
     return true;

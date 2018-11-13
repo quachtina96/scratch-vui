@@ -161,10 +161,34 @@ class ScratchProjectManager {
     }))
   }
 
+  _handleCurrentAction(utterance) {
+    DEBUG && console.log(`[pm handle utterance][_finishUtterance] executing current action`)
+    this.currentAction.execute(this.ssm, utterance)
+    this.currentAction = null;
+    return true;
+  }
+
+  async _handleCurrentProject(utterance) {
+    // Current project
+    DEBUG && console.log(`[handle utterance][_finishUtterance] current project handling utterance`)
+
+    var result = await this.currentProject.handleUtterance(utterance, this.scratchVoiced);
+    if (result == 'exit') {
+        DEBUG && console.log(`[pm handle utterance][_finishUtterance] finish project`)
+        this.ssm.finishProject();
+        return true;
+    } else if (result == true) {
+      DEBUG && console.log(`[pm handle utterance][_finishUtterance] current project successfully handled`)
+        // current project successfully handled it.
+      return true;
+    }
+    return false
+  }
+
   /**
    * Handle the utterance only when Scratch should be listening.
    */
-  handleUtterance(utterance) {
+  async handleUtterance(utterance) {
     if (this.listening) {
       if (this._isInterrupt(utterance)) {
         DEBUG && console.log(`[pm handle utterance] is interrupt`)
@@ -182,50 +206,25 @@ class ScratchProjectManager {
 
       // The current argument takes priority.
       if (this.currentArgument) {
-        this.currentArgument.handleUtterance(this.ssm, utterance).then(() => {
+        var handledByArgument = await this.currentArgument.handleUtterance(this.ssm, utterance);
+        if (handledByArgument) {
             // The utterance handler already finished its job.
             // reset the handler to use the default flow.
             this.triggerAction(this.currentAction, this.currentAction.getArgs(), utterance);
             return;
-        }, () => {
-          // TODO: upon failure, don't try to execute the action.
-          DEBUG && console.log(`[pm handle utterance] failed to satisfy current argument. call _finishUtterance`)
-          return _finishUtterance(utterance);
-        });
-      } else {
-        DEBUG && console.log(`[pm handle utterance] no current argument. call _finishUtterance`)
-        return _finishUtterance(utterance)
+        }
       }
 
-      var _finishUtterance = (utterance) => {
-        DEBUG && console.log(`[pm handle utterance][_finishUtterance]`)
-        // The current action takes priority after arguments are satisfied.
-        if (this.currentAction) {
-          DEBUG && console.log(`[pm handle utterance][_finishUtterance] executing current action`)
-          this.currentAction.execute(this.ssm, utterance)
-          this.currentAction = null;
-          return;
-        }
+      if (this.currentAction && this._handleCurrentAction(utterance)) {
+        return;
+      }
 
-        // Current project
-        if (this.currentProject) {
-          DEBUG && console.log(`[pm handle utterance][_finishUtterance] current project handling utterance`)
-          return this.currentProject.handleUtterance(utterance, this.scratchVoiced).then((result) => {
-            if (result == 'exit') {
-              DEBUG && console.log(`[pm handle utterance][_finishUtterance] finish project`)
-              this.ssm.finishProject();
-              return;
-            } else if (result == true) {
-              DEBUG && console.log(`[pm handle utterance][_finishUtterance] current project successfully handled`)
-              // current project successfully handled it.
-              return;
-            }
-          }, () => this._handleUtterance(utterance));
-        } else {
-          DEBUG && console.log(`[pm handle utterance][_finishUtterance] no action or project to handle `)
-          return this._handleUtterance(utterance);
-        }
-      };
+      if (this.currentProject && await this._handleCurrentProject(utterance)) {
+        return;
+      }
+
+      DEBUG && console.log(`[pm handle utterance][_finishUtterance] no action or project to handle `)
+      return this._handleUtterance(utterance);
 
     } else if (Utils.match(utterance, this.actions['listen'].trigger)) {
       // If Scratch wasn't listening before and the command is to tell Scratch

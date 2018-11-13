@@ -219,7 +219,7 @@ var ScratchStateMachine = new StateMachine.factory({
     },
     setMethods: function() {
       methodMap = {
-        handleUtterance: (utterance) => {this.pm.handleUtterance(utterance)},
+        handleUtterance: async (utterance) => {return await this.pm.handleUtterance(utterance)},
         onGetCurrentProject: () => {this.pm.getCurrentProject()},
         onRenameCurrentProject: (lifecycle, args) => {this.pm.renameCurrentProject(lifecycle, args)},
         onRenameProject: (lifecycle, args) => {this.pm.renameSpecifiedProject(lifecycle, args)},
