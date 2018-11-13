@@ -476,7 +476,7 @@ ScratchAction.Edit.getCurrentStep = {
 //goToStep
 ScratchAction.Edit.goToStep = {
 	"name":"goToStep",
-	"trigger":/^step (?:number)? ?(.*)|go to (?:step|steps|stop|stops|stuff|step) (.*)|what's (?:step|steps|stop|stops|stuff|step) (.*)|what is (?:step|steps|stop|stops|stuff|step) (.*)/,
+	"trigger":/^step (?:number)? ?(.*)|go to (?:step|steps|stop|stops|stuff|step) (.*)|what's (?:step|steps|stop|stops|stuff|step) (.*)|what (?:is)? ?(?:step|steps|stop|stops|stuff|step) (.*)/,
 	"idealTrigger":"go to step number 2",
 	"description":"jump to and hear step number 2 of the project",
 	"arguments": [
@@ -513,7 +513,7 @@ ScratchAction.Edit.previousStep = {
 //playStep
 ScratchAction.Edit.playStep = {
 	"name":"playStep",
-	"trigger":/^play (?:step|steps|stop|stops|stuff|step)$|^play (?:the)? ?current (?:step|steps|stop|stops|stuff|step)$|^what does it do$|^try it$/,
+	"trigger":/^play (?:step|steps|stop|stops|stuff|step)$|^play (?:the)? ?current (?:step|steps|stop|stops|stuff|step)$|^what does it do$|^try it$|^test it$|/,
 	"idealTrigger":"try it",
 	"description":"play the current step",
 	"arguments": [],
@@ -645,7 +645,9 @@ ScratchAction.Edit.deleteStep = {
 //replaceStep
 ScratchAction.Edit.replaceStep = {
 	"name":"replaceStep",
-	"trigger":/replace (?:step|steps|stop|stops|stuff)|replace steps|(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*) with (.*)/,
+	// Note: subtle bugs can occur based on the ordering of the possible phrases in the regular expression.
+	// The system accepts the first match moving left to right.
+	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*) with (.*)|replace (?:step|steps|stop|stops|stuff)|replace steps/,
 	"idealTrigger":"replace step 1 with say hello",
 	"description":"change step to say hello",
 	"arguments": [
