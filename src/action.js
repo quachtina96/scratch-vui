@@ -187,7 +187,7 @@ class Action {
 		if (this.name in ssm.pm.actions) {
 			DEBUG && console.log(`[action execute] general`);
 			ssm[this.name](this.getArgs(), utterance);
-		} else if (this.name in ssm.pm.currentProject.editor.actions) {
+		} else if (ssm.pm.currentProject && this.name in ssm.pm.currentProject.editor.actions) {
 			DEBUG && console.log(`[action execute] editor`);
 			var editor = ssm.pm.currentProject.editor;
 			editor.project = editor.project ? editor.project : ssm.pm.currentProject;

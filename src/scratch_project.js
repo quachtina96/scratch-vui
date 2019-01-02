@@ -194,13 +194,15 @@ var ScratchProject = StateMachine.factory({
             var editorResult = await this.editor.handleUtterance(utterance, this);
             if (editorResult == 'exit') {
               return this._finishProjectIfNeeded();
-            } else if (!editorResult) {
-              return this._matchToScratchCommand(utterance);
             } else {
               return true;
             }
           } catch (e) {
-            return false;
+            try {
+              this._matchToScratchCommand(utterance);
+            } catch (e) {
+              return false;
+            }
           }
         default:
           DEBUG && console.log(`[project handle utterance] Scratch project did not handle utterance ${utterance}`);

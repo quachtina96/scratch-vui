@@ -518,7 +518,6 @@ ScratchAction.Edit.playStep = {
 	"description":"play the current step",
 	"arguments": [],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined,
-	"question": true
 };
 
 //appendStep
