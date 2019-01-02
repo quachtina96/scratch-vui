@@ -32,8 +32,8 @@ class ScratchProjectManager {
     this.recognition = new webkitSpeechRecognition();
     // Triggers should be listed from more specific to more general to
     // ensure that the best fit trigger gets matched to the utterance.
-    this.triggers = ScratchAction.getTriggers('General');
-    this.actions = ScratchAction.General;
+    this.triggers = ScratchAction.getTriggersFromCategories(['General','Help']);
+    this.actions = Object.assign({}, ScratchAction.General, ScratchAction.Help);
     // Whether currently listening for a yes or no answer.
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
@@ -352,8 +352,9 @@ class ScratchProjectManager {
         // Set handle utterance mode to listen for yes or no.
         this.yesOrNo = {
           yesCallback: () => {this.triggerAction(new Action(ScratchAction.General.triggerType))},
-          noCallback: () => {this.say("Please try again.")}
+          noCallback: () => {this.say(`Okay. I will not ${triggerType}`)}
         }
+        return;
       } else {
         this.say("I don't understand.");
       }
@@ -780,7 +781,12 @@ class ScratchProjectManager {
       // Present action. pick random thing from scratch_commands.json
       let possiblePrefixes = ['One thing I can do is', "Here's one. I can"];
       let prefix = Utils.getNFromList(possiblePrefixes, 1, -1)[0];
-      pm.say(`${prefix} ${random_command.description}. Try by saying ${random_command.example_statement}`);
+      if (pm.ssm.state === 'InsideProject') {
+        pm.say(`${prefix} ${random_command.description}. Try saying ${random_command.example_statement}`);
+      } else {
+        // Clarify the necessary context for the suggested Scratch command.
+        pm.say(`${prefix} ${random_command.description}. Inside a new or existing project, try saying ${random_command.example_statement}`);
+      }
       resolve();
     });
   }

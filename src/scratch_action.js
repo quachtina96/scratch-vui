@@ -101,7 +101,8 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 
 ScratchAction.allActions = () => {
 	var actionItems = Object.entries(ScratchAction.General).concat(Object.entries(
-			ScratchAction.Edit));
+			ScratchAction.Edit).concat(Object.entries(
+				ScratchAction.Help)));
 	return actionItems.map((b) => b[1]);
 }
 
@@ -117,6 +118,20 @@ ScratchAction.getAllTriggers = () => {
  */
 ScratchAction.getTriggers = (category) => {
 	return Object.keys(ScratchAction[category]);
+}
+
+/**
+ * Return a list of trigger types belonging to the given category.
+ */
+ScratchAction.getTriggersFromCategories = (categoryList) => {
+	if (categoryList.length < 1 || categoryList.constructor != Array) {
+		return;
+	}
+	var result = ScratchAction.getTriggers(categoryList[0]);
+	for (var i = 1; i < categoryList.length; i++) {
+		result = result.concat(ScratchAction.getTriggers(categoryList[i]))
+	}
+	return result;
 }
 
 /**
@@ -713,7 +728,7 @@ ScratchAction.Help.getWhatISaid = {
 // Help users remember what Scratch said (if they didn't catch it)
 ScratchAction.Help.getWhatYouSaid = {
 	"name":"getWhatYouSaid",
-	"trigger":/what did you (?:just)? ?say|(?:can you)? ?repeat (?:that|yourself)|say that again|(?:can you)? ?say what you (?:just)? ?said ?(?:again)?|tell me what you (?:just)? ?said/,
+	"trigger":/what did you (?:just)? ?say|(?:could you)? ?repeat (?:that|yourself)|(?:can you)? ?repeat (?:that|yourself)|(?:can you)? ?repeat (?:that|yourself)|say that again|(?:can you)? ?say what you (?:just)? ?said ?(?:again)?|tell me what you (?:just)? ?said/,
 	"idealTrigger":"say that again",
 	"description":"get Scratch to repeat what they just said",
 	"question": true
