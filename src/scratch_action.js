@@ -287,9 +287,17 @@ ScratchAction.General.play = {
 //return
 ScratchAction.General.return = {
 	"name":"return",
-	"trigger":/go back$|go home|quit$|exit$|nevermind$|nevermind/,
+	"trigger":/go back$|nevermind$|nevermind/,
 	"idealTrigger":"go back",
 	"description":"go back to the last state you were in",
+};
+
+//return
+ScratchAction.General.goHome = {
+	"name":"goHome",
+	"trigger":/go home|quit$|exit$/,
+	"idealTrigger":"go home",
+	"description":"go back to the home state",
 };
 
 //getCurrentProject
@@ -320,7 +328,7 @@ ScratchAction.General.getNthProject = {
 //getProjectNames
 ScratchAction.General.getProjectNames = {
 	"name":"getProjectNames",
-	"trigger":/do you have any projects|what projects are there|what (?:projects|project) do (?:i|you) have|what have i made so far|what are (?:my|the) projects called|what are (?:the names of)? ?my projects/,
+	"trigger":/do you have any (?:other)? ?projects|what (?:other)? ?projects are there|what (?:other)? ?(?:projects|project) do (?:i|you) have|what have i made so far|what are (?:my|the) (?:other)? ?projects called|what are (?:the names of)? ?my (?:other)? ?projects/,
 	"idealTrigger":"what projects do i have",
 	"description":"hear a list of all the projects",
 	"question": true

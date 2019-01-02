@@ -66,7 +66,8 @@ var ScratchStateMachine = new StateMachine.factory({
         return this.history[this.history.length - 2];
       }
     },
-    {name: 'finishProject', from: 'InsideProject', to: 'Home'},
+    { name: 'goHome', from: '*', to: 'Home'},
+    { name: 'finishProject', from: 'InsideProject', to: 'Home'},
     { name: 'play', from: 'Home', to: 'PlayProject'},
     { name: 'play', from: 'InsideProject', to: 'PlayProject'},
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
