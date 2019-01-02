@@ -143,7 +143,7 @@ var ScratchProject = StateMachine.factory({
       if (!parseResult) {
 
         // Failed to parse the command using ScratchNLP.
-        throw Error(`[project handleUtterance] failed parse to Scratch command`);
+        throw Error(`[project handleUtterance] failed parse to Scratch command: ${command}`);
       } else {
         // Success!
         DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);

@@ -219,7 +219,7 @@ class ScratchProjectManager {
         return;
       }
 
-      if (this.currentProject && await this._handleCurrentProject(utterance)) {
+      if (this.ssm.state == 'InsideProject' && this.currentProject && await this._handleCurrentProject(utterance)) {
         return;
       }
 
