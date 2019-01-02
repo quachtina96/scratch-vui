@@ -171,10 +171,4 @@ if (!('webkitSpeechRecognition' in window)) {
       }
     }
   };
-
-  // Prevent speech recognition API from becoming unresponsive.
-  setInterval(resetVoiceRecog, 10000);
-  function resetVoiceRecog() {
-     recognition.stop();
-  }
 }
