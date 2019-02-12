@@ -6,6 +6,7 @@ const ScratchInstruction = require('./scratch_instruction.js');
 const ScratchProject = require('./scratch_project.js');
 const ScratchStateMachine = require('./scratch_state_machine.js');
 const ScratchAction = require('./scratch_action.js');
+const Action = require('./action.js').Action;
 const ScratchAudio = require('./audio.js');
 
 /**
@@ -23,28 +24,77 @@ class ScratchProjectEditor {
 	}
 
   /**
-   * If the utterance matches the form of a supported program editing
-   * command, execute the command.
+   * Handle action. Return true if successful, 'exit' if successfully finishing
+   * project, or false if unable to trigger action.
    */
-  handleUtterance(utterance, project) {
-  	this.project = project;
+  async handleUtterance(utterance, project) {
+    var action = await this._getAction(utterance, project);
+    if (!action) {
+      throw Error('Editor could not get action from utterance');
+    }
+    return this._handleAction(action, utterance);
+  }
+
+  /**
+   * Return action and arguments corresponding to utterance if there's a match.
+   */
+  async _getAction(utterance, project) {
+    DEBUG && console.log(`[editor handleUtterance]`);
+
+    this.project = project;
     utterance = Utils.removeFillerWords(utterance.toLowerCase());
 
-    var scratchProject = this;
-    for (var commandType in this.actions) {
-      var args = Utils.match(utterance, this.actions[commandType].trigger);
-      if (args && this[commandType]) {
-        this.project.pm.audio.cueSuccess();
-        this[commandType].call(scratchProject, args);
-        this.project.pm.save();
-        // We return 'exit' on executing the finish project command because we
-        // need to signal to the state machine that the project is finished.
-        if (commandType === 'finishProject') {
-          return 'exit';
-        }
-        return true;
+    var editor = this;
+    var pm = editor.project.pm;
+    DEBUG && console.log(`[editor handleUtterance] matching trigger types`);
+
+    for (var triggerType in editor.actions) {
+      var args = Utils.match(utterance, editor.actions[triggerType].trigger);
+      if (args && args.length > 0) {
+        DEBUG && console.log(`[editor handleUtterance] trigger type matched and action created`);
+
+        var action = new Action(editor.actions[triggerType]);
+        action.setArguments(pm.ssm, args);
+        console.log(`set arguments for action ${action.arguments.map((argument) => argument.value)}`)
+
+        // The current actions and arguments are maintained at the project manager
+        // level to simplify management since there can only be one current action
+        // and argument to focus on.
+        pm.currentAction = action;
+
+        // Await the synchronous audio cue
+        await pm.audio.cueSuccess();
+
+        return action;
       }
     }
+  }
+
+  /**
+   * Handle action. Return true if successful, 'exit' if successfully finishing
+   * project, or false if unable to trigger action.
+   */
+  _handleAction(action, utterance) {
+    var pm = this.project.pm;
+
+    if (pm.triggerAction(action, action.getArgs(), utterance)) {
+
+      // Successfully triggered action.
+      pm.currentAction = null;
+      pm.currentArgument = null;
+    } else {
+      console.log(`You are currently in editor state ${this.project.state} and failed to ${action.name}`);
+      return false;
+    }
+    // Save project.
+    pm.save();
+
+    // We return 'exit' on executing the finish project command because we
+    // need to signal to the state machine that the project is finished.
+    if (action.name === 'finishProject') {
+      return 'exit';
+    }
+    return true;
   }
 
   _describeCurrentStep() {

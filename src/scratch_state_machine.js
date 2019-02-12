@@ -66,7 +66,8 @@ var ScratchStateMachine = new StateMachine.factory({
         return this.history[this.history.length - 2];
       }
     },
-    {name: 'finishProject', from: 'InsideProject', to: 'Home'},
+    { name: 'goHome', from: '*', to: 'Home'},
+    { name: 'finishProject', from: 'InsideProject', to: 'Home'},
     { name: 'play', from: 'Home', to: 'PlayProject'},
     { name: 'play', from: 'InsideProject', to: 'PlayProject'},
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
@@ -219,7 +220,7 @@ var ScratchStateMachine = new StateMachine.factory({
     },
     setMethods: function() {
       methodMap = {
-        handleUtterance: (utterance) => {this.pm.handleUtterance(utterance)},
+        handleUtterance: async (utterance) => {return await this.pm.handleUtterance(utterance)},
         onGetCurrentProject: () => {this.pm.getCurrentProject()},
         onRenameCurrentProject: (lifecycle, args) => {this.pm.renameCurrentProject(lifecycle, args)},
         onRenameProject: (lifecycle, args) => {this.pm.renameSpecifiedProject(lifecycle, args)},
