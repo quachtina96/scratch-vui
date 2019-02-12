@@ -7,7 +7,6 @@ const ActionImport = require('./action.js');
 const Argument = ActionImport.Argument;
 const Action = ActionImport.Action;
 const Utils = require('./utils.js');
-const soundLibraryContent = require('./sounds.js');
 
 /**
  * Define the ScratchAction namespace.
@@ -546,7 +545,7 @@ ScratchAction.Edit.playStep = {
 //appendStep
 ScratchAction.Edit.appendStep = {
 	"name":"appendStep",
-	"trigger":/add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
+	"trigger":/append (?:a)? ?step|add (?:a)? ?step|add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
 	"idealTrigger":"next, play the chomp sound",
 	"description":"to add a new instruction, 'play the chomp sound', to the end of the project",
 	"arguments": [{
