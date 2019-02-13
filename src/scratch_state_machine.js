@@ -276,6 +276,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetScratchCommands: () => {this.pm.getScratchCommands()},
         onGetWhatYouSaid: () => {this.pm.getWhatScratchSaid()},
         onGetWhatISaid: () => {this.pm.getWhatUserSaid()},
+        onGreet: () => {this.pm.greet()}
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];
@@ -284,7 +285,7 @@ var ScratchStateMachine = new StateMachine.factory({
     introduceSelf() {
       this.pm.say("Hi, I’m Scratch! I'm a tool you can use to program and interact with\
         audio projects. Any time you need help or don't know what to do, you can say\
-        'Scratch, help' or ask 'what can i do'. I will try to answer any\
+        'Scratch, help' or ask 'what can i do?'. I will try to answer any\
         questions you have. To start, why don't you say 'alarm' to play the alarm project");
       this.pm.recognition.start();
     }
