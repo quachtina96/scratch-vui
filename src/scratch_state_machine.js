@@ -281,13 +281,9 @@ var ScratchStateMachine = new StateMachine.factory({
       }
     },
     introduceSelf() {
-      this.pm.say("Hi, I’m Scratch, a tool for you to build and interact with \
-        Scratch projects. Scratch projects are computer programs that you can \
-        play, interact with, and share. You can create Scratch projects by \
-        telling me instructions. I keep track of these instructions and when \
-        you say the name of the project, I will follow the instructions step \
-        by step. Any time you need help or don't know what to do, you can say \
-        'Scratch help' or ask 'what can i do'. I will try to answer any \
+      this.pm.say("Hi, I’m Bubba! I'm a tool you can use to program and interact with \
+        audio projects. Any time you need help or don't know what to do, you can say \
+        'Bubba help' or ask 'what can i do'. I will try to answer any \
         questions you have. To start, why don't you say 'alarm' to play the alarm project");
       this.pm.recognition.start();
     }
