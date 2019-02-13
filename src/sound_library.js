@@ -26,6 +26,9 @@ class SoundLibrary {
      */
     this.playingSoundPromise = null;
     this.dict = this._getDict(soundLibraryContent);
+    // The last set of sounds returned by a call to this.getNSounds may be
+    // requested by a user who missed it the first time.
+    this.lastNSounds = null;
   }
 
   /**
@@ -74,6 +77,7 @@ class SoundLibrary {
     } else {
       var sounds = soundLibraryContent.slice(opt_index, n);
     }
+    this.lastNSounds = sounds;
     return sounds;
   }
 
@@ -95,12 +99,45 @@ class SoundLibrary {
     return this._titleCase(soundName) in this.dict;
   }
 
+  getSoundTags() {
+    var tagListList = Object.values(this.dict).map((soundItem) => soundItem.tags);
+    var reducer = (accumulator, currentValue) => currentValue.concat(accumulator);
+    var masterTagList = tagListList.reduce(reducer);
+    return new Set(masterTagList);
+  }
+
   /**
-   * Search the sound library and return candidates for similar sounds
+   * Get a list of sounds with given tag.
    */
-  getSimilarSounds(soundName) {
-    // TODO: ask Eric for help.
-    return;
+  getSoundsTagged(tag) {
+    if (tag in this.getSoundTags()) {
+      return Object.values(this.dict).filter((soundItem) => {soundItem.tags.indexOf(tag) != -1});
+    }
+    return [];
+  }
+
+  /**
+   * Search the sound library and return candidates for sounds.
+   */
+  search(query) {
+    if (this.has(query)) {
+      return this.get(query)
+    } else {
+      // Conduct a substring search among the sound names
+      var candidates = Object.keys(this.dict).filter((soundName) => soundName.includes(query))
+      if (candidates.length > 0) {
+        return candidates;
+      } else {
+        if (this.getSoundTags().has(query)) {
+          return this.getSoundsTagged(query);
+        } else {
+          // fuzzy search tags
+          var fuzzySearchResults = Utils.fuzzySearch(query, Object.keys(this.dict));
+          console.log(`sound library fuzzy search results ${fuzzySearchResults}`)
+          return fuzzySearchResults;
+        }
+      }
+    }
   }
 
   /**
