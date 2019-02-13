@@ -99,7 +99,8 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getKnownCommands', from: '*', to: function() {return this.state} },
     { name: 'getScratchCommands', from: '*', to: function() {return this.state} },
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
-    { name: 'getWhatISaid', from: '*', to: function() {return this.state} }
+    { name: 'getWhatISaid', from: '*', to: function() {return this.state} },
+    { name: 'greet', from: '*', to: function() {return this.state} }
   ],
   data: function() {
     var ssm = this;
@@ -120,13 +121,15 @@ var ScratchStateMachine = new StateMachine.factory({
       if (!this.pm.audio.muteBackground) {
         this.pm.audio.cueHomeState()
       } else {
-        this.pm.say("You're in the home state.")
+        // TODO: implement a tutorial state machine.
+        // this.pm.say("You're in the home state.")
       }
 
       this.setupVM('scratch-stage')
       this.pm.load();
       this.setMethods();
       this.pm._updatePlayRegex();
+      this.introduceSelf();
     },
     setupVM: function(scratch_stage_canvas_id) {
       const storage = new ScratchStorage(); /* global ScratchStorage */
@@ -273,10 +276,18 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetScratchCommands: () => {this.pm.getScratchCommands()},
         onGetWhatYouSaid: () => {this.pm.getWhatScratchSaid()},
         onGetWhatISaid: () => {this.pm.getWhatUserSaid()},
+        onGreet: () => {this.pm.greet()}
       }
       for (var method in methodMap) {
         this[method] = methodMap[method];
       }
+    },
+    introduceSelf() {
+      this.pm.say("Hi, I’m Scratch! I'm a tool you can use to program and interact with\
+        audio projects. Any time you need help or don't know what to do, you can say\
+        'Scratch, help' or ask 'what can i do?'. I will try to answer any\
+        questions you have. To start, why don't you say 'alarm' to play the alarm project");
+      this.pm.recognition.start();
     }
   }
 });

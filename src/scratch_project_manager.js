@@ -783,7 +783,7 @@ class ScratchProjectManager {
     var pm = this;
     return new Promise((resolve, reject) => {
       // Pick a random command from the Scratch Commands.
-      let random_command = Utils.getNFromList(ScratchCommands, 1, -1)[0];
+      let random_command = Utils.randomChoice(ScratchCommands);
       // Present action. pick random thing from scratch_commands.json
       let possiblePrefixes = ['One thing I can do is', "Here's one. I can"];
       let prefix = Utils.getNFromList(possiblePrefixes, 1, -1)[0];
@@ -805,6 +805,10 @@ class ScratchProjectManager {
     } {
       this.say(`I didn't hear you say anything`);
     }
+  }
+  greet() {
+    var greetings = ["hello", "what's up", "hey", "yo"];
+    this.say(Utils.randomChoice(greetings));
   }
 }
 
