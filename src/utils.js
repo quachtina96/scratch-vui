@@ -368,7 +368,7 @@ Utils.getNFromList = (list, n, opt_index) => {
     return sounds;
 }
 
-Utils.randomChoice(list) {
+Utils.randomChoice = (list) => {
   return Utils.getNFromList(list, 1, -1)[0];
 }
 
