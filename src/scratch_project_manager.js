@@ -219,8 +219,14 @@ class ScratchProjectManager {
         return;
       }
 
-      if (this.ssm.state == 'InsideProject' && this.currentProject && await this._handleCurrentProject(utterance)) {
-        return;
+      if (this.ssm.state == 'InsideProject' && this.currentProject) {
+        var success = await this._handleCurrentProject(utterance);
+        if (success) {
+          DEBUG && console.log(`[pm handle utterance][_finishUtterance] _handleCurrentProject succeeded`)
+          return;
+        } else {
+          DEBUG && console.log(`[pm handle utterance][_finishUtterance] _handleCurrentProject failed`)
+        }
       }
 
       DEBUG && console.log(`[pm handle utterance][_finishUtterance] no action or project to handle `)
