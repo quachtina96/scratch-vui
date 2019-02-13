@@ -117,7 +117,12 @@ var ScratchStateMachine = new StateMachine.factory({
   methods: {
     // Initialize the state machine.
     onHome: function() {
-      this.pm.audio.cueHomeState()
+      if (!this.pm.audio.muteBackground) {
+        this.pm.audio.cueHomeState()
+      } else {
+        this.pm.say("You're in the home state.")
+      }
+
       this.setupVM('scratch-stage')
       this.pm.load();
       this.setMethods();
@@ -253,7 +258,13 @@ var ScratchStateMachine = new StateMachine.factory({
           this.pm.listening = true;
           this.pm.say("listening!");
         },
-        onHome: () => {this.pm.audio.cueHomeState()},
+        onHome: () => {
+          if (!this.pm.audio.muteBackground) {
+            this.pm.audio.cueHomeState()
+          } else {
+            this.pm.say("You're in the home state.")
+          }
+        },
         onPlayProject: () => {this.pm.audio.stopBackground()},
         onGetSounds: () => {this.pm.getSounds()},
         onQueryActions: () => {this.pm.getSuggestedActions()},
