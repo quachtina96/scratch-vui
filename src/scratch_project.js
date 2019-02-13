@@ -122,7 +122,7 @@ var ScratchProject = StateMachine.factory({
       }
     },
     // When the project editor could not handle the utterance,
-    _matchToScratchCommand: async (utterance) => {
+    _matchToScratchCommand: async (utterance, project) => {
       DEBUG && console.log(`[project _matchToScratchCommand] editor rejected handle utterance; now attempting Scratch command`);
       // If no edit commands work, attempt to match the utterance to a Scratch
       // command.
@@ -147,11 +147,11 @@ var ScratchProject = StateMachine.factory({
       } else {
         // Success!
         DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
-        await this.pm.audio.cueSuccess();
+        await project.pm.audio.cueSuccess();
         var instruction = new ScratchInstruction(command);
         instruction.parse = parseResult;
-        this.instructions.push(instruction);
-        this.addInstruction();
+        project.instructions.push(instruction);
+        project.addInstruction();
         return;
       }
     },
@@ -199,7 +199,8 @@ var ScratchProject = StateMachine.factory({
             }
           } catch (e) {
             try {
-              this._matchToScratchCommand(utterance);
+              await this._matchToScratchCommand(utterance, this);
+              return true;
             } catch (e) {
               return false;
             }
