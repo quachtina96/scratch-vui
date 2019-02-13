@@ -99,7 +99,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getKnownCommands', from: '*', to: function() {return this.state} },
     { name: 'getScratchCommands', from: '*', to: function() {return this.state} },
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
-    { name: 'getWhatISaid', from: '*', to: function() {return this.state} }
+    { name: 'getWhatISaid', from: '*', to: function() {return this.state} },
     { name: 'greet', from: '*', to: function() {return this.state} }
   ],
   data: function() {
