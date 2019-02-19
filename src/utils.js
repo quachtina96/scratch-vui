@@ -226,14 +226,11 @@ Utils.fuzzySearch = (query, candidates) => {
 
   // Build array of [triggerType, 1-JaroWinkler Score, Target Phrase]
   var triggerScores = [];
-  for (var i = 0; i < candidates.length; i++) {
-    var scores = Utils.score(query, candidates);
-    var minLeven = Utils.getMinDistance(Object.entries(scores).map(x => [x[0], x[1].leven]))
-    var minJaro = Utils.getMinDistance(Object.entries(scores).map(x => [x[0], 1 - x[1].jaro]))
-    triggerScores.push([candidates[i], minLeven[1], minJaro[1]])
-  }
-  console.log(triggerScores);
-  return Utils.getMinDistance(triggerScores)
+  var scores = Utils.score(query, candidates);
+  var minLeven = Utils.getMinDistance(Object.entries(scores).map(x => [x[0], x[1].leven]))
+  var minJaro = Utils.getMinDistance(Object.entries(scores).map(x => [x[0], 1 - x[1].jaro]))
+
+  return Array.from(new Set([minLeven[0], minJaro[0]]))
 }
 
 Utils.text2num = (numberWord) => {

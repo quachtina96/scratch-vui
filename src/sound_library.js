@@ -110,8 +110,9 @@ class SoundLibrary {
    * Get a list of sounds with given tag.
    */
   getSoundsTagged(tag) {
-    if (tag in this.getSoundTags()) {
-      return Object.values(this.dict).filter((soundItem) => {soundItem.tags.indexOf(tag) != -1});
+    if (this.getSoundTags().has(tag)) {
+      var taggedSounds = Object.values(this.dict).filter((soundItem) => {return soundItem.tags.includes(tag)});
+      return taggedSounds.map((sound) => sound.name);
     }
     return [];
   }
@@ -120,22 +121,36 @@ class SoundLibrary {
    * Search the sound library and return candidates for sounds.
    */
   search(query) {
+    var soundList = Object.keys(this.dict)
     if (this.has(query)) {
       return this.get(query)
     } else {
       // Conduct a substring search among the sound names
-      var candidates = Object.keys(this.dict).filter((soundName) => soundName.includes(query))
+      var candidates = soundList.filter((soundName) => soundName.toLowerCase().includes(query.toLowerCase()))
+      if (this.getSoundTags().has(query)) {
+        candidates = candidates.concat(this.getSoundsTagged(query));
+      }
       if (candidates.length > 0) {
         return candidates;
       } else {
-        if (this.getSoundTags().has(query)) {
-          return this.getSoundsTagged(query);
-        } else {
-          // fuzzy search tags
-          var fuzzySearchResults = Utils.fuzzySearch(query, Object.keys(this.dict));
-          console.log(`sound library fuzzy search results ${fuzzySearchResults}`)
-          return fuzzySearchResults;
-        }
+        // fuzzy search tags
+        var fuzzySearchResults = Utils.fuzzySearch(query, soundList);
+        var fuzzyTagSearchResults = Utils.fuzzySearch(query, Array.from(lib.getSoundTags()));
+
+        var fullCandidateList = Array.from(lib.getSoundTags()).concat(Object.keys(lib.dict));
+        var fuzzyFullSearchResults = Utils.fuzzySearch(query, fullCandidateList);
+
+        // Replace all resulting tags with the sounds that have the given tag.
+        var finalResults = [];
+        fuzzyFullSearchResults.forEach((result) => {
+          if (fuzzyTagSearchResults.includes(result)) {
+            finalResults = finalResults.concat(this.getSoundsTagged(result))
+          } else {
+            finalResults.push(result)
+          }
+        })
+
+        return finalResults
       }
     }
   }
