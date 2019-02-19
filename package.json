@@ -8,12 +8,14 @@
     "start": "webpack-dev-server",
     "test:lint": "eslint . --ext=js",
     "test:unit": "tap test/unit/*.js",
-    "test": "npm run test:lint && npm run test:unit"
+    "testlib":"tap test/unit/test_sound_library.js",
+    "test": "npm run test:unit"
   },
   "dependencies": {
     "cmu-pronouncing-dictionary": "^1.0.3",
     "cryptiles": "^4.1.2",
     "diff-match-patch": "1.0.0",
+    "eslint-plugin-promise": "^4.0.1",
     "fs": "0.0.1-security",
     "jaro-winkler": "^0.2.8",
     "javascript-state-machine": "^3.0.1",

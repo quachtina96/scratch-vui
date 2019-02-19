@@ -26,6 +26,9 @@ class SoundLibrary {
      */
     this.playingSoundPromise = null;
     this.dict = this._getDict(soundLibraryContent);
+    // The last set of sounds returned by a call to this.getNSounds may be
+    // requested by a user who missed it the first time.
+    this.lastNSounds = null;
   }
 
   /**
@@ -74,6 +77,7 @@ class SoundLibrary {
     } else {
       var sounds = soundLibraryContent.slice(opt_index, n);
     }
+    this.lastNSounds = sounds;
     return sounds;
   }
 
@@ -95,12 +99,60 @@ class SoundLibrary {
     return this._titleCase(soundName) in this.dict;
   }
 
+  getSoundTags() {
+    var tagListList = Object.values(this.dict).map((soundItem) => soundItem.tags);
+    var reducer = (accumulator, currentValue) => currentValue.concat(accumulator);
+    var masterTagList = tagListList.reduce(reducer);
+    return new Set(masterTagList);
+  }
+
   /**
-   * Search the sound library and return candidates for similar sounds
+   * Get a list of sounds with given tag.
    */
-  getSimilarSounds(soundName) {
-    // TODO: ask Eric for help.
-    return;
+  getSoundsTagged(tag) {
+    if (this.getSoundTags().has(tag)) {
+      var taggedSounds = Object.values(this.dict).filter((soundItem) => {return soundItem.tags.includes(tag)});
+      return taggedSounds.map((sound) => sound.name);
+    }
+    return [];
+  }
+
+  /**
+   * Search the sound library and return candidates for sounds.
+   */
+  search(query) {
+    var soundList = Object.keys(this.dict)
+    if (this.has(query)) {
+      return this.get(query)
+    } else {
+      // Conduct a substring search among the sound names
+      var candidates = soundList.filter((soundName) => soundName.toLowerCase().includes(query.toLowerCase()))
+      if (this.getSoundTags().has(query)) {
+        candidates = candidates.concat(this.getSoundsTagged(query));
+      }
+      if (candidates.length > 0) {
+        return candidates;
+      } else {
+        // fuzzy search tags
+        var fuzzySearchResults = Utils.fuzzySearch(query, soundList);
+        var fuzzyTagSearchResults = Utils.fuzzySearch(query, Array.from(lib.getSoundTags()));
+
+        var fullCandidateList = Array.from(lib.getSoundTags()).concat(Object.keys(lib.dict));
+        var fuzzyFullSearchResults = Utils.fuzzySearch(query, fullCandidateList);
+
+        // Replace all resulting tags with the sounds that have the given tag.
+        var finalResults = [];
+        fuzzyFullSearchResults.forEach((result) => {
+          if (fuzzyTagSearchResults.includes(result)) {
+            finalResults = finalResults.concat(this.getSoundsTagged(result))
+          } else {
+            finalResults.push(result)
+          }
+        })
+
+        return finalResults
+      }
+    }
   }
 
   /**

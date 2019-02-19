@@ -160,64 +160,78 @@ Utils._getTargets = (triggerMap) => {
   return targets
 }
 
- /**
-   * Match utterance to a desired action based on word distance.
-   * @param {!String} utterance - the text to match to triggers
-   * @param {!Object} triggers - dict mapping trigger types to the regular
-   *    expressions that allow text to match to that trigger.
-   * @return {!Array} a tuple consisting of the triggerType and the score
-   */
-  Utils.fuzzyMatch = (utterance, triggers) => {
-    // Get Levenshtein and JaroWinkler Distances between the utterance and the
-    // potential triggers.
+// Score candidate fuzzy matches to query using Jaro-Winkler and Levenshtein distance
+Utils.score = (query, candidates) => {
+  // triggerScores is an array of tuples (trigger, score)
+  var triggerScores = {}
 
-    // Rank the trigger types by the shortest distance between its triggers and
-    // the utterance
-    var targetMap = Utils._getTargets(triggers)
+  candidates.forEach((candidate) => {
+    var jaro = get_jarowinkler_distance(candidate, query);
+    var leven = LevenshteinDistance(candidate, query);
+    triggerScores[candidate] = {'jaro': jaro, 'leven': leven}
+  });
+  return triggerScores
+}
 
-    // triggerScores is an array of tuples (trigger, score)
-    var getTriggerScoreDict = function(utterance, targets) {
-      var triggerScores = {}
+Utils.getMinDistance = function(triggerScores) {
+  triggerScores.sort(function(first, second) {
+      return first[1]- second[1];
+  });
+  return triggerScores[0]
+}
 
-      targets.forEach((target) => {
-        var jaro = get_jarowinkler_distance(target, utterance);
-        var leven = LevenshteinDistance(target, utterance);
-        triggerScores[target] = {'jaro': jaro, 'leven': leven}
-      });
-      return triggerScores
-    }
+Utils.getMaxDistance = function(triggerScores) {
+  triggerScores.sort(function(first, second) {
+      return second[1] - first[1];
+  });
+  return triggerScores[0]
+}
 
-    var getMinDistance = function(triggerScores) {
-      triggerScores.sort(function(first, second) {
-          return first[1]- second[1];
-      });
-      return triggerScores[0]
-    }
+/**
+ * Match utterance to a desired action based on word distance.
+ * @param {!String} utterance - the text to match to triggers
+ * @param {!Object} triggers - dict mapping trigger types to the regular
+ *    expressions that allow text to match to that trigger.
+ * @return {!Array} a tuple consisting of the triggerType and the score
+ */
+Utils.fuzzyMatch = (utterance, triggers) => {
+  // Get Levenshtein and JaroWinkler Distances between the utterance and the
+  // potential triggers.
 
-    var getMaxDistance = function(triggerScores) {
-      triggerScores.sort(function(first, second) {
-          return second[1] - first[1];
-      });
-      return triggerScores[0]
-    }
+  // Rank the trigger types by the shortest distance between its triggers and
+  // the utterance
+  var targetMap = Utils._getTargets(triggers)
 
-    // Build array of [triggerType, 1-JaroWinkler Score, Target Phrase]
-    var triggerScores = []
-    for (var triggerType in targetMap) {
-      var targets = targetMap[triggerType]
-      var triggerScoreDict = getTriggerScoreDict(utterance, targets);
-      var minLeven = getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], x[1].leven]))
-      var minJaro = getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], 1 - x[1].jaro]))
-      triggerScores.push([triggerType, minJaro[1], minJaro[0]])
-      // Alternative ways we can calculate trigger scores are below. I chose
-      // JaroWinkler to start with because it is the simplest and the other
-      // measures have the same results.
+  // Build array of [triggerType, 1-JaroWinkler Score, Target Phrase]
+  var triggerScores = []
+  for (var triggerType in targetMap) {
+    var targets = targetMap[triggerType]
+    var triggerScoreDict = Utils.score(utterance, targets);
+    var minLeven = Utils.getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], x[1].leven]))
+    var minJaro = Utils.getMinDistance(Object.entries(triggerScoreDict).map(x => [x[0], 1 - x[1].jaro]))
+    triggerScores.push([triggerType, minJaro[1], minJaro[0]])
+    // Alternative ways we can calculate trigger scores are below. I chose
+    // JaroWinkler to start with because it is the simplest and the other
+    // measures have the same results.
 
-      // triggerScores.push([triggerType, minLeven[1]])
-      // triggerScores.push([triggerType, 15*minJaro[1] + minLeven[1]])
-    }
-    return getMinDistance(triggerScores)
+    // triggerScores.push([triggerType, minLeven[1]])
+    // triggerScores.push([triggerType, 15*minJaro[1] + minLeven[1]])
   }
+  return Utils.getMinDistance(triggerScores)
+}
+
+Utils.fuzzySearch = (query, candidates) => {
+  // Get Levenshtein and JaroWinkler Distances between the utterance and the
+  // potential triggers.
+
+  // Build array of [triggerType, 1-JaroWinkler Score, Target Phrase]
+  var triggerScores = [];
+  var scores = Utils.score(query, candidates);
+  var minLeven = Utils.getMinDistance(Object.entries(scores).map(x => [x[0], x[1].leven]))
+  var minJaro = Utils.getMinDistance(Object.entries(scores).map(x => [x[0], 1 - x[1].jaro]))
+
+  return Array.from(new Set([minLeven[0], minJaro[0]]))
+}
 
 Utils.text2num = (numberWord) => {
   var parseResult = parseInt(numberWord);
