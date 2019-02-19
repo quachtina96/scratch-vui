@@ -29,6 +29,7 @@ class SoundLibrary {
     // The last set of sounds returned by a call to this.getNSounds may be
     // requested by a user who missed it the first time.
     this.lastNSounds = null;
+    this.lastQuery = null;
   }
 
   /**
@@ -121,6 +122,7 @@ class SoundLibrary {
    * Search the sound library and return candidates for sounds.
    */
   search(query) {
+    this.lastQuery = query;
     var soundList = Object.keys(this.dict)
     if (this.has(query)) {
       return this.get(query)
@@ -135,9 +137,9 @@ class SoundLibrary {
       } else {
         // fuzzy search tags
         var fuzzySearchResults = Utils.fuzzySearch(query, soundList);
-        var fuzzyTagSearchResults = Utils.fuzzySearch(query, Array.from(lib.getSoundTags()));
+        var fuzzyTagSearchResults = Utils.fuzzySearch(query, Array.from(this.getSoundTags()));
 
-        var fullCandidateList = Array.from(lib.getSoundTags()).concat(Object.keys(lib.dict));
+        var fullCandidateList = Array.from(this.getSoundTags()).concat(Object.keys(this.dict));
         var fuzzyFullSearchResults = Utils.fuzzySearch(query, fullCandidateList);
 
         // Replace all resulting tags with the sounds that have the given tag.
