@@ -270,6 +270,7 @@ class ScratchProjectManager {
       // If trigger was matched, attempt to execute associated command.
       if (args && args.length > 0) {
         var actionToExecute = new Action(action);
+        actionToExecute.setArguments(this.ssm, args);
         actionToExecute.execute(this.ssm, utterance);
         return true;
       }
@@ -692,18 +693,43 @@ class ScratchProjectManager {
     // wasn't set in the constructor.
       pm.soundLibrary.vm = this.ssm.vm;
     }
-    return new Promise((resolve, reject) => {
+
+    if (args.length > 1) {
       var soundToFind = args[1].trim();
-      var soundItem = pm.soundLibrary.get(soundToFind)
-      if (soundItem) {
-        pm.soundLibrary.playSound(soundItem);
-      } else {
-        var randomSound = pm.soundLibrary.getRandomSound();
-        pm.say('No, but here is ' + randomSound.name, () => {
-          pm.soundLibrary.playSound(randomSound);
-        });
+    }
+
+    return new Promise((resolve, reject) => {
+      if (soundToFind) {
+        var soundItem = pm.soundLibrary.get(soundToFind)
+        if (soundItem) {
+          pm.soundLibrary.playSound(soundItem);
+          resolve();
+          return;
+        } else {
+          // Search the library for a related sound.
+          var candidateSounds = pm.soundLibrary.search(soundToFind);
+          var soundCount = candidateSounds.length;
+          if (soundCount > 0) {
+            // TODO: Share MULTIPLE search results with the user instead of just
+            // the first one.
+            pm.say(`I found ${soundCount} sounds`);
+            pm.say('Here is one called ' + candidateSounds[0], () => {
+              pm.soundLibrary.playSound(pmm.soundLibrary.get(candidateSounds[0]));
+            });
+          }
+          resolve();
+          return;
+        }
       }
+
+      // If there are no related sounds, play a random sound.
+      var randomSound = pm.soundLibrary.getRandomSound();
+      pm.say('No, but here is ' + randomSound.name, () => {
+        pm.soundLibrary.playSound(randomSound);
+      });
+
       resolve();
+      return;
     });
   }
   // Communicate what a user can do at a given state.

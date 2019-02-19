@@ -425,15 +425,12 @@ ScratchAction.General.getSounds = {
 //checkSound
 ScratchAction.General.checkSound = {
 	"name": "checkSound",
-	"trigger":/^do you (?:have|know) (?:a|the|this) (.*) sound?$/,
+	"trigger":/^do you (?:have|know) (?:a|an|the|this) (.*) sound?$/,
 	"idealTrigger":"do you have a boing sound?",
 	"description":"check if there's a boing sound",
 	"arguments": [
 		{
 			name: 'sound name',
-			validator: (ssm, soundName) => {
-				return ssm.pm.soundLibrary.has(soundName);
-			},
 			description: 'name of the sound you want to hear'
 		}
 	],

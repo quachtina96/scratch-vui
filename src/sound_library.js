@@ -135,9 +135,9 @@ class SoundLibrary {
       } else {
         // fuzzy search tags
         var fuzzySearchResults = Utils.fuzzySearch(query, soundList);
-        var fuzzyTagSearchResults = Utils.fuzzySearch(query, Array.from(lib.getSoundTags()));
+        var fuzzyTagSearchResults = Utils.fuzzySearch(query, Array.from(this.getSoundTags()));
 
-        var fullCandidateList = Array.from(lib.getSoundTags()).concat(Object.keys(lib.dict));
+        var fullCandidateList = Array.from(this.getSoundTags()).concat(Object.keys(this.dict));
         var fuzzyFullSearchResults = Utils.fuzzySearch(query, fullCandidateList);
 
         // Replace all resulting tags with the sounds that have the given tag.
