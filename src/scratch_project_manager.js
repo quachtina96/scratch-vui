@@ -713,8 +713,9 @@ class ScratchProjectManager {
             // TODO: Share MULTIPLE search results with the user instead of just
             // the first one.
             pm.say(`I found ${soundCount} sounds`);
-            pm.say('Here is one called ' + candidateSounds[0], () => {
-              pm.soundLibrary.playSound(pmm.soundLibrary.get(candidateSounds[0]));
+            var randomCandidate = Utils.randomChoice(candidateSounds);
+            pm.say('Here is one called ' + randomCandidate, () => {
+              pm.soundLibrary.playSound(pm.soundLibrary.get(randomCandidate));
             });
           }
           resolve();
