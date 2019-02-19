@@ -29,6 +29,7 @@ class SoundLibrary {
     // The last set of sounds returned by a call to this.getNSounds may be
     // requested by a user who missed it the first time.
     this.lastNSounds = null;
+    this.lastQuery = null;
   }
 
   /**
@@ -121,6 +122,7 @@ class SoundLibrary {
    * Search the sound library and return candidates for sounds.
    */
   search(query) {
+    this.lastQuery = query;
     var soundList = Object.keys(this.dict)
     if (this.has(query)) {
       return this.get(query)
