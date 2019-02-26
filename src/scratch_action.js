@@ -461,6 +461,28 @@ ScratchAction.General.queryActionTypes = {
 	"question": true
 };
 
+ScratchAction.General.greet = {
+	"name":"greet",
+	"trigger":/hello|what's up|hey|hi|yo|sup/,
+	"idealTrigger":"hi",
+	"description":"greet me",
+};
+
+// TODO: add support for answering questions about recording?
+ScratchAction.General.startRecording = {
+	"name":"startRecording",
+	"trigger": /start recording|start recording me/,
+	"idealTrigger": "start recording",
+	"description": "start recording a sound to use in projects"
+};
+
+ScratchAction.General.stopRecording = {
+	"name":"stopRecording",
+	"trigger": /stop recording|stop recording me/,
+	"idealTrigger": "stop recording",
+	"description": "end the recording of a sound to use in projects"
+};
+
 //////// EDIT PROJECT COMMANDS
 /**
  * Edit command namespace
@@ -733,13 +755,6 @@ ScratchAction.Help.getWhatYouSaid = {
 	"idealTrigger":"say that again",
 	"description":"get me to repeat what you just said",
 	"question": true
-};
-
-ScratchAction.General.greet = {
-	"name":"greet",
-	"trigger":/hello|what's up|hey|hi|yo|sup/,
-	"idealTrigger":"hi",
-	"description":"greet me",
 };
 
 // ScratchAction.Project.
