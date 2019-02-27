@@ -182,9 +182,9 @@ ScratchAction.General.queryState = {
 	"question": true
 };
 
-//newProject
-ScratchAction.General.newProject = {
-	"name": "newProject",
+//createAnewProject
+ScratchAction.General.createANewProject = {
+	"name": "createANewProject",
 	"trigger":/new project|create a? new project|create a? project|make a? new project|make a? project/,
 	"idealTrigger": "new project",
 	"description":"create a new project",

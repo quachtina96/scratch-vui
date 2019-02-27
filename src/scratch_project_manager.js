@@ -556,7 +556,7 @@ class ScratchProjectManager {
       resolve();
     }));
   }
-  newProject() {
+  createANewProject() {
     var pm = this;
     return new Promise(((resolve, reject) => {
       pm.audio.cueInsideProject();
@@ -747,7 +747,7 @@ class ScratchProjectManager {
           suggestedActions = [
             ScratchAction.General.play,
             ScratchAction.General.editExistingProject,
-            ScratchAction.General.newProject,
+            ScratchAction.General.createANewProject,
           ];
           break;
         case 'PlayProject':

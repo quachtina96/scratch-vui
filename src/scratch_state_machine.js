@@ -60,7 +60,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'deleteProject', from: '*', to: function() { return this.state} },
     { name: 'editExistingProject', from: 'PlayProject',  to: 'InsideProject' },
     { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
-    { name: 'newProject', from: 'Home',  to: 'InsideProject' },
+    { name: 'createANewProject', from: 'Home',  to: 'InsideProject' },
     // Return should take you back to the last state
     { name: 'return',   from: '*', to: function() {
         return this.history[this.history.length - 2];
@@ -71,7 +71,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'play', from: 'Home', to: 'PlayProject'},
     { name: 'play', from: 'InsideProject', to: 'PlayProject'},
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
-    { name: 'newProject', from: 'PlayProject',  to: 'InsideProject' },
+    { name: 'createANewProject', from: 'PlayProject',  to: 'InsideProject' },
     { name: 'playCurrentProject', from: 'PlayProject', to: 'PlayProject'},
     { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
     { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
@@ -236,7 +236,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetProjectNames: () => {this.pm.getProjectNames()},
         onGetProjectCount: () => {this.pm.getProjectCount()},
         onGetNthProject: (lifecycle, args) => {this.pm.getNthProject(lifecycle, args)},
-        onNewProject: () => {this.pm.newProject()},
+        onCreateANewProject: () => {this.pm.createANewProject()},
         onReturn: (lifecycle, args) => {this.pm.returnToPreviousState(lifecycle, args)},
         // Play existing project
         onPlay: (lifecycle, args, utterance) => {this.pm.play(lifecycle, args, utterance)},
