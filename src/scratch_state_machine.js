@@ -339,17 +339,21 @@ var ScratchStateMachine = new StateMachine.factory({
               // if the following is already taken
               vmSound.name = 'recording1';
 
-              // Get target on which to attach the sound and set it on the
-              // virtual machine.
-              console.log('ssm.vm.runtime.targets');
-              console.log(ssm.vm.runtime.targets);
-              var target = ssm.vm.runtime.targets[1];
-              ssm.vm.editingTarget = target;
+              // Store the sound in Scratch Storage.
+              storage.store(storage.AssetType.Sound, vmSound.dataFormat, wavBuffer, vmSound.assetId).then((assetMetadata) => {
+                console.log(assetMetadata);
+                // Get target on which to attach the sound and set it on the
+                // virtual machine.
+                console.log('ssm.vm.runtime.targets');
+                console.log(ssm.vm.runtime.targets);
+                var target = ssm.vm.runtime.targets[1];
+                ssm.vm.editingTarget = target;
 
-              ssm.vm.addSound(vmSound).then(() => {
-                  console.log('vm has added sound')
-                  console.log('now playing sound via recordings manager');
-                  ssm.recordingsManager.playRecording(vmSound.name)
+                ssm.vm.addSound(vmSound).then(() => {
+                    console.log('vm has added sound')
+                    console.log('now playing sound via recordings manager');
+                    ssm.recordingsManager.playRecording(vmSound.name)
+                });
               });
           });
         },
