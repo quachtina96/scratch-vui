@@ -8,7 +8,7 @@
     "start": "webpack-dev-server",
     "test:lint": "eslint . --ext=js",
     "test:unit": "tap test/unit/*.js",
-    "testlib":"tap test/unit/test_sound_library.js",
+    "testlib": "tap test/unit/test_sound_library.js",
     "test": "npm run test:unit"
   },
   "dependencies": {
@@ -24,6 +24,7 @@
     "scratch-vm": "latest",
     "underscore": "^1.9.1",
     "url-parse": "^1.4.3",
+    "websocket-as-promised": "^0.9.0",
     "wordnet-db": "^3.1.6"
   },
   "devDependencies": {

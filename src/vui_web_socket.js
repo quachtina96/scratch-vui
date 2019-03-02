@@ -1,16 +1,20 @@
-var ws = new WebSocket("ws://localhost:8765");
+const WebSocketAsPromised = require('websocket-as-promised');
 
-ws.onopen = function () {
-  ws.send("This is the browser!");
-};
+var wsUrl = "ws://localhost:8765";
+const wsp = new WebSocketAsPromised(wsUrl, {
+  packMessage: data => JSON.stringify(data),
+  unpackMessage: message => JSON.parse(message),
+  attachRequestId: (data, requestId) => Object.assign({id: requestId}, data), // attach requestId to message as `id` field
+  extractRequestId: data => data && data.id,                                  // read requestId from message `id` field
+});
 
-ws.onmessage = function (message) {
-  console.log('message recieved by vui: ')
-  console.log(message);
-};
+wsp.open()
+ .then(() => {
+ 	wsp.sendRequest({foo: 'bar'})
+ }) // actually sends {foo: 'bar', id: 'xxx'}, because `attachRequestId` defined above
+ .then(response => console.log(response));  // waits server message with corresponding requestId: {id: 'xxx', ...}
 
-var messageCount = 0;
-document.getElementById('sendMessageButton').onclick = function() {
-	ws.send(`${messageCount} Here's some text that the server is urgently awaiting!`);
-	messageCount = messageCount + 1;
-}
+wsp.onMessage.addListener(message => {
+	console.log('message recieved by vui: ');
+	console.log(message);
+});
