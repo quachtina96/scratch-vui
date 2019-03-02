@@ -18,3 +18,5 @@ wsp.onMessage.addListener(message => {
 	console.log('message recieved by vui: ');
 	console.log(message);
 });
+
+module.exports = wsp;

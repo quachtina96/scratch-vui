@@ -80,18 +80,23 @@ var ScratchProject = StateMachine.factory({
       return new Promise((resolve,reject) => {
         // Batch instructions for the server to translate.
         let rawInstructions = this.instructions.map(instruction => instruction.no_punctuation);
-        var urlSuffix = "user/" + this.ssm.user + "/scratch_program/" + this.name;
-        var method = "post";
-        var payload = {
-              'instructions': rawInstructions,
-              'useGreenFlag': true,
-              'start': startIndex,
-              'end':endIndex
-            };
-        Utils.requestScratchNLP(urlSuffix, method, payload).then(result => {
-          resolve(result);
+
+        // Send request to ScratchNLP via websockets.
+        wsp.sendRequest({
+          'type': 'project',
+          'user': this.ssm.user,
+          'projectName':this.name,
+          'instructions': rawInstructions,
+          'useGreenFlag': true,
+          'start': startIndex,
+          'end':endIndex
+        }).then(result => {
+          console.log('RESULT OF SEND REQUEST IN SCRATCH PROGRAM');
+          console.log(result.response);
+          resolve(result.response);
         })
         .catch(error => {
+          console.log('ERROR IN SEND REQUEST IN SCRATCH PROGRAM');
           console.log(error);
           reject(error);
         })

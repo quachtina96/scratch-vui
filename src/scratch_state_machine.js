@@ -129,7 +129,12 @@ var ScratchStateMachine = new StateMachine.factory({
       this.pm.load();
       this.setMethods();
       this.pm._updatePlayRegex();
-      this.introduceSelf();
+      // Only introduce if the browser has never interacted with Scratch before.
+      if (!window.localStorage.scratchVuiInteractedBefore) {
+        this.introduceSelf();
+        console.log('window.localStorage.scratchVuiInteractedBefore is true')
+        window.localStorage.scratchVuiInteractedBefore = true;
+      }
     },
     setupVM: function(scratch_stage_canvas_id) {
       const storage = new ScratchStorage(); /* global ScratchStorage */

@@ -44,10 +44,15 @@ ScratchAction.Validator.unconflictingProjectName = (ssm, projectName) => {
 	// Should not already be a Scratch command
 	const punctuationless = projectName.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 	const instruction = punctuationless.replace(/\s{2,}/g," ");
-	const urlSuffix = "translate/" + instruction;
-	const method = "get";
-	return Utils.requestScratchNLP(urlSuffix, method).then((result) => {
-		if (result != "I don't understand.") {
+
+	// Send request to ScratchNLP via websockets.
+	return wsp.sendRequest({
+		'type': 'translation',
+		'instruction': instruction
+	}).then((result) => {
+		console.log('RESULT OF SEND REQUEST IN SCRATCH ACTION');
+    	console.log(result.response);
+		if (result.response != "I don't understand.") {
 			// The project name maps to an existing scratch command
 			return false;
 		} else {
