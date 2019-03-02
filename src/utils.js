@@ -14,11 +14,6 @@ const dmp = new DiffMatchPatch();
  Utils = {}
 
 /**
- * This corresponds to the url where ScratchNLP is hosted.
- */
-Utils.ScratchNLPEndpointURL = "http://127.0.0.1:5000/"
-
-/**
  * Return whether or not the utterance starts with scratch/something that sounds
  * like Scratch.
  */
@@ -328,39 +323,6 @@ Utils.removeFillerWords = function(utterance) {
  */
 Utils.checkBounds = function(index, array) {
   return index >= 0 && index < array.length;
-}
-
-Utils.createCORSRequest = function(method, url) {
-  var xhr = new XMLHttpRequest();
-  if ("withCredentials" in xhr){
-      xhr.open(method, url, true);
-  } else if (typeof XDomainRequest != "undefined"){
-      xhr = new XDomainRequest();
-      xhr.open(method, url);
-  } else {
-      xhr = null;
-  }
-  return xhr;
-}
-
-/**
- * Send an HTTP request to the ScratchNLP endpoint.
- */
-Utils.requestScratchNLP = function(urlSuffix, method, opt_contents) {
-  return new Promise((resolve,reject) => {
-    var url = Utils.ScratchNLPEndpointURL + urlSuffix;
-    var request = Utils.createCORSRequest(method, url);
-    if (request) {
-      request.onload = () => {
-        resolve(request.responseText);
-      };
-      request.onerror = () => {
-        console.log(request.statusText);
-        reject(null);
-      };
-      request.send(JSON.stringify(opt_contents));
-    }
-  });
 }
 
 /**
