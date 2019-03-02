@@ -8,3 +8,9 @@ ws.onmessage = function (message) {
   console.log('message recieved by vui: ')
   console.log(message);
 };
+
+var messageCount = 0;
+document.getElementById('sendMessageButton').onclick = function() {
+	ws.send(`${messageCount} Here's some text that the server is urgently awaiting!`);
+	messageCount = messageCount + 1;
+}
