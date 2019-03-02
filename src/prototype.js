@@ -6,6 +6,7 @@
  */
 global.ScratchStateMachine = require('./scratch_state_machine.js');
 global.ScratchAudio = require('./audio.js');
+global.wsp = require('./vui_web_socket.js');
 
 global.scratch = new ScratchStateMachine();
 global.audio = new ScratchAudio();

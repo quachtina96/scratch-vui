@@ -47,13 +47,18 @@ class ScratchInstruction {
     // Strip punctutation.
     var punctuationless = instruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
     var instruction = punctuationless.replace(/\s{2,}/g," ");
-    var urlSuffix = "translate/" + instruction;
-    var method = "get";
-    return Utils.requestScratchNLP(urlSuffix, method).then((result) => {
-      if (result == "I don't understand.") {
+
+    // Send request to ScratchNLP via websockets.
+    return wsp.sendRequest({
+      'type': 'translation',
+      'instruction': instruction
+    }).then((result) => {
+      console.log('RESULT OF SEND REQUEST IN SCRATCH INSTRUCTION');
+      console.log(result.response);
+      if (result.response == "I don't understand.") {
         return false
       } else {
-        return result
+        return result.response
       }
     })
   }
