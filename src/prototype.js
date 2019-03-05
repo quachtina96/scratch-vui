@@ -83,7 +83,37 @@ if (!('webkitSpeechRecognition' in window)) {
   recognition.continuous = true;
   recognition.interimResults = true;
 
+  // Handlers for logging
+  recognition.onaudioend = function() {
+    console.log('[RECOGNITION] Audio capturing ended');
+  }
+
+  recognition.onaudiostart = function() {
+    console.log('[RECOGNITION] Audio capturing started');
+  }
+
+  recognition.onnomatch = function() {
+    console.log('[RECOGNITION] Speech not recognised');
+  }
+
+  recognition.onsoundend = function() {
+    console.log('[RECOGNITION] Sound has stopped being received');
+  }
+
+  recognition.onsoundstart = function() {
+    console.log('[RECOGNITION] Some sound is being received');
+  }
+
+  recognition.onspeechend = function() {
+    console.log('[RECOGNITION] Speech has stopped being detected');
+  }
+
+  recognition.onspeechstart = function() {
+    console.log('[RECOGNITION] Speech has been detected');
+  }
+
   recognition.onstart = function() {
+    console.log('[RECOGNITION] Speech recognition service has started');
     recognizing = true;
     showInfo('info_speak_now');
     start_img.src = 'assets/mic-animate.gif';
@@ -91,6 +121,8 @@ if (!('webkitSpeechRecognition' in window)) {
   };
 
   recognition.onerror = function(event) {
+    console.log('[RECOGNITION] error encountered; event:');
+    console.log(event);
     if (event.error == 'no-speech') {
       start_img.src = 'assets/mic.gif';
       showInfo('info_no_speech');
@@ -112,6 +144,8 @@ if (!('webkitSpeechRecognition' in window)) {
   };
 
   recognition.onend = function() {
+    console.log('[RECOGNITION] Speech recognition service disconnected');
+
     recognizing = false;
     if (ignore_onend) {
       recognition.start();
@@ -142,7 +176,7 @@ if (!('webkitSpeechRecognition' in window)) {
     for (global.i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
         final_transcript = event.results[i][0].transcript;
-        console.log(event.results[i][0].transcript)
+        console.log(`[RECOGNITION] result: ${event.results[i][0].transcript}`)
         scratch.pm.audio.cueListening();
         // Analyze utterance.
         scratch.handleUtterance(event.results[i][0].transcript)

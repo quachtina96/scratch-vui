@@ -368,9 +368,11 @@ class ScratchProjectManager {
       return;
     }
 
-    // Alert failure.
-    await this.audio.cueMistake();
-    this.say("I heard you say " + utterance);
+    if (!(this.ssm.state == 'PlayProject')) {
+      // Alert failure.
+      await this.audio.cueMistake();
+      this.say("I heard you say " + utterance);
+    }
 
     // TODO: rip out this state variable, because we are no longer requiring
     // scratch to always be voiced.
