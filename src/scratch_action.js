@@ -413,7 +413,7 @@ ScratchAction.General.holdOn = {
 //listen
 ScratchAction.General.listen = {
 	"name": "listen",
-	"trigger":/^listen$|^i'm ready$/,
+	"trigger":/^listen$|^i'm ready$|^start listening$/,
 	"idealTrigger":"listen",
 	"description":"get me to start listening until you say 'hold on'",
 };
@@ -430,7 +430,7 @@ ScratchAction.General.getSounds = {
 //checkSound
 ScratchAction.General.checkSound = {
 	"name": "checkSound",
-	"trigger":/^do you (?:have|know) (?:a|an|the|this) (.*) sound?$/,
+	"trigger":/^do you (?:have|know) (?:a|an|the|this) (.*) sound?$|^do you (?:have|know) (?:any) (.*) sounds?$/,
 	"idealTrigger":"do you have a boing sound?",
 	"description":"check if there's a boing sound",
 	"arguments": [
