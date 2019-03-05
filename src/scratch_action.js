@@ -197,7 +197,11 @@ ScratchAction.General.createANewProjectCalled = {
 		name: 'project name',
 		validator: (ssm, projectName) => {
 			// project must be in user's list of projects
-			return !ssm.pm.has(projectName);
+			if (ssm.pm.has(projectName)) {
+				return 'A project called that already exists'
+			} else {
+				return true;
+			}
 		},
 		description: 'name of the project to create'
 	}]
@@ -221,7 +225,11 @@ ScratchAction.General.deleteProject = {
 			name: 'project name',
 			validator: (ssm, projectName) => {
 				// project must be in user's list of projects
-				return ssm.pm.has(projectName);
+				if (ssm.pm.has(projectName)) {
+					return true;
+				} else {
+					return 'there is no project called that';
+				}
 			},
 			description: 'name of the project to delete'
 		}
