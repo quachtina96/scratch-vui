@@ -712,6 +712,7 @@ ScratchAction.Edit.replaceStep = {
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 };
 
+
 /**
  * Namespace for Interrupt commands
  */
@@ -765,6 +766,22 @@ ScratchAction.General.greet = {
 	"idealTrigger":"hi",
 	"description":"greet me",
 };
+
+// ScratchAction.General.stopEditing = {
+// 	"name":"stopEditing",
+// 	"trigger":/that's it|thats it|stop editing|i'm done editing/,
+// 	"idealTrigger":"that's it",
+// 	"description":"stop editing the current project",
+// };
+
+//finishProject
+// ScratchAction.Edit.finishProject = {
+// 	"name":"finishProject",
+// 	"trigger":/no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it|end project|finish project/,
+// 	"idealTrigger":"i'm done",
+// 	"description":"leave the project",
+// 	"contextValidator": ScratchAction.Validator.currentProjectDefined
+// };
 
 // ScratchAction.Project.
 			// "respond to certain events", "play a sound", "repeat actions",
