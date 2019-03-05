@@ -353,7 +353,7 @@ var ScratchStateMachine = new StateMachine.factory({
 
               // Pass an empty string as the assetId in order to force the
               // store to create a new sound asset for the recording.
-              storage.store(storage.AssetType.Sound, vmSound.dataFormat, wavBuffer, '').then((assetMetadata) => {
+              storage.store(storage.AssetType.Sound, vmSound.dataFormat, wavBuffer, vmSound.assetId).then((assetMetadata) => {
 
                 console.log(assetMetadata);
                 // Get target on which to attach the sound and set it on the
