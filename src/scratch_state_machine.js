@@ -261,7 +261,7 @@ var ScratchStateMachine = new StateMachine.factory({
           this.pm.audio.cueBackground(this.state);
         },
         onStartCues: () => {this.pm.audio.setMute("muteCues", false)},
-        onHoldOn: () => {this.pm.listening = false},
+        onHoldOn: () => {this.pm.listening = false; this.pm.say("I won't respond until you say listen");},
         onListen: () => {
           this.pm.listening = true;
           this.pm.say("listening!");
