@@ -567,6 +567,21 @@ class ScratchProjectManager {
       resolve();
     }));
   }
+  createANewProjectCalled(lifecycle, args) {
+    var pm = this;
+    // TODO: pull name from arguments.
+    var projectName = args[1].trim();
+    // TODO: implement name verification in scratch action.
+    return new Promise((resolve, reject) => {
+      pm.audio.cueInsideProject();
+      pm.currentProject = new ScratchProject(pm);
+      pm.untitledCount++;
+      pm.projects[projectName] = pm.currentProject;
+      pm.currentProject.name = projectName;
+      pm.currentProject.nameProject(); // TODO: figure out if "this" refers to the correct thing.
+      resolve();
+    });
+  }
   returnToPreviousState() {
     var pm = this;
     return new Promise(((resolve, reject) => {

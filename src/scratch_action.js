@@ -187,6 +187,22 @@ ScratchAction.General.queryState = {
 	"question": true
 };
 
+//createAnewProjectCalled
+ScratchAction.General.createANewProjectCalled = {
+	"name": "createANewProjectCalled",
+	"trigger":/(?:new project|create a? new project|create a? project|make a? new project|make a? project)(?: called (.*))/,
+	"idealTrigger": "new project called",
+	"description":"create a new project with a name",
+	"arguments":[{
+		name: 'project name',
+		validator: (ssm, projectName) => {
+			// project must be in user's list of projects
+			return !ssm.pm.has(projectName);
+		},
+		description: 'name of the project to create'
+	}]
+};
+
 //createAnewProject
 ScratchAction.General.createANewProject = {
 	"name": "createANewProject",
@@ -670,7 +686,7 @@ ScratchAction.Edit.replaceStep = {
 	"name":"replaceStep",
 	// Note: subtle bugs can occur based on the ordering of the possible phrases in the regular expression.
 	// The system accepts the first match moving left to right.
-	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*) with (.*)|replace (?:step|steps|stop|stops|stuff)|replace steps/,
+	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*)|(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*) with (.*)|replace (?:step|steps|stop|stops|stuff)|replace steps/,
 	"idealTrigger":"replace step 1 with say hello",
 	"description":"change step to say hello",
 	"arguments": [

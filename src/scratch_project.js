@@ -21,6 +21,7 @@ var ScratchProject = StateMachine.factory({
     // Support linear project creation process: create, empty, named, nonempty
     { name: 'startProjectCreation', from: 'create', to: 'empty'},
     { name: 'nameProject', from: 'empty', to: 'named'},
+    { name: 'nameProject', from: 'create', to: 'named'},
     { name: 'addInstruction', from: 'named', to: 'nonempty'},
     { name: 'addInstruction', from: 'nonempty', to: 'nonempty'},
     { name: 'finishProject', from: 'nonempty', to: 'nonempty'},
