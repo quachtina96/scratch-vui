@@ -93,6 +93,10 @@ var ScratchProject = StateMachine.factory({
         }).then(result => {
           console.log('RESULT OF SEND REQUEST IN SCRATCH PROGRAM');
           console.log(result.response);
+          // We must post-process the json by adding in the appropriate
+          // sound recordings.
+
+
           resolve(result.response);
         })
         .catch(error => {

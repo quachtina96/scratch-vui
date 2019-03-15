@@ -20,9 +20,7 @@ const AudioEngine = require("scratch-audio");
 
 // Scratch Sound Recording
 const AudioRecorder = require("./audio_recorder.js").default;
-const AudioBufferPlayer = require("./audio-buffer-player.js").default;
 const RecordingsManager = require("./recordings_manager.js");
-const WavEncoder = require('wav-encoder');
 
 const ScratchNLPEndpointURL = "http://127.0.0.1:5000/"
 const ASSET_SERVER = 'https://cdn.assets.scratch.mit.edu/';
@@ -311,73 +309,8 @@ var ScratchStateMachine = new StateMachine.factory({
           DEBUG && console.log('stop recording');
           const {samples, sampleRate, levels, trimStart, trimEnd} = this.audioRecorder.stop();
           console.log({samples, sampleRate, levels, trimStart, trimEnd});
-          this.confirmRecorded(samples, sampleRate, levels, trimStart, trimEnd);
-        },
-        confirmRecorded: (samples,sampleRate, levels, trimStart, trimEnd) => {
-          var ssm = this;
-          const sampleCount = samples.length;
-          const startIndex = Math.floor(trimStart * sampleCount);
-          const endIndex = Math.floor(trimEnd * sampleCount);
-          const clippedSamples = samples.slice(startIndex, endIndex);
-          WavEncoder.encode({
-              sampleRate: sampleRate,
-              channelData: [clippedSamples]
-          }).then(wavBuffer => {
-              const vmSound = {
-                  format: '',
-                  dataFormat: 'wav',
-                  rate: sampleRate,
-                  sampleCount: clippedSamples.length
-              };
-
-              // Create an asset from the encoded .wav and get resulting md5
-              const storage = ssm.vm.runtime.storage;
-              vmSound.asset = new storage.Asset(
-                  storage.AssetType.Sound,
-                  null,
-                  storage.DataFormat.WAV,
-                  new Uint8Array(wavBuffer),
-                  true // generate md5
-              );
-              vmSound.assetId = vmSound.asset.assetId;
-
-              // update vmSound object with md5 property
-              vmSound.md5 = `${vmSound.assetId}.${vmSound.dataFormat}`;
-              // The VM will update the sound name to a fresh name
-              // if the following is already taken
-              vmSound.name = 'recording1';
-
-              console.log('vmSound');
-              console.log(vmSound);
-
-              // Create and use and AudioBufferPlayer
-              // The thing about the audio buffer player is that it uses the clipped samples and not the web encoded.
-              // var player = new AudioBufferPlayer(clippedSamples, sampleRate);
-              // player.play(trimStart, trimEnd, () => {console.log('audiobufferplayerUPDATE')}, () => {console.log('audiobufferplayerEND')});
-
-              // Store the sound in Scratch Storage.
-
-              // Pass an empty string as the assetId in order to force the
-              // store to create a new sound asset for the recording.
-              // TODO: not sure if the wav buffer is supposed to be converted to a uint array before storing..
-              storage.store(storage.AssetType.Sound, vmSound.dataFormat, new Uint8Array(wavBuffer), vmSound.assetId,true).then((assetMetadata) => {
-
-                console.log(assetMetadata);
-                // Get target on which to attach the sound and set it on the
-                // virtual machine.
-                console.log('ssm.vm.runtime.targets');
-                console.log(ssm.vm.runtime.targets);
-                var target = ssm.vm.runtime.targets[1];
-                ssm.vm.editingTarget = target;
-
-                ssm.vm.addSound(vmSound).then(() => {
-                    console.log('vm has added sound')
-                    console.log('now playing sound via recordings manager');
-                    ssm.recordingsManager.playRecording(vmSound)
-                });
-              });
-          });
-        },
+          this.recordingsManager.confirmAndStoreRecording(samples, sampleRate, levels, trimStart, trimEnd);
+        }
       }
 
       for (var method in methodMap) {
