@@ -20,6 +20,7 @@ const AudioEngine = require("scratch-audio");
 
 // Scratch Sound Recording
 const AudioRecorder = require("./audio_recorder.js").default;
+const AudioBufferPlayer = require("./audio-buffer-player.js").default;
 const RecordingsManager = require("./recordings_manager.js");
 const WavEncoder = require('wav-encoder');
 
@@ -349,11 +350,17 @@ var ScratchStateMachine = new StateMachine.factory({
               console.log('vmSound');
               console.log(vmSound);
 
+              // Create and use and AudioBufferPlayer
+              // The thing about the audio buffer player is that it uses the clipped samples and not the web encoded.
+              // var player = new AudioBufferPlayer(clippedSamples, sampleRate);
+              // player.play(trimStart, trimEnd, () => {console.log('audiobufferplayerUPDATE')}, () => {console.log('audiobufferplayerEND')});
+
               // Store the sound in Scratch Storage.
 
               // Pass an empty string as the assetId in order to force the
               // store to create a new sound asset for the recording.
-              storage.store(storage.AssetType.Sound, vmSound.dataFormat, wavBuffer, vmSound.assetId).then((assetMetadata) => {
+              // TODO: not sure if the wav buffer is supposed to be converted to a uint array before storing..
+              storage.store(storage.AssetType.Sound, vmSound.dataFormat, new Uint8Array(wavBuffer), vmSound.assetId,true).then((assetMetadata) => {
 
                 console.log(assetMetadata);
                 // Get target on which to attach the sound and set it on the
@@ -366,7 +373,7 @@ var ScratchStateMachine = new StateMachine.factory({
                 ssm.vm.addSound(vmSound).then(() => {
                     console.log('vm has added sound')
                     console.log('now playing sound via recordings manager');
-                    ssm.recordingsManager.playRecording(vmSound.name)
+                    ssm.recordingsManager.playRecording(vmSound)
                 });
               });
           });
