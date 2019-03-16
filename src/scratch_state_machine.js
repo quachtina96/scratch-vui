@@ -104,7 +104,6 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
     { name: 'getWhatISaid', from: '*', to: function() {return this.state} },
     { name: 'greet', from: '*', to: function() {return this.state} },
-    // { name: 'startRecording', from: '*', to: 'Recording'},
     { name: 'recordASound', from: '*', to: 'Recording'},
     { name: 'stopRecording', from: 'Recording', to: function() {
         return this.history[this.history.length - 2];
