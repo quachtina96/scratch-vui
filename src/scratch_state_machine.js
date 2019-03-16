@@ -302,10 +302,6 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetWhatYouSaid: () => {this.pm.getWhatScratchSaid()},
         onGetWhatISaid: () => {this.pm.getWhatUserSaid()},
         onGreet: () => {this.pm.greet()},
-        // onStartRecording: () => {
-        //   DEBUG && console.log('start recording');
-        //   this.audioRecorder.startRecording();
-        // },
         onRecordASound: (lifecycle, args) => {
           DEBUG && console.log('start recording');
           var soundName = args[1];

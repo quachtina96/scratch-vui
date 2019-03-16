@@ -468,16 +468,9 @@ ScratchAction.General.greet = {
 	"description":"greet me",
 };
 
-// ScratchAction.General.startRecording = {
-// 	"name":"startRecording",
-// 	"trigger": /start recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|/,
-// 	"idealTrigger": "record",
-// 	"description": "start recording a sound to use in projects"
-// };
-
 ScratchAction.General.recordASound = {
 	"name":"recordASound",
-	"trigger": /record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
+	"trigger": /start recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
 	"idealTrigger": "record a sound called soundName",
 	"description": "start recording a sound to use in projects",
 	"arguments": [
