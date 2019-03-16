@@ -18,6 +18,9 @@ const SB2BitmapAdapter = require("scratch-svg-renderer").BitmapAdapter;
 const SB2SVGAdapter = require("scratch-svg-renderer").SVGRenderer;
 const AudioEngine = require("scratch-audio");
 
+// Scratch Sound Recording
+const AudioRecorder = require("./audio_recorder.js").default;
+const RecordingsManager = require("./recordings_manager.js");
 
 const ScratchNLPEndpointURL = "http://127.0.0.1:5000/"
 const ASSET_SERVER = 'https://cdn.assets.scratch.mit.edu/';
@@ -100,13 +103,19 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getScratchCommands', from: '*', to: function() {return this.state} },
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
     { name: 'getWhatISaid', from: '*', to: function() {return this.state} },
-    { name: 'greet', from: '*', to: function() {return this.state} }
+    { name: 'greet', from: '*', to: function() {return this.state} },
+    { name: 'recordASound', from: '*', to: 'Recording'},
+    { name: 'stopRecording', from: 'Recording', to: function() {
+        return this.history[this.history.length - 2];
+      } }
   ],
   data: function() {
     var ssm = this;
     return {
       pm: new ScratchProjectManager(ssm),
       vm: new VirtualMachine(),
+      audioRecorder: new AudioRecorder(),
+      recordingsManager: new RecordingsManager(),
       // TODO: add flow for asking for the user's name when working with the
       // Scratch...
       user: "tina"
@@ -125,16 +134,25 @@ var ScratchStateMachine = new StateMachine.factory({
         // this.pm.say("You're in the home state.")
       }
 
-      this.setupVM('scratch-stage')
+      this.setupVM('scratch-stage');
       this.pm.load();
       this.setMethods();
       this.pm._updatePlayRegex();
+
       // Only introduce if the browser has never interacted with Scratch before.
       if (!window.localStorage.scratchVuiInteractedBefore) {
         this.introduceSelf();
         console.log('window.localStorage.scratchVuiInteractedBefore is true')
         window.localStorage.scratchVuiInteractedBefore = true;
       }
+      this.introduceSelf();
+
+      this.recordingsManager.vm = this.vm;
+      // Start listening and define handlers for the audio recorder.
+      var handleStarted = () => {console.log('started recording')};
+      var handleLevelUpdate = () => {};
+      var handleRecordingError = () => {console.log('recording error')};
+      this.audioRecorder.startListening(handleStarted, handleLevelUpdate, handleRecordingError);
     },
     setupVM: function(scratch_stage_canvas_id) {
       const storage = new ScratchStorage(); /* global ScratchStorage */
@@ -221,9 +239,10 @@ var ScratchStateMachine = new StateMachine.factory({
         this.pm.audio.cueProjectFinished();
       });
 
-
       // Run threads
       this.vm.start();
+
+      this.vm.loadProject(this.recordingsManager.baseProject);
     },
     setSpeechRecognition: function() {
       this.pm.updateGrammarWithProjects.bind(this);
@@ -281,19 +300,32 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetScratchCommands: () => {this.pm.getScratchCommands()},
         onGetWhatYouSaid: () => {this.pm.getWhatScratchSaid()},
         onGetWhatISaid: () => {this.pm.getWhatUserSaid()},
-        onGreet: () => {this.pm.greet()}
+        onGreet: () => {this.pm.greet()},
+        onRecordASound: (lifecycle, args) => {
+          DEBUG && console.log('start recording');
+          var soundName = args[1];
+          console.log(`sound to record: ${soundName}`);
+          this.audioRecorder.startRecording(soundName);
+        },
+        onStopRecording: () => {
+          DEBUG && console.log('stop recording');
+          const {samples, sampleRate, levels, trimStart, trimEnd} = this.audioRecorder.stop();
+          console.log({samples, sampleRate, levels, trimStart, trimEnd});
+          this.recordingsManager.confirmAndStoreRecording(samples, sampleRate, levels, trimStart, trimEnd, this.audioRecorder.recordingName);
+        }
       }
+
       for (var method in methodMap) {
         this[method] = methodMap[method];
       }
     },
-    introduceSelf() {
+    introduceSelf: function() {
       this.pm.say("Hi, I’m Scratch! I'm a tool you can use to program and interact with\
         audio projects. Any time you need help or don't know what to do, you can say\
         'Scratch, help' or ask 'what can i do?'. I will try to answer any\
         questions you have. To start, why don't you say 'alarm' to play the alarm project");
       this.pm.recognition.start();
-    }
+    },
   }
 });
 

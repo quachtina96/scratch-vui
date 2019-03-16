@@ -150,8 +150,9 @@ class ScratchProjectManager {
       .then((scratchProgram) => {
         // NOTE: We do not need to JSON.stringify the scratch program before
         // passing it to the vm because it is already a string.
-        console.log(JSON.parse(scratchProgram))
-        this.ssm.vm.loadProject(scratchProgram).then(()=> {
+        console.log('executeCurrentProjectWithVM scratchProgram')
+        console.log(scratchProgram)
+        this.ssm.vm.loadProject(JSON.stringify(scratchProgram)).then(()=> {
           this.ssm.vm.greenFlag();
         });
 

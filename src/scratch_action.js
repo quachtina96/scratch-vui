@@ -461,6 +461,33 @@ ScratchAction.General.queryActionTypes = {
 	"question": true
 };
 
+ScratchAction.General.greet = {
+	"name":"greet",
+	"trigger":/hello|what's up|hey|hi|yo|sup/,
+	"idealTrigger":"hi",
+	"description":"greet me",
+};
+
+ScratchAction.General.recordASound = {
+	"name":"recordASound",
+	"trigger": /start recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
+	"idealTrigger": "record a sound called soundName",
+	"description": "start recording a sound to use in projects",
+	"arguments": [
+		{
+			name: 'sound name',
+			description: 'name of the sound you want to make'
+		}
+	],
+};
+
+ScratchAction.General.stopRecording = {
+	"name":"stopRecording",
+	"trigger": /(?:end|stop) recording|stop recording me/,
+	"idealTrigger": "stop recording",
+	"description": "end the recording of a sound to use in projects"
+};
+
 //////// EDIT PROJECT COMMANDS
 /**
  * Edit command namespace
@@ -733,13 +760,6 @@ ScratchAction.Help.getWhatYouSaid = {
 	"idealTrigger":"say that again",
 	"description":"get me to repeat what you just said",
 	"question": true
-};
-
-ScratchAction.General.greet = {
-	"name":"greet",
-	"trigger":/hello|what's up|hey|hi|yo|sup/,
-	"idealTrigger":"hi",
-	"description":"greet me",
 };
 
 // ScratchAction.Project.
