@@ -103,11 +103,14 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getScratchCommands', from: '*', to: function() {return this.state} },
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
     { name: 'getWhatISaid', from: '*', to: function() {return this.state} },
+    { name: 'getRecordings', from: '*', to: function() {return this.state} },
     { name: 'greet', from: '*', to: function() {return this.state} },
     { name: 'recordASound', from: '*', to: 'Recording'},
     { name: 'stopRecording', from: 'Recording', to: function() {
         return this.history[this.history.length - 2];
-      } }
+      } },
+    { name: 'playARecording', from: '*', to: function() {return this.state} },
+    { name: 'renameRecording', from: '*', to: function() {return this.state} },
   ],
   data: function() {
     var ssm = this;
@@ -302,16 +305,36 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetWhatISaid: () => {this.pm.getWhatUserSaid()},
         onGreet: () => {this.pm.greet()},
         onRecordASound: (lifecycle, args) => {
-          DEBUG && console.log('start recording');
-          var soundName = args[1];
-          console.log(`sound to record: ${soundName}`);
-          this.audioRecorder.startRecording(soundName);
+          this.pm.say('3, 2, 1, go!', ()=> {
+            DEBUG && console.log('start recording');
+            var soundName = args[1];
+            console.log(`sound to record: ${soundName}`);
+            this.audioRecorder.startRecording(soundName);
+          });
         },
         onStopRecording: () => {
           DEBUG && console.log('stop recording');
           const {samples, sampleRate, levels, trimStart, trimEnd} = this.audioRecorder.stop();
           console.log({samples, sampleRate, levels, trimStart, trimEnd});
           this.recordingsManager.confirmAndStoreRecording(samples, sampleRate, levels, trimStart, trimEnd, this.audioRecorder.recordingName);
+        },
+        onGetRecordings: async () => {
+          var recordingNames = await this.recordingsManager.getAllRecordings();
+          this.pm.say(`${recordingNames}`)
+        },
+        onPlayARecording: async (lifecycle, args) => {
+          var soundName = args[1];
+          var recordingNames = await this.recordingsManager.play(soundName);
+        },
+        onRenameRecording: async (lifecycle, args) => {
+          var oldName = Utils.titlecase(args[1]);
+          var newName = Utils.titlecase(args[2]);
+          this.recordingsManager.renameVmSound(oldName, newName)
+          .catch((e) => {
+            console.log(e);
+          }).then(()=> {
+            this.pm.say(`renamed ${oldName} to ${newName}`);
+          })
         }
       }
 

@@ -6,6 +6,7 @@
  */
 const AudioBufferPlayer = require("./audio-buffer-player.js").default;
 const WavEncoder = require('wav-encoder');
+const WavDecoder = require('wav-decoder');
 const Utils = require('./utils.js');
 
 class RecordingsManager {
@@ -50,6 +51,8 @@ class RecordingsManager {
 	 * @return {Object} the object representing the vmSound
 	 */
 	async _getVmSound(soundName) {
+		// Recordings are stored with titlecase
+		soundName = Utils.titlecase(soundName);
 		// Get sound from local storage to get the information.
 		var vmSound = await this.vm.runtime.storage.localStorageHelper.loadVmSound(soundName);
 		console.log('got vmSound in _getVmSound. here it is:')
@@ -183,6 +186,23 @@ class RecordingsManager {
 					});
 				});
 		});
+	}
+
+	async getAllRecordings() {
+		var storage = this.vm.runtime.storage.localStorageHelper;
+		return await storage.getAllRecordings();
+	}
+
+	async play(soundName) {
+		var vmSound = await this._getVmSound(soundName);
+		var wavBuffer = vmSound.asset.data;
+		WavDecoder.decode(wavBuffer.buffer).then((bufferToPlay) => {
+			var player = new AudioBufferPlayer(bufferToPlay.channelData[0], 44140);
+
+			var start = 0;
+			var end = bufferToPlay.channelData[0].length;
+			player.play(start, end);
+		})
 	}
 }
 

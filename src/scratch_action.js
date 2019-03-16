@@ -470,13 +470,13 @@ ScratchAction.General.greet = {
 
 ScratchAction.General.recordASound = {
 	"name":"recordASound",
-	"trigger": /start recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
+	"trigger": /start ?a? recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
 	"idealTrigger": "record a sound called soundName",
 	"description": "start recording a sound to use in projects",
 	"arguments": [
 		{
 			name: 'sound name',
-			description: 'name of the sound you want to make'
+			description: 'name of the sound'
 		}
 	],
 };
@@ -487,6 +487,46 @@ ScratchAction.General.stopRecording = {
 	"idealTrigger": "stop recording",
 	"description": "end the recording of a sound to use in projects"
 };
+
+ScratchAction.General.getRecordings = {
+	"name":"getRecordings",
+	"trigger":/list ?(?:all|the)? recordings|get ?(?:all|the)? recordings|^what recordings (?:are there|do you (?:know|have))|what (?:other)? ?recordings do you (?:know|have)|list all the recordings ?(?:that)? ?(?:i've made)$/,
+	"idealTrigger": "list recordings",
+	"description": "hear me list all the recordings"
+};
+
+ScratchAction.General.playARecording = {
+	"name":"playARecording",
+	"trigger":/hear ?(?:a|the)? ?(.*)? recording|what's ?(?:a|the)? ?(.*)? recording/,
+	"idealTrigger": "hear recording",
+	"description": "hear the last recording",
+	"arguments": [
+		{
+			name: 'recording name',
+			description: 'recording'
+		}
+	],
+};
+
+ScratchAction.General.renameRecording = {
+	"name":"renameRecording",
+	"trigger": /rename recording/,
+	"idealTrigger": "rename recording",
+	"description": "rename recording",
+	"arguments": [
+		{
+			name: 'recording to rename',
+			description: 'recording'
+		},
+		{
+			name: 'new name',
+			description: 'recording'
+		}
+	],
+};
+
+// TODO:
+// rename a recording
 
 //////// EDIT PROJECT COMMANDS
 /**
