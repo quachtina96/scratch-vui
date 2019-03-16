@@ -468,17 +468,29 @@ ScratchAction.General.greet = {
 	"description":"greet me",
 };
 
-// TODO: add support for answering questions about recording?
-ScratchAction.General.startRecording = {
-	"name":"startRecording",
-	"trigger": /start recording|start recording me/,
-	"idealTrigger": "start recording",
-	"description": "start recording a sound to use in projects"
+// ScratchAction.General.startRecording = {
+// 	"name":"startRecording",
+// 	"trigger": /start recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|/,
+// 	"idealTrigger": "record",
+// 	"description": "start recording a sound to use in projects"
+// };
+
+ScratchAction.General.recordASound = {
+	"name":"recordASound",
+	"trigger": /record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
+	"idealTrigger": "record a sound called soundName",
+	"description": "start recording a sound to use in projects",
+	"arguments": [
+		{
+			name: 'sound name',
+			description: 'name of the sound you want to make'
+		}
+	],
 };
 
 ScratchAction.General.stopRecording = {
 	"name":"stopRecording",
-	"trigger": /stop recording|stop recording me/,
+	"trigger": /(?:end|stop) recording|stop recording me/,
 	"idealTrigger": "stop recording",
 	"description": "end the recording of a sound to use in projects"
 };

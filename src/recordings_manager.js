@@ -6,6 +6,7 @@
  */
 const AudioBufferPlayer = require("./audio-buffer-player.js").default;
 const WavEncoder = require('wav-encoder');
+const Utils = require('./utils.js');
 
 class RecordingsManager {
 	constructor() {
@@ -56,16 +57,34 @@ class RecordingsManager {
 		return vmSound
 	}
 
+	/**
+	 * rename sound
+	 * @param {!String} soundName - name of the sound
+	 * @return {Object} the object representing the vmSound
+	 */
+	async renameVmSound(soundName, newSoundName) {
+		// Get sound from local storage to get the information.
+		var storage = this.vm.runtime.storage.localStorageHelper;
+		var vmSound = await storage.loadVmSound(soundName);
+		// Delete old entry
+		await storage.deleteVmSound(soundName);
+		// Create new entry
+		vmSound.name = newSoundName;
+		storage.storeVmSound(vmSound);
+		return vmSound
+	}
+
 	async addRecordingsToProject(projectJson) {
 		// Replace placeholder sound recordings in the project json with real
 		// sound objects
 		var sprite = projectJson.children[0];
 		var candidateRecordings = sprite.sounds.filter((soundObject) => 'isRecording' in soundObject)
 		var sounds = sprite.sounds.filter((soundObject) => !('isRecording' in soundObject))
-		return new Promise((resolve, reject) => {
-			candidateRecordings.forEach(async (soundName) => {
-				var soundObject = await this._getVmSound(soundName);
-				if (soundObject) {
+
+    return Promise.all(candidateRecordings.map(async (soundPlaceholder) => {
+				var soundName = soundPlaceholder.name;
+				var vmSound = await this._getVmSound(soundName);
+				if (vmSound) {
 					sounds.push({
 						"soundName": vmSound.name,
 						"soundID": sprite.sounds.length,
@@ -77,10 +96,14 @@ class RecordingsManager {
 				} else {
 					console.log(`failed to get the vm sound for ${soundName}`);
 				}
-			});
-		}).then(() => {
-			sprite.sounds = sounds;
-		})
+			})
+    ).catch(function(e) {
+      console.log(e);
+      reject(e);
+    }).then(function() {
+      sprite.sounds = sounds;
+      return projectJson;
+    });
 	}
 
 	// Create a project json that will the get loaded into the vm so we can verify that we can play the recorded sound in a project.
@@ -99,7 +122,7 @@ class RecordingsManager {
 		this.vm.stopAll();
 	}
 
-	confirmAndStoreRecording(samples, sampleRate, levels, trimStart, trimEnd) {
+	confirmAndStoreRecording(samples, sampleRate, levels, trimStart, trimEnd, recordingName) {
 		const sampleCount = samples.length;
 		const startIndex = Math.floor(trimStart * sampleCount);
 		const endIndex = Math.floor(trimEnd * sampleCount);
@@ -133,10 +156,7 @@ class RecordingsManager {
 				// The VM will update the sound name to a fresh name
 				// if the following is already taken
 				// TODO(quacht): prompt the user for the recording name.
-				vmSound.name = 'recording1';
-
-				console.log('vmSound');
-				console.log(vmSound);
+				vmSound.name = Utils.titlecase(recordingName);
 
 				// Create and use and AudioBufferPlayer
 				// The thing about the audio buffer player is that it uses the clipped samples and not the web encoded.

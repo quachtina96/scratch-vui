@@ -22,6 +22,7 @@ class AudioRecorder {
         this.recording = false;
         this.started = false;
         this.buffers = [];
+        this.recordingName = null;
 
         this.disposed = false;
     }
@@ -48,8 +49,9 @@ class AudioRecorder {
         }
     }
 
-    startRecording () {
+    startRecording (opt_soundName) {
         this.recording = true;
+        this.recordingName = opt_soundName;
     }
 
     attachUserMediaStream (userMediaStream, onUpdate) {

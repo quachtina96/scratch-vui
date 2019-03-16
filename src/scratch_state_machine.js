@@ -104,7 +104,8 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
     { name: 'getWhatISaid', from: '*', to: function() {return this.state} },
     { name: 'greet', from: '*', to: function() {return this.state} },
-    { name: 'startRecording', from: '*', to: 'Recording'},
+    // { name: 'startRecording', from: '*', to: 'Recording'},
+    { name: 'recordASound', from: '*', to: 'Recording'},
     { name: 'stopRecording', from: 'Recording', to: function() {
         return this.history[this.history.length - 2];
       } }
@@ -301,15 +302,21 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetWhatYouSaid: () => {this.pm.getWhatScratchSaid()},
         onGetWhatISaid: () => {this.pm.getWhatUserSaid()},
         onGreet: () => {this.pm.greet()},
-        onStartRecording: () => {
+        // onStartRecording: () => {
+        //   DEBUG && console.log('start recording');
+        //   this.audioRecorder.startRecording();
+        // },
+        onRecordASound: (lifecycle, args) => {
           DEBUG && console.log('start recording');
-          this.audioRecorder.startRecording();
+          var soundName = args[1];
+          console.log(`sound to record: ${soundName}`);
+          this.audioRecorder.startRecording(soundName);
         },
         onStopRecording: () => {
           DEBUG && console.log('stop recording');
           const {samples, sampleRate, levels, trimStart, trimEnd} = this.audioRecorder.stop();
           console.log({samples, sampleRate, levels, trimStart, trimEnd});
-          this.recordingsManager.confirmAndStoreRecording(samples, sampleRate, levels, trimStart, trimEnd);
+          this.recordingsManager.confirmAndStoreRecording(samples, sampleRate, levels, trimStart, trimEnd, this.audioRecorder.recordingName);
         }
       }
 
