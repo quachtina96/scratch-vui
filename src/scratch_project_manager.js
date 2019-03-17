@@ -610,6 +610,8 @@ class ScratchProjectManager {
       this.storage.save();
       pm._updatePlayRegex();
       pm.currentProject.finishProject();
+      // Unset the current project when moving into the home state.
+      pm.currentProject = null;
       resolve();
     }));
   }

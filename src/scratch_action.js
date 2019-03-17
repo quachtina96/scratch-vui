@@ -205,7 +205,11 @@ ScratchAction.General.deleteProject = {
 			name: 'project name',
 			validator: (ssm, projectName) => {
 				// project must be in user's list of projects
-				return ssm.pm.has(projectName);
+				if (ssm.pm.has(projectName)) {
+					return true;
+				} else {
+					return `I don't have a project called ${projectName}`;
+				}
 			},
 			description: 'name of the project to delete'
 		}
