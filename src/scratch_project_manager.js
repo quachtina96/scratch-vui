@@ -108,7 +108,9 @@ class ScratchProjectManager {
       if (opt_on_end) {
         opt_on_end();
       }
-      scratch.recognition.start();
+      // Commented out line below in order to require users to press the space bar
+      // when they want to talk.
+      // scratch.recognition.start();
     }
 
     // Synthesize speech!
