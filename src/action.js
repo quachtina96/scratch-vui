@@ -167,8 +167,8 @@ class Action {
 	 */
 	_requestArgument(pm, argument) {
 		this.current = argument;
-		pm.say(`What do you want the ${argument.description} to be?`)
-
+		// pm.say(`What do you want the ${argument.description} to be?`)
+		pm.say(`What is the ${argument.name}?`)
 	}
 
 	modifyArgument(ssm, name, value) {

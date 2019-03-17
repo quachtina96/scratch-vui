@@ -29,6 +29,7 @@
     "scratch-vm": "latest",
     "underscore": "^1.9.1",
     "url-parse": "^1.4.3",
+    "wav-decoder": "^1.3.0",
     "wav-encoder": "^1.3.0",
     "websocket-as-promised": "^0.9.0",
     "wordnet-db": "^3.1.6"
