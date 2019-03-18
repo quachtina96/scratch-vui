@@ -3,40 +3,6 @@ const StateMachine = require('javascript-state-machine');
 const ListNavigator = require('../../src/list_navigator.js');
 const Utils = require('../../src/utils.js');
 
-var chunksize = 2;
-
-var getNavigatorFunctions = (list, chunksize, opt_current) => {
-	// Return a successor if it exists. Otherwise, return null.
-	var current = opt_current ? opt_current : 0;
-	var successor = (list, current) => {
-		// return chunks of chunksize
-		var pages = list.chunk(chunksize);
-		if (pages.length -1 == current) {
-			return null;
-		} else {
-			return pages[current + 1]
-		}
-	};
-
-	// Return a predecessor if it exists. Otherwise, return null.
-	var predecessor = (list, current) => {
-		// return chunks of chunksize
-		var pages = list.chunk(chunksize);
-		if (0 == current) {
-			return null;
-		} else {
-			return pages[current - 1]
-		}
-	};
-
-	return {
-		successor: successor,
-		predecessor: predecessor
-	}
-};
-
-
-// TODO: correct test
 test('empty list successor', t => {
 	var testlist = [];
 	var chunksize = 1;
