@@ -196,6 +196,10 @@ if (!('webkitSpeechRecognition' in window)) {
   document.onkeydown = function(evt) {
     evt = evt || window.event;
     if (evt.code == 'Space') {
+      if (scratch.state == "Recording") {
+        scratch.stopRecording();
+        return;
+      }
       if (recognizing) {
         recognition.stop();
         // play sound cue for stopping listening.
