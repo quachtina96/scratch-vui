@@ -8,7 +8,7 @@ test('empty list successor', t => {
 	var chunksize = 1;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), null);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.current(), null);
 	t.end();
 });
@@ -18,7 +18,7 @@ test('empty list predecessor', t => {
 	var chunksize = 1;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), null);
-	nav.moveToPredecessor();
+	nav.previous();
 	t.same(nav.current(), null);
 	t.end();
 });
@@ -29,9 +29,9 @@ test('single element list successor and predecessor', t => {
 	var chunksize = 1;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), [1]);
-	nav.moveToPredecessor();
+	nav.previous();
 	t.same(nav.current(), [1]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.current(), [1]);
 	t.end();
 });
@@ -42,9 +42,9 @@ test('single element list successor and predecessor', t => {
 	var chunksize = 2;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), [1]);
-	nav.moveToPredecessor();
+	nav.previous();
 	t.same(nav.current(), [1]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.current(), [1]);
 	t.end();
 });
@@ -54,9 +54,9 @@ test('two element list', t => {
 	var chunksize = 2;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), [1,2]);
-	nav.moveToPredecessor();
+	nav.previous();
 	t.same(nav.current(), [1,2]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.current(), [1,2]);
 	t.end();
 });
@@ -66,12 +66,12 @@ test('two element list', t => {
 	var chunksize = 1;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), [1]);
-	nav.moveToPredecessor();
+	nav.previous();
 
 	// no predecessor
 	t.same(nav.currentPageIndex, 0);
 	t.same(nav.current(), [1]);
-	nav.moveToSuccessor();
+	nav.next();
 
 	t.same(nav.currentPageIndex, 1);
 	t.same(nav.current(), [2]);
@@ -84,10 +84,10 @@ test('three element list', t => {
 	var chunksize = 2;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), [1,2]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.currentPageIndex, 1);
 	t.same(nav.current(), [3]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.currentPageIndex, 1);
 	t.same(nav.current(), [3]);
 	t.end();
@@ -98,7 +98,7 @@ test('four element list', t => {
 	var chunksize = 2;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), [1,2]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.currentPageIndex, 1);
 	t.same(nav.current(), [3,4]);
 	t.end();
@@ -109,22 +109,22 @@ test('five element list', t => {
 	var chunksize = 2;
 	var nav = new ListNavigator(testlist, chunksize);
 	t.same(nav.current(), [1,2]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.currentPageIndex, 1);
 	t.same(nav.current(), [3,4]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.currentPageIndex, 2);
 	t.same(nav.current(), [5]);
-	nav.moveToSuccessor();
+	nav.next();
 	t.same(nav.currentPageIndex, 2);
 	t.same(nav.current(), [5]);
-	nav.moveToPredecessor();
+	nav.previous();
 	t.same(nav.currentPageIndex, 1);
 	t.same(nav.current(), [3,4]);
-	nav.moveToPredecessor();
+	nav.previous();
 	t.same(nav.currentPageIndex, 0);
 	t.same(nav.current(), [1,2]);
-	nav.moveToPredecessor();
+	nav.previous();
 	t.same(nav.currentPageIndex, 0);
 	t.same(nav.current(), [1,2]);
 	t.end();

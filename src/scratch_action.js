@@ -106,7 +106,8 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 ScratchAction.allActions = () => {
 	var actionItems = Object.entries(ScratchAction.General).concat(Object.entries(
 			ScratchAction.Edit).concat(Object.entries(
-				ScratchAction.Help)));
+				ScratchAction.Help).concat(Object.entries(
+					ScratchAction.ListNavigator))));
 	return actionItems.map((b) => b[1]);
 }
 
@@ -114,7 +115,8 @@ ScratchAction.getAllTriggers = () => {
 	return ScratchAction.getTriggers('Edit').concat(
 			ScratchAction.getTriggers('General')).concat(
 			ScratchAction.getTriggers('Interrupt')).concat(
-			ScratchAction.getTriggers('Help'));
+			ScratchAction.getTriggers('Help').concat(
+			ScratchAction.getTriggers('ListNavigator')));
 }
 
 /**
@@ -434,7 +436,7 @@ ScratchAction.General.getSounds = {
 //checkSound
 ScratchAction.General.checkSound = {
 	"name": "checkSound",
-	"trigger":/^do you (?:have|know) (?:a|an|the|this) (.*) sound?$/,
+	"trigger":/^do you (?:have|know) (?:a|an|the|this|any) (.*) sound/,
 	"idealTrigger":"do you have a boing sound?",
 	"description":"check if there's a boing sound",
 	"arguments": [
@@ -467,7 +469,7 @@ ScratchAction.General.queryActionTypes = {
 
 ScratchAction.General.greet = {
 	"name":"greet",
-	"trigger":/hello|what's up|hey|hi|yo|sup/,
+	"trigger":/ ?hello | ?what's up | ?hey | ?hi | ?yo | ?sup /,
 	"idealTrigger":"hi",
 	"description":"greet me",
 };
@@ -529,8 +531,31 @@ ScratchAction.General.renameRecording = {
 	],
 };
 
-// TODO:
-// rename a recording
+/**
+ * ListNavigator namespace for Scratch Actions
+ */
+ScratchAction.ListNavigator = {};
+
+ScratchAction.ListNavigator.finishNavigatingList = {
+	"name":"finishNavigatingList",
+	"trigger": /exit list/,
+	"idealTrigger": "go back",
+	"description": "to finish navigating the list and return to previous state",
+};
+
+ScratchAction.ListNavigator.getNextPart = {
+	"name":"getNextPart",
+	"trigger": /more|other|next/, // what are others, are there others, what's next, what is next, do you have more, give me more, show me more, tell me more -- these might even have arguments passed into them
+	"idealTrigger": "next",
+	"description": "to get the next part of the list",
+};
+
+ScratchAction.ListNavigator.getPreviousPart = {
+	"name":"getPreviousPart",
+	"trigger":  /previous|before/,
+	"idealTrigger": "go back",
+	"description": "to get the previous part of the list",
+};
 
 //////// EDIT PROJECT COMMANDS
 /**

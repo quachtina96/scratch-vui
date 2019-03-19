@@ -62,8 +62,13 @@ class ScratchAudio {
 		   scratchAudio.cue.onended = resolve;                     // when done, resolve
 
 			if (!scratchAudio.muteCues) {
-				scratchAudio.cue.src = url;
-				scratchAudio.cue.play();
+				try {
+					scratchAudio.cue.src = url;
+					scratchAudio.cue.play();
+				} catch (e) {
+					console.log(e);
+				}
+
 			}
 		});
 	}

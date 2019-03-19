@@ -183,7 +183,7 @@ class Action {
 	}
 
 	execute(ssm, utterance) {
-    DEBUG && console.log(`[action execute]`);
+    	DEBUG && console.log(`[action execute]`);
 		if (this.name in ssm.pm.actions) {
 			DEBUG && console.log(`[action execute] general`);
 			ssm[this.name](this.getArgs(), utterance);
@@ -196,4 +196,7 @@ class Action {
 	}
 }
 
-export { Argument, Action }
+module.exports = {
+	Argument:Argument,
+	Action:Action
+}

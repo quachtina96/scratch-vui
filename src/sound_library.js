@@ -10,6 +10,7 @@ const AudioEngine = require('scratch-audio');
 // TODO: figure out why this doesn't work
 // const soundLibraryContent = require('assets/sound/sounds.json');
 const soundLibraryContent = require('./sounds.js');
+const ListNavigator = require('./list_navigator.js');
 
 class SoundLibrary {
   constructor(vm) {
@@ -30,6 +31,25 @@ class SoundLibrary {
     // requested by a user who missed it the first time.
     this.lastNSounds = null;
     this.lastQuery = null;
+
+    this.unwrapper = (soundList, ssm) => {
+      // Build promise chain to present each sound in order.
+      var pm = ssm.pm;
+      var funcs = soundList.map((item) => new Promise((resolve, reject) => {
+        pm.soundLibrary.stopPlayingSound();
+        pm.say('Here is ' + item.name, () => {
+          pm.soundLibrary.playSound(item)
+        });
+      }));
+      var promise = funcs[0];
+      for (var i = 1; i < funcs.length; i++) {
+        promise = promise.then(funcs[i]);
+      }
+      return promise.then(() => {
+        resolve();
+      });
+    }
+    this.listNavigator = new ListNavigator(soundLibraryContent, 3, null, this.unwrapper);
   }
 
   /**
