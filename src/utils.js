@@ -362,6 +362,7 @@ Array.prototype.chunk = function (chunk_size) {
 
 // Given a string return the titlecase version of it.
 Utils.titlecase = (string) => {
+  str = String(string);
   return string.split(' ').map((word) => {return word[0].toUpperCase().concat(word.substring(1))}).join(' ')
 };
 

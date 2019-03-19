@@ -75,7 +75,8 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'goHome', from: '*', to: 'Home'},
     { name: 'finishProject', from: 'InsideProject', to: 'Home'},
     { name: 'play', from: 'Home', to: 'PlayProject'},
-    { name: 'play', from: 'InsideProject', to: 'PlayProject'},
+    { name: 'editProject', from: 'Home', to: 'InsideProject'},
+    // { name: 'play', from: 'InsideProject', to: 'PlayProject'}, // disable ability to play a project when inside project to prevent conflicts between commands
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
     { name: 'playCurrentProject', from: 'PlayProject', to: 'PlayProject'},
     { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},

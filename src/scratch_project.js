@@ -149,7 +149,7 @@ var ScratchProject = StateMachine.factory({
         var end = start + voicedScratch[0].length + 1;
         var command = utterance.substring(end, utterance.length);
       }
-      var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+      var punctuationless = command.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
       var command = punctuationless.replace(/\s{2,}/g," ");
 
       var parseResult = await ScratchInstruction.parse(command);
@@ -200,6 +200,8 @@ var ScratchProject = StateMachine.factory({
             delete this.pm.projects['Untitled-'+this.pm.untitledCount];
             await this.pm.audio.cueSuccess();
             this.nameProject();
+          } else {
+            this.pm.say(`${proposedName} cannot be used as a project name. It conflicts with another project or command`);
           }
           return true;
         case 'named':

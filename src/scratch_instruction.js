@@ -15,7 +15,7 @@ class ScratchInstruction {
    * @param {!String} rawInstruction - the utterance from the user.
    */
   constructor(rawInstruction) {
-    var punctuationless = rawInstruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var punctuationless = rawInstruction.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
     var instruction = punctuationless.replace(/\s{2,}/g," ");
     this.no_punctuation = instruction;
     this.raw = rawInstruction.trim();
@@ -45,7 +45,7 @@ class ScratchInstruction {
    */
   static parse(instruction) {
     // Strip punctutation.
-    var punctuationless = instruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var punctuationless = instruction.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
     var instruction = punctuationless.replace(/\s{2,}/g," ");
 
     // Send request to ScratchNLP via websockets.

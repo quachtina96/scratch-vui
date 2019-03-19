@@ -197,9 +197,13 @@ class ScratchProjectManager {
     if (this.listening) {
       if (this._isInterrupt(utterance)) {
         DEBUG && console.log(`[pm handle utterance] is interrupt`)
-        this.currentAction = null;
-        this.currentArgument = null;
-        this.say('Canceled action.')
+        if (this.currentAction) {
+          this.currentAction = null;
+          this.currentArgument = null;
+          this.say('Canceled action.')
+        } else {
+          this.say('No action to cancel.')
+        }
         return;
       }
 
@@ -658,7 +662,8 @@ class ScratchProjectManager {
     return new Promise(((resolve, reject) => {
       pm.audio.cueInsideProject();
       var projectName = args[1];
-      var projectName = projectName ? projectName : pm.currentProject.name;
+      projectName = projectName ? projectName : pm.currentProject.name;
+      projectName = projectName.toLowerCase();
       pm.announceProjectToEdit(pm.projects[projectName])
       pm.currentProject = pm.projects[projectName];
       resolve();

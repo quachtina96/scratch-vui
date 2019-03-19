@@ -126,12 +126,12 @@ if (!('webkitSpeechRecognition' in window)) {
     if (event.error == 'no-speech') {
       start_img.src = 'assets/mic.gif';
       showInfo('info_no_speech');
-      ignore_onend = true;
+      // ignore_onend = true;
     }
     if (event.error == 'audio-capture') {
       start_img.src = 'assets/mic.gif';
       showInfo('info_no_microphone');
-      ignore_onend = true;
+      // ignore_onend = true;
     }
     if (event.error == 'not-allowed') {
       if (event.timeStamp - start_timestamp < 100) {
@@ -139,7 +139,7 @@ if (!('webkitSpeechRecognition' in window)) {
       } else {
         showInfo('info_denied');
       }
-      ignore_onend = true;
+      // ignore_onend = true;
     }
   };
 

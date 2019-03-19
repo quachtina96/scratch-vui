@@ -42,7 +42,7 @@ ScratchAction.Validator.unconflictingProjectName = (ssm, projectName) => {
 	}
 
 	// Should not already be a Scratch command
-	const punctuationless = projectName.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+	const punctuationless = projectName.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 	const instruction = punctuationless.replace(/\s{2,}/g," ");
 
 	// Send request to ScratchNLP via websockets.
@@ -84,7 +84,7 @@ ScratchAction.Validator.scratchCommand = (ssm, step) => {
 	if (ScratchAction.Validator.existingProject(ssm, step)) {
 		return true;
 	}
-	var punctuationless = step.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+	var punctuationless = step.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 	var step = punctuationless.replace(/\s{2,}/g," ");
 	return ScratchInstruction.parse(step).then((result) => {
 		if (!result) {
@@ -255,7 +255,7 @@ ScratchAction.General.renameCurrentProject = {
 //renameProject
 ScratchAction.General.renameProject = {
 	"name": "renameProject",
-	"trigger":/change (?:the)? ?name of (?:the)? ?(.*) project to (.*)|rename (?:the)? ?(.*) (?:project)? ?to (?:be)? ?(.*)|call (?:the)? ?(.*) project (.*) instead/,
+	"trigger":/rename project| rename (?:a|the) project|change (?:the)? ?name of (?:the)? ?(.*) project to (.*)|rename (?:the)? ?(.*) (?:project)? ?to (?:be)? ?(.*)|call (?:the)? ?(.*) project (.*) instead/,
 	"idealTrigger":"call the OLD_NAME project NEW_NAME instead",
 	"description":"change the name of one of your projects",
 	"arguments": [
@@ -290,7 +290,7 @@ ScratchAction.General.editExistingProject = {
 //editProject
 ScratchAction.General.editProject = {
 	"name":'editProject',
-	"trigger":/see inside|what's inside|open project|since i said|what inside the project|what is inside/,
+	"trigger":/edit ?:(the)? project|see inside|what's inside|open project|since i said|what inside the project|what is inside/,
 	"idealTrigger":"what's inside",
 	"description":"edit the current project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -299,7 +299,7 @@ ScratchAction.General.editProject = {
 //finishProject
 ScratchAction.General.finishProject = {
 	"name":"finishProject",
-	"trigger":/no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it|end project|finish project/,
+	"trigger":/those are all the steps|exit project|leave|project|no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|end project|finish project/,
 	"idealTrigger":"i'm done",
 	"description":"leave the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined

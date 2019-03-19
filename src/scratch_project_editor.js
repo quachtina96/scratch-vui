@@ -165,6 +165,7 @@ class ScratchProjectEditor {
   // multiple stacks, and this can get tricky with event-based stuff (which
   // Scratch implements as multiple stacks)
   appendStep(args) {
+    var editor =  this;
     var step = args[1];
     var voicedScratch = Utils.matchRegex(step, /^(?:scratch|search)(?:ed)?/);
     var command = step;
@@ -174,20 +175,27 @@ class ScratchProjectEditor {
       var end = start + voicedScratch[0].length + 1;
       var command = step.substring(end, step.length);
     }
-    var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var punctuationless = command.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
     var command = punctuationless.replace(/\s{2,}/g," ");
     ScratchInstruction.parse(command).then((result) => {
       if (!result) {
         // Failed to parse the command using ScratchNLP. Alert failure.
-        this.audio.cueMistake().then(()=>{
-          this.project.pm.say("I heard you say " + step + ". That's not a Scratch command.");
+        editor.audio.cueMistake().then(()=>{
+          editor.project.pm.say("I heard you say " + step + ". That's not a Scratch command.");
         });
       } else {
         // Success!
         var instruction = new ScratchInstruction(command);
         instruction.parse = result
-        this.instructions.push(instruction);
-        this.addInstruction();
+        try {
+          editor.project.instructions.push(instruction);
+          editor.project.addInstruction();
+        } catch (e) {
+          console.log(`error:`)
+          console.log(e)
+          console.log(`result: ${result}`)
+        }
+
       }
     });
   }
