@@ -140,9 +140,6 @@ var ScratchStateMachine = new StateMachine.factory({
     onHome: function() {
       if (!this.pm.audio.muteBackground) {
         this.pm.audio.cueHomeState()
-      } else {
-        // TODO: implement a tutorial state machine.
-        // this.pm.say("You're in the home state.")
       }
 
       this.setupVM('scratch-stage');
