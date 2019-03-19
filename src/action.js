@@ -67,7 +67,7 @@ class Argument {
 			return true;
 		} else {
 			await ssm.pm.audio.cueMistake();
-			DEBUG && console.log(`[argument handleUtterance] could not value`);
+			DEBUG && console.log(`[argument handleUtterance] could not set value`);
 			console.log(`could not set ${this.name} to ${value}`);
 			throw Error(`could not set argument ${this.name} to ${value}`);
 		}
@@ -167,8 +167,8 @@ class Action {
 	 */
 	_requestArgument(pm, argument) {
 		this.current = argument;
-		pm.say(`What do you want the ${argument.description} to be?`)
-
+		// pm.say(`What do you want the ${argument.description} to be?`)
+		pm.say(`What is the ${argument.name}?`)
 	}
 
 	modifyArgument(ssm, name, value) {
@@ -183,7 +183,7 @@ class Action {
 	}
 
 	execute(ssm, utterance) {
-    DEBUG && console.log(`[action execute]`);
+    	DEBUG && console.log(`[action execute]`);
 		if (this.name in ssm.pm.actions) {
 			DEBUG && console.log(`[action execute] general`);
 			ssm[this.name](this.getArgs(), utterance);
@@ -196,4 +196,7 @@ class Action {
 	}
 }
 
-export { Argument, Action }
+module.exports = {
+	Argument:Argument,
+	Action:Action
+}

@@ -198,6 +198,8 @@ if (!('webkitSpeechRecognition' in window)) {
     if (evt.code == 'Space') {
       if (recognizing) {
         recognition.stop();
+        // play sound cue for stopping listening.
+        scratch.pm.audio.cueDoneListening();
         return;
       } else {
         scratch.vm.stopAll();

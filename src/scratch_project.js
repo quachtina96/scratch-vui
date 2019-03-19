@@ -81,6 +81,7 @@ var ScratchProject = StateMachine.factory({
       return new Promise((resolve,reject) => {
         // Batch instructions for the server to translate.
         let rawInstructions = this.instructions.map(instruction => instruction.no_punctuation);
+        var projectJson;
 
         // Send request to ScratchNLP via websockets.
         wsp.sendRequest({
@@ -94,7 +95,15 @@ var ScratchProject = StateMachine.factory({
         }).then(result => {
           console.log('RESULT OF SEND REQUEST IN SCRATCH PROGRAM');
           console.log(result.response);
-          resolve(result.response);
+          // We must post-process the json by adding in the appropriate
+          // sound recordings.
+          projectJson = JSON.parse(result.response);
+          this.ssm.recordingsManager.addRecordingsToProject(projectJson).then(() => {
+            console.log(`getScratchProgram's result.response`);
+            console.log(projectJson);
+            resolve(projectJson);
+          });
+
         })
         .catch(error => {
           console.log('ERROR IN SEND REQUEST IN SCRATCH PROGRAM');

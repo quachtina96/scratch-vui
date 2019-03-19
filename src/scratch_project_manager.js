@@ -10,7 +10,8 @@ const ScratchVUIStorage = require('./storage.js');
 const ScratchAction = require('./scratch_action.js');
 const ScratchAudio = require('./audio.js');
 const SoundLibrary = require('./sound_library.js');
-const ScratchCommands = require('./scratch_commands.js')
+const ScratchCommands = require('./scratch_commands.js');
+const ListNavigator = require('./list_navigator.js');
 
 /**
  * ScratchProjectManager class
@@ -48,6 +49,7 @@ class ScratchProjectManager {
     // conversation regarding a question, you can use the utteranceHandler.
     this.currentAction = null;
     this.currentArgument = null;
+    this.listNavigator = null;
   }
 
   load() {
@@ -108,7 +110,9 @@ class ScratchProjectManager {
       if (opt_on_end) {
         opt_on_end();
       }
-      scratch.recognition.start();
+      // Commented out line below in order to require users to press the space bar
+      // when they want to talk.
+      // scratch.recognition.start();
     }
 
     // Synthesize speech!
@@ -119,7 +123,7 @@ class ScratchProjectManager {
   /**
    * Execute current project with VM
    */
-   executeCurrentProjectWithVM(mode) {
+  executeCurrentProjectWithVM(mode) {
     var pm = this;
     return new Promise(((resolve, reject) => {
       pm.audio.stopBackground();
@@ -150,8 +154,9 @@ class ScratchProjectManager {
       .then((scratchProgram) => {
         // NOTE: We do not need to JSON.stringify the scratch program before
         // passing it to the vm because it is already a string.
-        console.log(JSON.parse(scratchProgram))
-        this.ssm.vm.loadProject(scratchProgram).then(()=> {
+        console.log('executeCurrentProjectWithVM scratchProgram')
+        console.log(scratchProgram)
+        this.ssm.vm.loadProject(JSON.stringify(scratchProgram)).then(()=> {
           this.ssm.vm.greenFlag();
         });
 
@@ -195,6 +200,14 @@ class ScratchProjectManager {
         this.currentAction = null;
         this.currentArgument = null;
         this.say('Canceled action.')
+        return;
+      }
+
+      if (this.listNavigator) {
+        var result = this.listNavigator.handleUtterance(utterance);
+        if (result == 'exit') {
+          this.ssm.finishNavigatingList();
+        }
         return;
       }
 
@@ -624,6 +637,8 @@ class ScratchProjectManager {
       this.storage.save();
       pm._updatePlayRegex();
       pm.currentProject.finishProject();
+      // Unset the current project when moving into the home state.
+      pm.currentProject = null;
       resolve();
     }));
   }
@@ -687,20 +702,12 @@ class ScratchProjectManager {
       pm.soundLibrary.vm =this.ssm.vm;
     }
     return new Promise((resolve, reject) => {
-      pm.say('I have many sounds. Here are 3');
+      pm.say('I have many sounds. Here are the first 3');
+      var sounds = pm.soundLibrary.listNavigator.current();
+      pm.soundLibrary.listNavigator.ssm = pm.ssm;
+      pm.listNavigator = pm.soundLibrary.listNavigator;
       // Build promise chain to present each sound in order.
-      var funcs = pm.soundLibrary.getNSounds(3, -1).map((item) => new Promise((resolve, reject) => {
-        pm.say('Here is ' + item.name, () => {
-          pm.soundLibrary.playSound(item)
-        });
-      }));
-      var promise = funcs[0];
-      for (var i = 1; i < funcs.length; i++) {
-        promise = promise.then(funcs[i]);
-      }
-      return promise.then(() => {
-        resolve();
-      });
+      return pm.soundLibrary.unwrapper(sounds, pm.ssm);
     });
   }
   checkSound(lifecycle, args) {
@@ -727,13 +734,11 @@ class ScratchProjectManager {
           var candidateSounds = pm.soundLibrary.search(soundToFind);
           var soundCount = candidateSounds.length;
           if (soundCount > 0) {
-            // TODO: Share MULTIPLE search results with the user instead of just
-            // the first one.
             pm.say(`I found ${soundCount} sounds`);
-            var randomCandidate = Utils.randomChoice(candidateSounds);
-            pm.say('Here is one called ' + randomCandidate, () => {
-              pm.soundLibrary.playSound(pm.soundLibrary.get(randomCandidate));
-            });
+            var candidateSoundItems = candidateSounds.map((name) => pm.soundLibrary.get(name));
+            this.listNavigator = new ListNavigator(candidateSoundItems, 1, this.ssm, pm.soundLibrary.unwrapper);
+            this.listNavigator.current();
+            pm.soundLibrary.unwrapper(this.listNavigator.current(), pm.ssm);
           }
           resolve();
           return;

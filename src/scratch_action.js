@@ -106,7 +106,8 @@ ScratchAction.Validator.currentProjectStepNumber = (ssm, number) => {
 ScratchAction.allActions = () => {
 	var actionItems = Object.entries(ScratchAction.General).concat(Object.entries(
 			ScratchAction.Edit).concat(Object.entries(
-				ScratchAction.Help)));
+				ScratchAction.Help).concat(Object.entries(
+					ScratchAction.ListNavigator))));
 	return actionItems.map((b) => b[1]);
 }
 
@@ -114,7 +115,8 @@ ScratchAction.getAllTriggers = () => {
 	return ScratchAction.getTriggers('Edit').concat(
 			ScratchAction.getTriggers('General')).concat(
 			ScratchAction.getTriggers('Interrupt')).concat(
-			ScratchAction.getTriggers('Help'));
+			ScratchAction.getTriggers('Help').concat(
+			ScratchAction.getTriggers('ListNavigator')));
 }
 
 /**
@@ -228,7 +230,7 @@ ScratchAction.General.deleteProject = {
 				if (ssm.pm.has(projectName)) {
 					return true;
 				} else {
-					return 'there is no project called that';
+					return `I don't have a project called ${projectName}`;
 				}
 			},
 			description: 'name of the project to delete'
@@ -454,7 +456,7 @@ ScratchAction.General.getSounds = {
 //checkSound
 ScratchAction.General.checkSound = {
 	"name": "checkSound",
-	"trigger":/^do you (?:have|know) (?:a|an|the|this) (.*) sound?$|^do you (?:have|know) (?:any) (.*) sounds?$/,
+	"trigger":/^do you (?:have|know) (?:a|an|the|this|any) (.*) sound/,
 	"idealTrigger":"do you have a boing sound?",
 	"description":"check if there's a boing sound",
 	"arguments": [
@@ -483,6 +485,89 @@ ScratchAction.General.queryActionTypes = {
 	"idealTrigger":"what kinds of things can i do",
 	"description":"explore different kinds of actions",
 	"question": true
+};
+
+ScratchAction.General.recordASound = {
+	"name":"recordASound",
+	"trigger": /start ?a? recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
+	"idealTrigger": "record a sound called soundName",
+	"description": "start recording a sound to use in projects",
+	"arguments": [
+		{
+			name: 'sound name',
+			description: 'name of the sound'
+		}
+	],
+};
+
+ScratchAction.General.stopRecording = {
+	"name":"stopRecording",
+	"trigger": /(?:end|stop) recording|stop recording me/,
+	"idealTrigger": "stop recording",
+	"description": "end the recording of a sound to use in projects"
+};
+
+ScratchAction.General.getRecordings = {
+	"name":"getRecordings",
+	"trigger":/list ?(?:all|the)? recordings|get ?(?:all|the)? recordings|^what recordings (?:are there|do you (?:know|have))|what (?:other)? ?recordings do you (?:know|have)|list all the recordings ?(?:that)? ?(?:i've made)$/,
+	"idealTrigger": "list recordings",
+	"description": "hear me list all the recordings"
+};
+
+ScratchAction.General.playARecording = {
+	"name":"playARecording",
+	"trigger":/hear ?(?:a|the)? ?(.*)? recording|what's ?(?:a|the)? ?(.*)? recording/,
+	"idealTrigger": "hear recording",
+	"description": "hear the last recording",
+	"arguments": [
+		{
+			name: 'recording name',
+			description: 'recording'
+		}
+	],
+};
+
+ScratchAction.General.renameRecording = {
+	"name":"renameRecording",
+	"trigger": /rename recording/,
+	"idealTrigger": "rename recording",
+	"description": "rename recording",
+	"arguments": [
+		{
+			name: 'recording to rename',
+			description: 'recording'
+		},
+		{
+			name: 'new name',
+			description: 'recording'
+		}
+	],
+};
+
+/**
+ * ListNavigator namespace for Scratch Actions
+ */
+ScratchAction.ListNavigator = {};
+
+ScratchAction.ListNavigator.finishNavigatingList = {
+	"name":"finishNavigatingList",
+	"trigger": /exit list/,
+	"idealTrigger": "go back",
+	"description": "to finish navigating the list and return to previous state",
+};
+
+ScratchAction.ListNavigator.getNextPart = {
+	"name":"getNextPart",
+	"trigger": /more|other|next/, // what are others, are there others, what's next, what is next, do you have more, give me more, show me more, tell me more -- these might even have arguments passed into them
+	"idealTrigger": "next",
+	"description": "to get the next part of the list",
+};
+
+ScratchAction.ListNavigator.getPreviousPart = {
+	"name":"getPreviousPart",
+	"trigger":  /previous|before/,
+	"idealTrigger": "go back",
+	"description": "to get the previous part of the list",
 };
 
 //////// EDIT PROJECT COMMANDS
@@ -760,28 +845,13 @@ ScratchAction.Help.getWhatYouSaid = {
 	"question": true
 };
 
+
 ScratchAction.General.greet = {
 	"name":"greet",
 	"trigger":/^hello$|^what's up$|^hey$|^hi$|^yo$|^sup$/,
 	"idealTrigger":"hi",
 	"description":"greet me",
 };
-
-// ScratchAction.General.stopEditing = {
-// 	"name":"stopEditing",
-// 	"trigger":/that's it|thats it|stop editing|i'm done editing/,
-// 	"idealTrigger":"that's it",
-// 	"description":"stop editing the current project",
-// };
-
-//finishProject
-// ScratchAction.Edit.finishProject = {
-// 	"name":"finishProject",
-// 	"trigger":/no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it|end project|finish project/,
-// 	"idealTrigger":"i'm done",
-// 	"description":"leave the project",
-// 	"contextValidator": ScratchAction.Validator.currentProjectDefined
-// };
 
 // ScratchAction.Project.
 			// "respond to certain events", "play a sound", "repeat actions",
