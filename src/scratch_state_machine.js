@@ -83,7 +83,7 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'stay', from: '*', to: function() { return this.state} },
     { name: 'getCurrentProject', from: '*', to: function() { return this.state} },
     { name: 'getNthProject', from: '*', to: function() { return this.state} },
-    { name: 'getProjectNames', from: '*', to: function() { return this.state} },
+    { name: 'getProjectNames', from: '*', to: 'NavigatingAList'},
     { name: 'getProjectCount', from: '*', to: function() { return this.state} },
     { name: 'queryState', from: '*', to: function() { return this.state} },
     { name: 'stopBackground', from: '*', to: function() {return this.state} },
@@ -92,25 +92,31 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'startCues', from: '*', to: function() {return this.state} },
     { name: 'holdOn', from: '*', to: function() {return this.state} },
     { name: 'listen', from: '*', to: function() {return this.state} },
-    { name: 'getSounds', from: '*', to: function() {return this.state} },
-    { name: 'checkSound', from: '*', to: function() {return this.state} },
+    { name: 'getSounds', from: '*', to: 'NavigatingAList'},
+    { name: 'checkSound', from: '*', to: 'NavigatingAList'},
     { name: 'stopProject', from: 'PlayProject', to: function() {
         return this.history[this.history.length - 2];
       }
     },
-    { name: 'queryActions', from: '*', to: function() {return this.state} },
-    { name: 'getKnownCommands', from: '*', to: function() {return this.state} },
-    { name: 'getScratchCommands', from: '*', to: function() {return this.state} },
+    { name: 'queryActions', from: '*', to: function() {return this.state} }, // todo?:listnav
+    { name: 'getKnownCommands', from: '*', to: function() {return this.state} }, // todo?:listnav
+    { name: 'getScratchCommands', from: '*', to: function() {return this.state} }, // todo?:listnav
     { name: 'getWhatYouSaid', from: '*', to: function() {return this.state} },
     { name: 'getWhatISaid', from: '*', to: function() {return this.state} },
-    { name: 'getRecordings', from: '*', to: function() {return this.state} },
     { name: 'greet', from: '*', to: function() {return this.state} },
+    // Sound Recording State Changes
+    { name: 'getRecordings', from: '*', to: 'NavigatingAList'},
     { name: 'recordASound', from: '*', to: 'Recording'},
     { name: 'stopRecording', from: 'Recording', to: function() {
         return this.history[this.history.length - 2];
       } },
     { name: 'playARecording', from: '*', to: function() {return this.state} },
     { name: 'renameRecording', from: '*', to: function() {return this.state} },
+        // Go back to the previous state when you're done navigating a list.
+    { name: 'finishNavigatingList', from: 'NavigatingAList', to: function() {
+        return this.history[this.history.length - 2];
+      }
+    },
   ],
   data: function() {
     var ssm = this;
@@ -335,7 +341,10 @@ var ScratchStateMachine = new StateMachine.factory({
           }).then(()=> {
             this.pm.say(`renamed ${oldName} to ${newName}`);
           })
-        }
+        },
+        onNavigatingAList: () => {
+          this.pm.say(`You are now navigating a list from the start. Say 'next' or 'previous' to move through the list.`);
+        },
       }
 
       for (var method in methodMap) {

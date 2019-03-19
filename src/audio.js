@@ -62,8 +62,13 @@ class ScratchAudio {
 		   scratchAudio.cue.onended = resolve;                     // when done, resolve
 
 			if (!scratchAudio.muteCues) {
-				scratchAudio.cue.src = url;
-				scratchAudio.cue.play();
+				try {
+					scratchAudio.cue.src = url;
+					scratchAudio.cue.play();
+				} catch (e) {
+					console.log(e);
+				}
+
 			}
 		});
 	}
@@ -75,14 +80,16 @@ class ScratchAudio {
 
 	cueSuccess() {
 		// https://freesound.org/people/Mattix/sounds/402288/
-		return this._playCue('assets/sound/coin.wav');
+		return this._playCue('assets/sound/v2/magicspell.mp3');
 	}
 
 	cueProjectStarted() {
 		// sound came from reversing the Scratch 3.0 Coin sound
-		this._playCue('assets/sound/coin_reverse.wav');
+		return this._playCue('assets/sound/coin.wav');
 	}
 
+	// Here, we define a cue for the project ending. Hesitant to actually enable
+	// this because it distracts from the composability of the projects
 	cueProjectFinished() {
 		// sound came from reversing the Scratch 3.0 Coin sound
 		this._playCue('assets/sound/coin_reverse.wav');
@@ -90,12 +97,12 @@ class ScratchAudio {
 
 	cueListening() {
 		// sound came from Scratch sound assets
-		this._playCue('assets/sound/snap.wav');
+		this._playCue('assets/sound/v2/startListening.wav');
 	}
 
 	cueDoneListening() {
 		// sound came from Scratch sound assets
-		this._playCue('assets/sound/pop.wav');
+		this._playCue('assets/sound/v2/stopListening.wav');
 	}
 
 	// Ambient sounds to characterize different contexts
