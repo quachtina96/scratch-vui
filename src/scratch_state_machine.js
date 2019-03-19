@@ -64,6 +64,9 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'editExistingProject', from: 'PlayProject',  to: 'InsideProject' },
     { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
     { name: 'createANewProject', from: 'Home',  to: 'InsideProject' },
+    { name: 'createANewProject', from: 'PlayProject',  to: 'InsideProject' },
+    { name: 'createANewProjectCalled', from: 'Home',  to: 'InsideProject' },
+    { name: 'createANewProjectCalled', from: 'PlayProject',  to: 'InsideProject' },
     // Return should take you back to the last state
     { name: 'return',   from: '*', to: function() {
         return this.history[this.history.length - 2];
@@ -74,7 +77,6 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'play', from: 'Home', to: 'PlayProject'},
     { name: 'play', from: 'InsideProject', to: 'PlayProject'},
     { name: 'play', from: 'PlayProject', to: 'PlayProject'},
-    { name: 'createANewProject', from: 'PlayProject',  to: 'InsideProject' },
     { name: 'playCurrentProject', from: 'PlayProject', to: 'PlayProject'},
     { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
     { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
@@ -269,6 +271,7 @@ var ScratchStateMachine = new StateMachine.factory({
         onGetProjectNames: () => {this.pm.getProjectNames()},
         onGetProjectCount: () => {this.pm.getProjectCount()},
         onGetNthProject: (lifecycle, args) => {this.pm.getNthProject(lifecycle, args)},
+        onCreateANewProjectCalled: (lifecycle, args) => {this.pm.createANewProjectCalled(lifecycle,args)},
         onCreateANewProject: () => {this.pm.createANewProject()},
         onReturn: (lifecycle, args) => {this.pm.returnToPreviousState(lifecycle, args)},
         // Play existing project
@@ -289,7 +292,7 @@ var ScratchStateMachine = new StateMachine.factory({
           this.pm.audio.cueBackground(this.state);
         },
         onStartCues: () => {this.pm.audio.setMute("muteCues", false)},
-        onHoldOn: () => {this.pm.listening = false},
+        onHoldOn: () => {this.pm.listening = false; this.pm.say("I won't respond until you say listen");},
         onListen: () => {
           this.pm.listening = true;
           this.pm.say("listening!");

@@ -189,6 +189,26 @@ ScratchAction.General.queryState = {
 	"question": true
 };
 
+//createAnewProjectCalled
+ScratchAction.General.createANewProjectCalled = {
+	"name": "createANewProjectCalled",
+	"trigger":/(?:new project|create a? new project|create a? project|make a? new project|make a? project)(?: called (.*))/,
+	"idealTrigger": "new project called",
+	"description":"create a new project with a name",
+	"arguments":[{
+		name: 'project name',
+		validator: (ssm, projectName) => {
+			// project must be in user's list of projects
+			if (ssm.pm.has(projectName)) {
+				return 'A project called that already exists'
+			} else {
+				return true;
+			}
+		},
+		description: 'name of the project to create'
+	}]
+};
+
 //createAnewProject
 ScratchAction.General.createANewProject = {
 	"name": "createANewProject",
@@ -419,7 +439,7 @@ ScratchAction.General.holdOn = {
 //listen
 ScratchAction.General.listen = {
 	"name": "listen",
-	"trigger":/^listen$|^i'm ready$/,
+	"trigger":/^listen$|^i'm ready$|^start listening$/,
 	"idealTrigger":"listen",
 	"description":"get me to start listening until you say 'hold on'",
 };
@@ -465,13 +485,6 @@ ScratchAction.General.queryActionTypes = {
 	"idealTrigger":"what kinds of things can i do",
 	"description":"explore different kinds of actions",
 	"question": true
-};
-
-ScratchAction.General.greet = {
-	"name":"greet",
-	"trigger":/ ?hello | ?what's up | ?hey | ?hi | ?yo | ?sup /,
-	"idealTrigger":"hi",
-	"description":"greet me",
 };
 
 ScratchAction.General.recordASound = {
@@ -766,7 +779,7 @@ ScratchAction.Edit.replaceStep = {
 	"name":"replaceStep",
 	// Note: subtle bugs can occur based on the ordering of the possible phrases in the regular expression.
 	// The system accepts the first match moving left to right.
-	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*) with (.*)|replace (?:step|steps|stop|stops|stuff)|replace steps/,
+	"trigger":/(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*)|(?:replace|replaced) (?:step|steps|stop|stops|stuff|step at) (?:number)? ?(.*) with (.*)|replace (?:step|steps|stop|stops|stuff)|replace steps/,
 	"idealTrigger":"replace step 1 with say hello",
 	"description":"change step to say hello",
 	"arguments": [
@@ -783,6 +796,7 @@ ScratchAction.Edit.replaceStep = {
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 };
+
 
 /**
  * Namespace for Interrupt commands
@@ -829,6 +843,14 @@ ScratchAction.Help.getWhatYouSaid = {
 	"idealTrigger":"say that again",
 	"description":"get me to repeat what you just said",
 	"question": true
+};
+
+
+ScratchAction.General.greet = {
+	"name":"greet",
+	"trigger":/^hello$|^what's up$|^hey$|^hi$|^yo$|^sup$/,
+	"idealTrigger":"hi",
+	"description":"greet me",
 };
 
 // ScratchAction.Project.
