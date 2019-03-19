@@ -290,29 +290,6 @@ class ScratchProjectManager {
     }
   }
 
-  // /**
-  //  * Handle list navigation command
-  //  *
-  //  * @param {!String} utterance - what the user said
-  //  * @return {boolean} true if the utterance was handled, false if the utterance
-  //  *    was not a question.
-  //  */
-  // _navigateList(utterance) {
-  //   var listNavActions = ScratchAction.NavigateList;
-  //   // Handle list navigation if there is a match to the utterance.
-  //   for (var action of listNavActions) {
-  //     var trigger = action.trigger;
-  //     var args = this.scratchVoiced ? Utils.matchRegex(utterance, trigger) : Utils.match(utterance, trigger);
-  //     // If trigger was matched, attempt to execute associated command.
-  //     if (args && args.length > 0) {
-  //       // TODO:
-  //       // var actionToExecute = new Action(action);
-  //       // actionToExecute.execute(this.ssm, utterance);
-  //       return true;
-  //     }
-  //   }
-  // }
-
   /**
    * Handle utterance on the general navigation level.
    */
