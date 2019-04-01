@@ -148,12 +148,12 @@ var ScratchStateMachine = new StateMachine.factory({
       this.setMethods();
       this.pm._updatePlayRegex();
 
-      // Only introduce if the browser has never interacted with Scratch before.
-      if (!window.localStorage.scratchVuiInteractedBefore) {
-        this.introduceSelf();
-        console.log('window.localStorage.scratchVuiInteractedBefore is true')
-        window.localStorage.scratchVuiInteractedBefore = true;
-      }
+      // // Only introduce if the browser has never interacted with Scratch before.
+      // if (window.localStorage.scratchVuiInteractedBefore == "false") {
+      //   this.introduceSelf();
+      //   console.log('window.localStorage.scratchVuiInteractedBefore is true')
+      //   window.localStorage.scratchVuiInteractedBefore = "true";
+      // }
       this.introduceSelf();
 
       this.recordingsManager.vm = this.vm;
