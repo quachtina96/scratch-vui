@@ -200,6 +200,8 @@ var ScratchProject = StateMachine.factory({
             delete this.pm.projects['Untitled-'+this.pm.untitledCount];
             await this.pm.audio.cueSuccess();
             this.nameProject();
+            this.pm._updatePlayRegex();
+
           } else {
             this.pm.say(`${proposedName} cannot be used as a project name. It conflicts with another project or command`);
           }
