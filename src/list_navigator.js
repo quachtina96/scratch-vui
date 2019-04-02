@@ -143,13 +143,6 @@ var ListNavigator = StateMachine.factory({
 	        DEBUG && console.log(`[listNavigator handleUtterance] trigger type matched and action created`);
 
 	        var action = new Action(listNavigator.actions[triggerType]);
-	        // action.setArguments(listNavigator.ssm, args);
-	        // console.log(`set arguments for action ${action.arguments.map((argument) => argument.value)}`)
-
-	        // // The current actions and arguments are maintained at the  manager
-	        // // level to simplify management since there can only be one current action
-	        // // and argument to focus on.
-	        // listNavigator.ssm.pm.currentAction = action;
 
 	        // Await the synchronous audio cue
 	        await listNavigator.ssm.pm.audio.cueSuccess();
