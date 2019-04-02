@@ -100,18 +100,19 @@ class Action {
 		this.contextValidator = options.contextValidator ? options.contextValidator : () => {return true};
 		this.idealTrigger = options.idealTrigger ? options.idealTrigger : () => {return true};
 		this.missingArguments = null;
+		this.invalidArguments = [];
 		// The current argument that is being set or requested.
 		this.current = null;
 	}
 
 	validInContext(ssm) {
 		var result = this.contextValidator(ssm);
-    if (result != true) {
-      // Explain why the context is invalid.
-      ssm.pm.say(result);
-      result = false;
-    }
-    return result;
+	    if (result != true) {
+	      // Explain why the context is invalid.
+	      ssm.pm.say(result);
+	      result = false;
+	    }
+	    return result;
 	}
 
 	/**
@@ -119,8 +120,15 @@ class Action {
 	 * expression.
 	 */
 	setArguments(ssm, args) {
+		this.invalidArguments = [];
 		for (var i=1; i<args.length; i++) {
-			this.arguments[i-1].set(ssm, args[i])
+			var valid = this.arguments[i-1].set(ssm, args[i]);
+			if (!valid) {
+				this.invalidArguments.push({
+					argument: this.arguments[i-1],
+					invalidValue: args[i]
+				});
+			}
 		}
 	}
 
