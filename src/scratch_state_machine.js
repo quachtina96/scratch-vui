@@ -61,7 +61,8 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'renameCurrentProject', from: '*', to: function() { return this.state} },
     { name: 'renameProject', from: '*', to: function() { return this.state} },
     { name: 'deleteProject', from: '*', to: function() { return this.state} },
-    { name: 'editExistingProject', from: ['PlayProject', 'Home','NavigatingAList'],  to: 'InsideProject' },
+    // TODO: disable inside to inside project
+    { name: 'editExistingProject', from: ['PlayProject', 'Home','NavigatingAList', 'InsideProject'],  to: 'InsideProject' },
     { name: 'createANewProject', from: ['Home', 'PlayProject', 'NavigatingAList'],  to: 'InsideProject' },
     { name: 'createANewProjectCalled', from: ['Home', 'PlayProject', 'NavigatingAList'],  to: 'InsideProject' },
     // Return should take you back to the last state

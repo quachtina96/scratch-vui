@@ -797,7 +797,7 @@ class ScratchProjectManager {
             ScratchAction.Edit.nextStep,
             ScratchAction.Edit.goToStep,
             ScratchAction.Edit.playStep,
-            ScratchAction.Edit.insertStepAfter,
+            ScratchAction.Edit.insertStep,
             ScratchAction.General.getSounds,
             ScratchAction.General.play,
           ]

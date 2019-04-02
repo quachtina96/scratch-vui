@@ -671,7 +671,7 @@ ScratchAction.Edit.appendStep = {
 //insertStepBefore
 ScratchAction.Edit.insertStepBefore = {
 	"name":"insertStepBefore",
-	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (?:number)? ?(.*)|insert (?:step|steps|stop|stops|stuff|step)/,
+	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (?:number)? ?(.*)/,
 	// TODO: what are other commands that would be good to try to insert.
 	// could we design these commands to be more exciting.
 	"idealTrigger":"insert 'play the bark sound' before step number '1'",
@@ -694,7 +694,7 @@ ScratchAction.Edit.insertStepBefore = {
 //insertStepAfter
 ScratchAction.Edit.insertStepAfter = {
 	"name":"insertStepAfter",
-	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|insert (?:step|steps|stop|stops|stuff|step)/,
+	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)/,
 	// TODO: there is so much potential to make these triggers and descriptions
 	// contextual based on the current step.
 	"idealTrigger":"insert 'play the meow sound' after step number '1'",
@@ -754,6 +754,34 @@ ScratchAction.Edit.beforeInsertStep = {
 			'validator': ScratchAction.Validator.scratchCommand,
 			'description':'instruction to insert'
 		}
+	],
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
+};
+
+//insertStep
+ScratchAction.Edit.insertStep = {
+	"name":"insertStep",
+	"trigger":/insert (?:a)? ?(?:step|steps|stop|stops|stuff|step)/,
+	// TODO: what are other commands that would be good to try to insert.
+	// could we design these commands to be more exciting.
+	"idealTrigger":"insert step",
+	"description":"insert a new command",
+	"arguments": [
+		{
+			'name': 'instruction',
+			'validator': ScratchAction.Validator.scratchCommand,
+			'description':'instruction to insert'
+		},
+		{
+			name: 'step number',
+			validator: ScratchAction.Validator.currentProjectStepNumber,
+			description: 'step number to insert next to'
+		},
+		{
+			'name': 'direction',
+			'validator': ScratchAction.Validator.scratchCommand,
+			'description':'before or after'
+		},
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 };

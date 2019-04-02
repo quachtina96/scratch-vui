@@ -203,7 +203,7 @@ class ScratchProjectEditor {
   /**
    * In order to support
    */
-  insertStep(options) {
+  _insertStep(options) {
     var direction = options.direction;
     var referenceStepNumber = options.referenceStepNumber;
     var utterance = options.utterance;
@@ -211,7 +211,8 @@ class ScratchProjectEditor {
     var step = new ScratchInstruction(utterance);
     ScratchInstruction.parse(step.no_punctuation).then((parse) => {
       if (parse) {
-        this._insertStep(step, referenceStepNumber);
+        this._insertStepHelper(step, referenceStepNumber);
+        this.project.pm.say(`inserted step ${direction} step ${referenceStepNumber}`);
       }
     });
   }
@@ -219,7 +220,7 @@ class ScratchProjectEditor {
   /**
    * Helper function for inserting.
    */
-  _insertStep(step, location) {
+  _insertStepHelper(step, location) {
     this.project.instructions.splice(location, 0, step);
     this.project.instructionPointer = location;
   }
@@ -241,7 +242,7 @@ class ScratchProjectEditor {
         referenceStepNumber: this._getNumber(args[2])-1
       }
     }
-    this.insertStep(options);
+    this._insertStep(options);
   }
 
   insertStepAfter(args, invertedArguments=false) {
@@ -258,15 +259,24 @@ class ScratchProjectEditor {
         referenceStepNumber: this._getNumber(args[2])
       }
     }
-    this.insertStep(options);
+    this._insertStep(options);
   }
 
   beforeInsertStep(args) {
-    this.insertStepBefore(args, true);
+    this._insertStepBefore(args, true);
   }
 
   afterInsertStep(args) {
-    this.insertStepAfter(args, true);
+    this._insertStepAfter(args, true);
+  }
+
+  insertStep(args) {
+    var options =  {
+        direction: args[3],
+        utterance: args[1],
+        referenceStepNumber: this._getNumber(args[2])
+      }
+    this._insertStep(options);
   }
 
   /**
