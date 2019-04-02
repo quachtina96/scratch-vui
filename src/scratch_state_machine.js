@@ -61,12 +61,9 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'renameCurrentProject', from: '*', to: function() { return this.state} },
     { name: 'renameProject', from: '*', to: function() { return this.state} },
     { name: 'deleteProject', from: '*', to: function() { return this.state} },
-    { name: 'editExistingProject', from: 'PlayProject',  to: 'InsideProject' },
-    { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
-    { name: 'createANewProject', from: 'Home',  to: 'InsideProject' },
-    { name: 'createANewProject', from: 'PlayProject',  to: 'InsideProject' },
-    { name: 'createANewProjectCalled', from: 'Home',  to: 'InsideProject' },
-    { name: 'createANewProjectCalled', from: 'PlayProject',  to: 'InsideProject' },
+    { name: 'editExistingProject', from: ['PlayProject', 'Home','NavigatingAList'],  to: 'InsideProject' },
+    { name: 'createANewProject', from: ['Home', 'PlayProject', 'NavigatingAList'],  to: 'InsideProject' },
+    { name: 'createANewProjectCalled', from: ['Home', 'PlayProject', 'NavigatingAList'],  to: 'InsideProject' },
     // Return should take you back to the last state
     { name: 'return',   from: '*', to: function() {
         return this.history[this.history.length - 2];
@@ -74,14 +71,10 @@ var ScratchStateMachine = new StateMachine.factory({
     },
     { name: 'goHome', from: '*', to: 'Home'},
     { name: 'finishProject', from: 'InsideProject', to: 'Home'},
-    { name: 'play', from: 'Home', to: 'PlayProject'},
-    { name: 'editProject', from: 'Home', to: 'InsideProject'},
+    { name: 'play', from: ['Home', 'NavigatingAList','PlayProject'], to: 'PlayProject'},
+    { name: 'editProject', from: ['PlayProject', 'Home', 'NavigatingAList'], to: 'InsideProject'},
     // { name: 'play', from: 'InsideProject', to: 'PlayProject'}, // disable ability to play a project when inside project to prevent conflicts between commands
-    { name: 'play', from: 'PlayProject', to: 'PlayProject'},
-    { name: 'playCurrentProject', from: 'PlayProject', to: 'PlayProject'},
-    { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
-    { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
-    // Support this.goto(STATE_NAME);
+    { name: 'playCurrentProject', from: ['PlayProject', 'InsideProject'], to: 'PlayProject'},
     { name: 'goto', from: '*', to: function(s) { return s } },
     { name: 'stay', from: '*', to: function() { return this.state} },
     { name: 'getCurrentProject', from: '*', to: function() { return this.state} },
@@ -360,6 +353,9 @@ var ScratchStateMachine = new StateMachine.factory({
         questions you have. To start, why don't you say 'alarm' to play the alarm project");
       this.pm.recognition.start();
     },
+    onLeaveNavigatingAList: function() {
+      this.pm.listNavigator = null;
+    }
   }
 });
 
