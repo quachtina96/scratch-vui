@@ -166,11 +166,13 @@ class ScratchProjectManager {
     }))
   }
 
+  /**
+   * Pass the utterance to the current action. Execute the current action and
+   * set current action to null.
+   */
   _handleCurrentAction(utterance) {
     DEBUG && console.log(`[pm handle utterance][_finishUtterance] executing current action`)
-    this.currentAction.execute(this.ssm, utterance)
-    this.currentAction = null;
-    return true;
+    this.triggerAction(this.currentAction, null, utterance);
   }
 
   async _handleCurrentProject(utterance) {
@@ -232,11 +234,14 @@ class ScratchProjectManager {
         }
       }
 
-      if (this.currentAction && this._handleCurrentAction(utterance)) {
+      // If there is a current action, attempt to handle the action. You've
+      // handled the utterance if current action successfully handled it.
+      if (this.currentAction) {
+        this._handleCurrentAction(utterance);
         return;
       }
 
-      if (this.ssm.state == 'InsideProject' && this.currentProject) {
+      if ((this.ssm.state == 'InsideProject' || this.ssm.state == 'PlayProject') && this.currentProject) {
         var success = await this._handleCurrentProject(utterance);
         if (success) {
           DEBUG && console.log(`[pm handle utterance][_finishUtterance] _handleCurrentProject succeeded`)
@@ -340,11 +345,7 @@ class ScratchProjectManager {
         if (this.ssm.can(triggerType)) {
           var action = new Action(ScratchAction.General[triggerType])
           this.currentAction = action;
-          if (this.triggerAction(action, args, utterance)) {
-            // Successfully triggered action.
-            this.currentAction = null;
-            this.currentArgument = null;
-          }
+          this.triggerAction(action, args, utterance);
         } else {
           this.say('You are currently in ' + this.ssm.state + ' mode and cannot '
             + triggerType + ' from here.');
@@ -358,7 +359,6 @@ class ScratchProjectManager {
         this.currentProject.handleUtteranceDuringExecution(utterance, this.scratchVoiced);
     }
     else if (Utils.containsScratch(utterance)) {
-      // TODO: figure out whether i should force this section to contain Scratch or not!
       this.say("I heard you say " + utterance);
 
       // Suggest a close match if there exists one via fuzzy matching.
@@ -368,8 +368,6 @@ class ScratchProjectManager {
       var jaroWinklerScore = result[1] // 1 - JaroWinkler Distance
       var triggerType = result[0]
       if (jaroWinklerScore < .25) {
-        // TODO: enable the line below.
-        // this.say("Did you mean to say " + spoken version of detected trigger type + "?");
         this.say("Did you want to " + triggerType + "?");
         // TODO: integrate way to ask for additional arguments to pass to
         // triggerAction.
@@ -413,32 +411,34 @@ class ScratchProjectManager {
 
   /**
    * Execute action associated with trigger type with given arguments and
-   * utterance.
+   * utterance. Resets the current action if successful.
    * @param {!Action} action - the action to execute.
    * @param {Array<string>} args - the arguments extracted from utterance using
    *    the regex associated with the trigger. See ScratchRegex in triggers.js
    * @param {string} - utterance - user input
+   * @return {boolean} whether or not the action was successfully triggered?
    */
   triggerAction(action, opt_args, opt_utterance) {
     opt_args = opt_args ? opt_args : [];
     opt_utterance = opt_utterance ? opt_utterance : "";
-    this.action = action;
 
     // Validate context
     if (!action.validInContext(this.ssm)) {
-      return;
+      console.log("Action is not valid in context");
+      return false;
     }
 
     // Validate arguments
     console.log(`[pm triggerAction] set arguments: ${opt_args}`)
     action.setArguments(this.ssm, opt_args);
     console.log(`[pm triggerAction] result: ${action.arguments}`)
-    // TINA: what happens when one argument has been satisfied.
+
+    // Request a missing argument from the user.
     var missingArgument = action.getMissingArgument(this.ssm);
     if (missingArgument) {
       // Let the argument handle the utterances until the argument is filled.
       this.currentArgument = missingArgument;
-      return;
+      return false;
     } else {
       this.currentArgument = null;
     }
@@ -446,6 +446,8 @@ class ScratchProjectManager {
     // Attempt action
     try {
       action.execute(this.ssm, opt_utterance);
+      this.currentAction = null;
+      this.currentArgument = null;
       return true;
     } catch(e) {
       // Handle failure based on transition type.

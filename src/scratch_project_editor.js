@@ -77,12 +77,7 @@ class ScratchProjectEditor {
   _handleAction(action, utterance) {
     var pm = this.project.pm;
 
-    if (pm.triggerAction(action, action.getArgs(), utterance)) {
-
-      // Successfully triggered action.
-      pm.currentAction = null;
-      pm.currentArgument = null;
-    } else {
+    if (!pm.triggerAction(action, action.getArgs(), utterance)) {
       console.log(`You are currently in editor state ${this.project.state} and failed to ${action.name}`);
       return false;
     }
