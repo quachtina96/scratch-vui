@@ -557,10 +557,14 @@ class ScratchProjectManager {
       if (names.length == 1) {
         pm.say("One project called " + names[0]);
       } else if (names.length) {
-        var whatToSay = Object.keys(pm.projects);
-        whatToSay.splice(whatToSay.length-1, 0, 'and');
-        whatToSay.join(',')
-        pm.say(whatToSay);
+        var projectNamesUnwrapper = (nameList, ssm) => {
+          var whatToSay = nameList;
+          whatToSay.splice(whatToSay.length-1, 0, 'and');
+          whatToSay.join(',')
+          ssm.pm.say(whatToSay);
+        };
+        pm.listNavigator = new ListNavigator(Object.keys(pm.projects), 3, pm.ssm, projectNamesUnwrapper);
+        pm.listNavigator.navigate();
       } else {
         pm.say("You don't have any projects.");
       }
@@ -707,12 +711,10 @@ class ScratchProjectManager {
       pm.soundLibrary.vm =this.ssm.vm;
     }
     return new Promise((resolve, reject) => {
-      pm.say('I have many sounds. Here are the first 3');
-      var sounds = pm.soundLibrary.listNavigator.current();
+      pm.say('I have many sounds.');
       pm.soundLibrary.listNavigator.ssm = pm.ssm;
       pm.listNavigator = pm.soundLibrary.listNavigator;
-      // Build promise chain to present each sound in order.
-      return pm.soundLibrary.unwrapper(sounds, pm.ssm);
+      return pm.listNavigator.navigate();
     });
   }
   checkSound(lifecycle, args) {
@@ -742,8 +744,7 @@ class ScratchProjectManager {
             pm.say(`I found ${soundCount} sounds`);
             var candidateSoundItems = candidateSounds.map((name) => pm.soundLibrary.get(name));
             this.listNavigator = new ListNavigator(candidateSoundItems, 1, this.ssm, pm.soundLibrary.unwrapper);
-            this.listNavigator.current();
-            pm.soundLibrary.unwrapper(this.listNavigator.current(), pm.ssm);
+            this.listNavigator.navigate();
           }
           resolve();
           return;

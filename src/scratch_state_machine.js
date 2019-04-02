@@ -327,7 +327,8 @@ var ScratchStateMachine = new StateMachine.factory({
         },
         onGetRecordings: async () => {
           var recordingNames = await this.recordingsManager.getAllRecordings();
-          this.pm.say(`${recordingNames}`)
+          this.pm.listNavigator = new ListNavigator(recordingNames, 3, null, (name) => {return name});
+          this.pm.listNavigator.navigate();
         },
         onPlayARecording: async (lifecycle, args) => {
           var soundName = args[1];

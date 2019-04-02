@@ -62,6 +62,18 @@ class ScratchInstruction {
       }
     })
   }
+
+  //TODO(quacht): implement
+  //TODO(quacht): reworking the grammar COULD help w/ this. might go along with
+  // generating documentation.
+  /**
+   * Given an instruction, reworks the instruction if it corresponds to known
+   * mistranscriptions.
+   */
+  static recognize(instruction) {
+    // "90 for misheard as 94"
+    return;
+  }
 }
 
 module.exports = ScratchInstruction;

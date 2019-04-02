@@ -59,6 +59,9 @@ var ListNavigator = StateMachine.factory({
 		},
 	],
 	data: function(list, chunksize, opt_ssm, opt_unwrapper) {
+		if (chunksize < 1) {
+			throw Error("Cannot navigate a list with a chunksize smaller than 1.")
+		}
 		var getNavigatorFunctions = (list, chunksize, opt_current) => {
 			// Return a successor if it exists. Otherwise, return null.
 			var current = opt_current ? opt_current : 0;
@@ -93,6 +96,7 @@ var ListNavigator = StateMachine.factory({
 		var unwrapper = opt_unwrapper ? opt_unwrapper : null;
 		return {
 			list: list,
+			chunksize: chunksize,
 			chunkedList: list.chunk(chunksize),
 			successor: successor,
 			predecessor: predecessor,
@@ -176,11 +180,22 @@ var ListNavigator = StateMachine.factory({
 	  },
 	  getNextPart() {
 	  	this.next();
-	  	this.unwrapper(this.current(), this.ssm);
+	  	this.getCurrent();
 	  },
 	  getPreviousPart() {
 	  	this.previous();
+	  	this.getCurrent();
+	  },
+	  getCurrent() {
 	  	this.unwrapper(this.current(), this.ssm);
+	  },
+	  navigate() {
+	  	if (this.chunksize == 1) {
+			this.ssm.pm.say(`Here is the first item in the list.`)
+	  	} else {
+	  		this.ssm.pm.say(`Here are the first ${this.chunksize} items in the list.`)
+	  	}
+		this.getCurrent();
 	  },
 	  // TODO: utilize getPart so that we can index into specific pages of the
 	  // list.

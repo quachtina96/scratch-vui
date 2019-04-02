@@ -1,0 +1,39 @@
+// To test whether you can play a project inside of a project
+new project
+debug one
+say hello
+i'm done
+
+debug one
+// scratch should say hello
+
+new project
+try to use a project
+play the chomp sound
+debug one
+// scratch should say Okay, what's the next step.
+play the meow sound
+i'm done
+
+try to use a project
+// scratch should play the chomp sound, say hello, and then play the meow sound
+
+______________
+
+realistically, what will it take to make this happen?
+
+ATTEMPT 1:
+-> on this scratch vui side--> generating the list of sentences that will create the program....
+--> what about when the command sits INSIDE of the a loops
+
+failure mode: "debug one forever."
+
+ATTEMPT 2:
+"debug one forever."
+
+scratchNLP - needs to know what things are valid project names. Add a new kind of message to be understood.
+everytime someone creates a new project, notify scratchNLP of that project name.
+______________
+
+PRIORITY:
+prevent the bug where the command/argument gets repeated!
