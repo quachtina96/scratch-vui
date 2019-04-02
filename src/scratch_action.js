@@ -773,13 +773,19 @@ ScratchAction.Edit.insertStep = {
 			'description':'instruction to insert'
 		},
 		{
-			name: 'step number',
-			validator: ScratchAction.Validator.currentProjectStepNumber,
-			description: 'step number to insert next to'
+			'name': 'step number',
+			'validator': ScratchAction.Validator.currentProjectStepNumber,
+			'description': 'step number to insert next to'
 		},
 		{
 			'name': 'direction',
-			'validator': ScratchAction.Validator.scratchCommand,
+			'validator': (ssm, direction) => {
+				if(['before', 'after'].includes(direction)) {
+					return true;
+				} else {
+					return 'the direction must be before or after'
+				}
+			},
 			'description':'before or after'
 		},
 	],
@@ -789,7 +795,7 @@ ScratchAction.Edit.insertStep = {
 //deleteStep
 ScratchAction.Edit.deleteStep = {
 	"name":"deleteStep",
-	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|delete (?:step|steps|stop|stops|stuff|step)/,
+	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|delete ?(?:a)? (?:step|steps|stop|stops|stuff|step)/,
 	"idealTrigger":"delete step 1",
 	"description":"delete the first step",
 	"arguments": [
