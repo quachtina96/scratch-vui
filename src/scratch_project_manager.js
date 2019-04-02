@@ -700,6 +700,12 @@ class ScratchProjectManager {
       if (pm.currentProject) {
         pm.say('Your current project is ' + pm.currentProject.name);
       }
+      if (pm.currentAction) {
+        pm.say(`Your current action is ${pm.currentAction.name}`);
+      }
+      if (pm.currentArgument) {
+        pm.say(`Your current argument is ${pm.currentArgument.description}`);
+      }
       resolve();
     });
   }
