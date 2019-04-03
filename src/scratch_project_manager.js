@@ -245,6 +245,10 @@ class ScratchProjectManager {
         var success = await this._handleCurrentProject(utterance);
         if (success) {
           DEBUG && console.log(`[pm handle utterance][_finishUtterance] _handleCurrentProject succeeded`)
+          // If the current project successfully handles the utterance, it means
+          // that the user has moved into the inside project state, so make that
+          // transition with the state machine.
+          this.ssm.editProjectWithoutIntro();
           return;
         } else {
           DEBUG && console.log(`[pm handle utterance][_finishUtterance] _handleCurrentProject failed`)
