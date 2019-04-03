@@ -509,7 +509,7 @@ ScratchAction.General.stopRecording = {
 
 ScratchAction.General.getRecordings = {
 	"name":"getRecordings",
-	"trigger":/what recordings do i have|list ?(?:all|the)? recordings|get ?(?:all|the)? recordings|^what recordings (?:are there|do you (?:know|have))|what (?:other)? ?recordings do you (?:know|have)|list all the recordings ?(?:that)? ?(?:i've made)$/,
+	"trigger":/what recordings do you have|what recordings do i have|list ?(?:all|the)? recordings|get ?(?:all|the)? recordings|^what recordings (?:are there|do you (?:know|have))|what (?:other)? ?recordings do you (?:know|have)|list all the recordings ?(?:that)? ?(?:i've made)$/,
 	"idealTrigger": "list recordings",
 	"description": "hear me list all the recordings"
 };

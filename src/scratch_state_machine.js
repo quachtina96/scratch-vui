@@ -5,6 +5,8 @@
  */
 const StateMachine = require('javascript-state-machine');
 const StateMachineHistory = require('javascript-state-machine/lib/history')
+const ListNavigator = require('./list_navigator.js');
+
 const ScratchVUIStorage = require('./storage.js');
 const ScratchProjectManager = require('./scratch_project_manager.js');
 const Utils = require('./utils.js');
@@ -322,7 +324,13 @@ var ScratchStateMachine = new StateMachine.factory({
         },
         onGetRecordings: async () => {
           var recordingNames = await this.recordingsManager.getAllRecordings();
-          this.pm.listNavigator = new ListNavigator(recordingNames, 3, null, (name) => {return name});
+          var namesUnwrapper = (nameList, ssm) => {
+            var whatToSay = nameList;
+            whatToSay.splice(whatToSay.length-1, 0, 'and');
+            whatToSay.join(',')
+            ssm.pm.say(whatToSay);
+          };
+          this.pm.listNavigator = new ListNavigator(recordingNames, 3, this, namesUnwrapper);
           this.pm.listNavigator.navigate();
         },
         onPlayARecording: async (lifecycle, args) => {
