@@ -299,7 +299,7 @@ ScratchAction.General.editProject = {
 //finishProject
 ScratchAction.General.finishProject = {
 	"name":"finishProject",
-	"trigger":/those are all the steps|exit project|leave project|no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|end project|finish project/,
+	"trigger":/those are all the steps|exit project|leave project|no next steps|no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|end project|finish project/,
 	"idealTrigger":"i'm done",
 	"description":"leave the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -589,7 +589,7 @@ ScratchAction.Edit.getStepCount = {
 //getAllSteps
 ScratchAction.Edit.getAllSteps = {
 	"name":"getAllSteps",
-	"trigger":/what are (?:all)? ?the steps|what does (?:my|the)? ?project do right now/,
+	"trigger":/what steps are there|what are (?:all)? ?the steps|what does (?:my|the)? ?project do right now/,
 	"idealTrigger":"what are all the steps",
 	"description":"hear me say all the steps in the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined,
@@ -656,7 +656,7 @@ ScratchAction.Edit.playStep = {
 //appendStep
 ScratchAction.Edit.appendStep = {
 	"name":"appendStep",
-	"trigger":/append (?:a)? ?step|add (?:a)? ?step|add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
+	"trigger":/append (?:a)? ?step|^a stop$|add (?:a)? ?step|add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
 	"idealTrigger":"next, play the chomp sound",
 	"description":"to add a new instruction, 'play the chomp sound', to the end of the project",
 	"arguments": [{
