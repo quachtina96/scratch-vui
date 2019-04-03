@@ -195,6 +195,7 @@ if (!('webkitSpeechRecognition' in window)) {
 
   document.onkeydown = function(evt) {
     evt = evt || window.event;
+    if (!document.activeElement === document.getElementById("type-to-code"))
     if (evt.code == 'Space') {
       if (scratch.state == "Recording") {
         scratch.stopRecording();
@@ -212,4 +213,20 @@ if (!('webkitSpeechRecognition' in window)) {
       }
     }
   };
+
+  var typeToCode = document.getElementById("type-to-code");
+  var historyText = document.getElementById("history_text");
+  typeToCode.onkeydown = function(evt) {
+    evt = evt || window.event;
+    // If the user has pressed enter
+    if (evt.code === 'Enter') {
+        var newUtterance = document.getElementById("type-to-code").value;
+        scratch.handleUtterance(newUtterance);
+        document.getElementById("type-to-code").value = "";
+        historyText.value = historyText.value + "\n" + newUtterance;
+    }
+    else {
+        console.log('not enter in text area')
+    }
+  }
 }
