@@ -193,25 +193,31 @@ if (!('webkitSpeechRecognition' in window)) {
     }
   };
 
+  var typeToCodeHandlesSpace = true;
   document.onkeydown = function(evt) {
     evt = evt || window.event;
-    if (!document.activeElement === document.getElementById("type-to-code"))
-    if (evt.code == 'Space') {
-      if (scratch.state == "Recording") {
-        scratch.stopRecording();
-        return;
+    if (!typeToCodeHandlesSpace) {
+      console.log('typeToCode DOES NOT Handle Space')
+      if (evt.code == 'Space') {
+        if (scratch.state == "Recording") {
+          scratch.stopRecording();
+          return;
+        }
+        if (recognizing) {
+          recognition.stop();
+          // play sound cue for stopping listening.
+          scratch.pm.audio.cueDoneListening();
+          return;
+        } else {
+          scratch.vm.stopAll();
+          scratch.pm.synth.cancel();
+          recognition.start();
+        }
       }
-      if (recognizing) {
-        recognition.stop();
-        // play sound cue for stopping listening.
-        scratch.pm.audio.cueDoneListening();
-        return;
-      } else {
-        scratch.vm.stopAll();
-        scratch.pm.synth.cancel();
-        recognition.start();
-      }
+    } else {
+      console.log('typeToCodeHandlesSpace')
     }
+
   };
 
   var typeToCode = document.getElementById("type-to-code");
@@ -223,10 +229,19 @@ if (!('webkitSpeechRecognition' in window)) {
         var newUtterance = document.getElementById("type-to-code").value;
         scratch.handleUtterance(newUtterance);
         document.getElementById("type-to-code").value = "";
-        historyText.value = historyText.value + "\n" + newUtterance;
-    }
-    else {
-        console.log('not enter in text area')
+        historyText.innerHTML = historyText.innerHTML + "\n" + newUtterance + "\n";
+    }  else {
+        console.log('did not press enter in text area')
     }
   }
+
+  document.onclick = function(e) {
+    if (e.target.id === 'type-to-code') {
+      console.log('clicked IN type to code')
+      typeToCodeHandlesSpace = true;
+    } else {
+      console.log('clicked OUTSIDE type to code')
+      typeToCodeHandlesSpace = false;
+    }
+  };
 }
