@@ -614,9 +614,9 @@ ScratchAction.Edit.goToStep = {
 	"description":"jump to and hear step number 2 of the project",
 	"arguments": [
 		{
-			name: 'step number',
-			// skip the validator, because _describeCurrentStep already does validation.
-			description: 'name step to go to'
+			'name': 'step number',
+			'validator': ScratchAction.Validator.currentProjectStepNumber,
+			'description': 'name step to go to'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined,
