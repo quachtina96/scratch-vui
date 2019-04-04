@@ -193,11 +193,12 @@ if (!('webkitSpeechRecognition' in window)) {
     }
   };
 
-  var typeToCodeHandlesSpace = true;
+  // Handle keypresses!
+  var typeToCodeHandlesSpace = false;
+
   document.onkeydown = function(evt) {
     evt = evt || window.event;
     if (!typeToCodeHandlesSpace) {
-      console.log('typeToCode DOES NOT Handle Space')
       if (evt.code == 'Space') {
         if (scratch.state == "Recording") {
           scratch.stopRecording();
@@ -214,8 +215,6 @@ if (!('webkitSpeechRecognition' in window)) {
           recognition.start();
         }
       }
-    } else {
-      console.log('typeToCodeHandlesSpace')
     }
 
   };
@@ -230,18 +229,16 @@ if (!('webkitSpeechRecognition' in window)) {
         scratch.handleUtterance(newUtterance);
         document.getElementById("type-to-code").value = "";
         historyText.innerHTML = historyText.innerHTML + "\n" + newUtterance + "\n";
-    }  else {
-        console.log('did not press enter in text area')
     }
   }
 
-  document.onclick = function(e) {
-    if (e.target.id === 'type-to-code') {
-      console.log('clicked IN type to code')
-      typeToCodeHandlesSpace = true;
-    } else {
-      console.log('clicked OUTSIDE type to code')
-      typeToCodeHandlesSpace = false;
-    }
-  };
+  // When the user leaves the text area for typing to Scratch give the document
+  // permission to handle the spacebar as usual.
+  typeToCode.onblur = function() {
+    typeToCodeHandlesSpace = false;
+  }
+
+  typeToCode.onfocus = function() {
+    typeToCodeHandlesSpace = true;
+  }
 }
