@@ -1,0 +1,4 @@
+name,description,idealTrigger
+finishNavigatingList,to finish navigating the list and return to previous state,go back
+getPreviousPart,to get the previous part of the list,go back
+getNextPart,to get the next part of the list,next

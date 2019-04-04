@@ -1,0 +1,16 @@
+name,description,idealTrigger
+goToStep,jump to and hear step number 2 of the project,go to step number 2
+appendStep,"to add a new instruction, 'play the chomp sound', to the end of the project","next, play the chomp sound"
+beforeInsertStep,insert a new command before step number 1,before step number '1'insert 'play the bark sound'
+previousStep,go to the step before,previous step
+insertStepBefore,insert a new command before step number 1,insert 'play the bark sound' before step number '1'
+getAllSteps,hear me say all the steps in the project,what are all the steps
+nextStep,go to the next step,next step
+insertStepAfter,insert a new command after step number 1,insert 'play the meow sound' after step number '1'
+getStepCount,get the number of steps in the project,how many steps are there
+afterInsertStep,insert a new command after step number 1,after step number '1' insert 'play the meow sound'
+replaceStep,change step to say hello,replace step 1 with say hello
+deleteStep,delete the first step,delete step 1
+playStep,play the current step,try it
+insertStep,insert a new command,insert step
+getCurrentStep,get the number and description of the current step,what step am i on

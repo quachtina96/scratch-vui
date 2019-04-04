@@ -1,0 +1,26 @@
+{
+  "finishNavigatingList":{
+    "name":"finishNavigatingList",
+    "trigger":{
+
+    },
+    "idealTrigger":"go back",
+    "description":"to finish navigating the list and return to previous state"
+  },
+  "getNextPart":{
+    "name":"getNextPart",
+    "trigger":{
+
+    },
+    "idealTrigger":"next",
+    "description":"to get the next part of the list"
+  },
+  "getPreviousPart":{
+    "name":"getPreviousPart",
+    "trigger":{
+
+    },
+    "idealTrigger":"go back",
+    "description":"to get the previous part of the list"
+  }
+}

@@ -1,0 +1,35 @@
+name,description,idealTrigger
+stopProject,stop playing a project,stop
+editProject,edit the current project,what's inside
+stopRecording,end the recording of a sound to use in projects,stop recording
+startCues,start the audio cues,start audio cues
+renameCurrentProject,rename the current project ,call this project NEW_NAME
+greet,greet me,hi
+getCurrentProject,find out what project you are on,what project am i on
+queryActionTypes,explore different kinds of actions,what kinds of things can i do
+getProjectNames,hear a list of all the projects,what projects do i have
+checkSound,check if there's a boing sound,do you have a boing sound?
+queryActions,get a suggestion for what to try next,what can i do
+stopBackground,stop the background music,stop the background music
+listen,get me to start listening until you say 'hold on',listen
+play,play a project made by tina called give me a compliment.,give me a compliment
+getRecordings,hear me list all the recordings,list recordings
+return,go back to the last state you were in,go back
+createANewProject,create a new project,new project
+startBackground,start the background music,start background music
+createANewProjectCalled,create a new project with a name,new project called
+playCurrentProject,play the current project,play project
+renameRecording,rename recording,rename recording
+deleteProject,delete a project,delete the BLANK project
+getProjectCount,hear how many projects there are,how many projects do i have'
+finishProject,leave the project,i'm done
+recordASound,start recording a sound to use in projects,record a sound called soundName
+holdOn,make me ignore you until you say 'listen',hold on
+stopCues,stop the audio cues,stop audio cues
+editExistingProject,check out what the alarm project is made of,what's inside alarm
+getSounds,discover what sounds there are,what sounds are there
+goHome,go back to the home state,go home
+playARecording,hear the last recording,hear recording
+getNthProject,get the first project,what's project number one'
+queryState,figure out what state you are in,what state am i in
+renameProject,change the name of one of your projects,call the OLD_NAME project NEW_NAME instead

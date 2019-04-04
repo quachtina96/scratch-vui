@@ -1,0 +1,10 @@
+{
+  "cancel":{
+    "name":"cancel",
+    "trigger":{
+
+    },
+    "idealTrigger":"cancel",
+    "description":"stop an action that you were in the middle of"
+  }
+}
