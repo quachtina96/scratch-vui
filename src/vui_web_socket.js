@@ -12,8 +12,10 @@ wsp.open()
  .then(() => {
  	wsp.sendRequest({foo: 'bar'})
  }) // actually sends {foo: 'bar', id: 'xxx'}, because `attachRequestId` defined above
- .then(response => console.log(response));  // waits server message with corresponding requestId: {id: 'xxx', ...}
-
+ .then(response => console.log(response))  // waits server message with corresponding requestId: {id: 'xxx', ...}
+ .catch(function(err) {
+ 	console.log('err');
+ });
 wsp.onMessage.addListener(message => {
 	console.log('message recieved by vui: ');
 	console.log(message);

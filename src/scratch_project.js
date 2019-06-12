@@ -33,7 +33,6 @@ var ScratchProject = StateMachine.factory({
       pm: pm,
       ssm: pm.ssm,
       name: null,
-      audio: new ScratchAudio(),
       instructions: [],
       // Use 1-based indexing so step 1 refers to the first step when
       // communicating to the user.

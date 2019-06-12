@@ -656,7 +656,7 @@ ScratchAction.Edit.playStep = {
 //appendStep
 ScratchAction.Edit.appendStep = {
 	"name":"appendStep",
-	"trigger":/append (?:a)? ?step|^a stop$|add (?:a)? ?step|add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
+	"trigger":/append (?:a)? ?step|^a stop$|add (?:a|another)? ?step|add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
 	"idealTrigger":"next, play the chomp sound",
 	"description":"to add a new instruction, 'play the chomp sound', to the end of the project",
 	"arguments": [{
@@ -855,8 +855,8 @@ ScratchAction.Help.getKnownCommands = {
 
 ScratchAction.Help.getScratchCommands = {
 	"name":"getScratchCommands",
-	"trigger":/what scratch commands do you (?:know|have)|(?:tell me|what are) (?:the|some ?(?:of the)?) scratch commands (?:that you know|you know)?|what (?:(?:kinds|kind) of)? ?scratch commands (?:are there|do you know)|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you (?:have|know))/,
-	"idealTrigger":"what scratch commands are there",
+	"trigger":/what commands do you (?:know|have)|(?:tell me|what are) (?:the|some ?(?:of the)?) commands (?:that you know|you know)?|what (?:(?:kinds|kind) of)? ?commands (?:are there|do you know)|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you (?:have|know))/,
+	"idealTrigger":"what commands are there",
 	"description":"learn about what commands you can use in your projects",
 	"question": true
 };
