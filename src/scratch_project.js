@@ -160,12 +160,16 @@ var ScratchProject = StateMachine.factory({
         throw Error(`[project handleUtterance] failed parse to Scratch command: ${command}`);
       } else {
         // Success!
-        DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
-        await project.pm.audio.cueSuccess();
-        var instruction = new ScratchInstruction(command);
-        instruction.parse = parseResult;
-        project.instructions.push(instruction);
-        project.addInstruction();
+
+        // Only add to the project if we are inside the project
+        if (this.ssm.state == 'InsideProject') {
+          DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
+          await project.pm.audio.cueSuccess();
+          var instruction = new ScratchInstruction(command);
+          instruction.parse = parseResult;
+          project.instructions.push(instruction);
+          project.addInstruction();
+        }
         return;
       }
     },
