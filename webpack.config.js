@@ -16,7 +16,7 @@ module.exports = {
 	],
 	watch: true,
   devServer: {
-		contentBase: path.join(__dirname, 'dist'),
+		contentBase: path.join(__dirname, 'build'),
 		compress: true,
 		port: process.env.PORT || 1337
   }

@@ -1,10 +1,6 @@
 {
   "name": "scratch-vui",
   "version": "1.0.0",
-  "engines": {
-    "node": "10.3.0",
-    "npm":"6.8.0"
-  },
   "description": "voice user interface for scratch",
   "main": "prototype.js",
   "scripts": {
@@ -51,9 +47,13 @@
     "webpack-cli": "2.0.13",
     "webpack-dev-server": "3.1.1"
   },
+  "engines": {
+    "node": "10.3.0",
+    "npm":"6.8.0"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/quachtina96/scratch-vui.git"
+    "url": "https://github.com/quachtina96/scratch-vui"
   },
   "author": "Tina Quach (quacht@mit.edu)",
   "license": "UNLICENSED",
