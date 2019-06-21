@@ -102,7 +102,6 @@ class RecordingsManager {
 			})
     ).catch(function(e) {
       console.log(e);
-      reject(e);
     }).then(function() {
       sprite.sounds = sounds;
       return projectJson;

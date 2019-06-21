@@ -15,7 +15,7 @@ class ScratchInstruction {
    * @param {!String} rawInstruction - the utterance from the user.
    */
   constructor(rawInstruction) {
-    var punctuationless = rawInstruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var punctuationless = rawInstruction.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
     var instruction = punctuationless.replace(/\s{2,}/g," ");
     this.no_punctuation = instruction;
     this.raw = rawInstruction.trim();
@@ -45,7 +45,7 @@ class ScratchInstruction {
    */
   static parse(instruction) {
     // Strip punctutation.
-    var punctuationless = instruction.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var punctuationless = instruction.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
     var instruction = punctuationless.replace(/\s{2,}/g," ");
 
     // Send request to ScratchNLP via websockets.
@@ -61,6 +61,37 @@ class ScratchInstruction {
         return result.response
       }
     })
+  }
+
+  //TODO(quacht): reworking the grammar COULD help w/ this. might go along with
+  // generating documentation.
+  /**
+   * Given an instruction, reworks the instruction if it corresponds to known
+   * mistranscriptions.
+   */
+  static _handleSpecialCases(utterance) {
+    // For now, this method only handles a single kind of common
+    // mistranscriptions related to the Scratch music extension.
+
+    // This command often fails because a number is used to identify the note
+    // and a number is used to specify the number of beats and for is a homonym
+    // for "four"
+    var regex = /play (?:note|No.|no) (.*) beat/;
+    var matches = Utils.matchRegex(utterance, regex);
+    if (matches) {
+        return;
+      var toFix = matches[1];
+      //  4 --> for
+      // 2 --> to
+      //    the note #
+      //    the number of beats
+      // A great way to get this would be to ask the user, but can we infer this
+      // information.
+      // "94 one" // 541
+
+    }
+    // "90 for misheard as 94"
+    return;
   }
 }
 

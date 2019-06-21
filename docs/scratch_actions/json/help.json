@@ -1,0 +1,46 @@
+{
+  "cancel":{
+    "name":"cancel",
+    "trigger":{
+
+    },
+    "idealTrigger":"cancel",
+    "description":"stop an action that you were in the middle of"
+  },
+  "getKnownCommands":{
+    "name":"getKnownCommands",
+    "trigger":{
+
+    },
+    "idealTrigger":"what can you do",
+    "description":"hear what things I can do",
+    "question":true
+  },
+  "getScratchCommands":{
+    "name":"getScratchCommands",
+    "trigger":{
+
+    },
+    "idealTrigger":"what scratch commands are there",
+    "description":"learn about what commands you can use in your projects",
+    "question":true
+  },
+  "getWhatISaid":{
+    "name":"getWhatISaid",
+    "trigger":{
+
+    },
+    "idealTrigger":"what did you hear me say",
+    "description":"hear what I thought you said",
+    "question":true
+  },
+  "getWhatYouSaid":{
+    "name":"getWhatYouSaid",
+    "trigger":{
+
+    },
+    "idealTrigger":"say that again",
+    "description":"get me to repeat what you just said",
+    "question":true
+  }
+}

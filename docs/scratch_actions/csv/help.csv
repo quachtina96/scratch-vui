@@ -1,0 +1,6 @@
+name,description,idealTrigger
+cancel,stop an action that you were in the middle of,cancel
+getWhatISaid,hear what I thought you said,what did you hear me say
+getKnownCommands,hear what things I can do,what can you do
+getWhatYouSaid,get me to repeat what you just said,say that again
+getScratchCommands,learn about what commands you can use in your projects,what scratch commands are there

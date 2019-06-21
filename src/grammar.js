@@ -15,6 +15,8 @@ ScratchGrammar.commands = `#JSGF V1.0;
 
 	grammar scratch_state_machine.command;
 
+	public <agent> = codie|cody|codi;
+
 	public <newProject> = new project|create new project|create project|make new project|make project;
 
 	public <editExistingProject> = see inside ;
@@ -23,7 +25,7 @@ ScratchGrammar.commands = `#JSGF V1.0;
 
 	public <finishProject> = i'm done|i'm finished;
 
-	public <play> = scratch <project>|scratch play <project>|play <project>|;
+	public <play> = <agent> <project>|<agent> play <project>|play <project>|;
 
 	public <playCurrentProject> = play project|start project|play current project|test project;
 

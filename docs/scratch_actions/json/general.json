@@ -1,0 +1,357 @@
+{
+  "queryState":{
+    "name":"queryState",
+    "trigger":{
+
+    },
+    "idealTrigger":"what state am i in",
+    "description":"figure out what state you are in",
+    "question":true
+  },
+  "createANewProjectCalled":{
+    "name":"createANewProjectCalled",
+    "trigger":{
+
+    },
+    "idealTrigger":"new project called",
+    "description":"create a new project with a name",
+    "arguments":[
+      {
+        "name":"project name",
+        "description":"name of the project to create"
+      }
+    ]
+  },
+  "createANewProject":{
+    "name":"createANewProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"new project",
+    "description":"create a new project"
+  },
+  "deleteProject":{
+    "name":"deleteProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"delete the BLANK project",
+    "description":"delete a project",
+    "arguments":[
+      {
+        "name":"project name",
+        "description":"name of the project to delete"
+      }
+    ]
+  },
+  "renameCurrentProject":{
+    "name":"renameCurrentProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"call this project NEW_NAME",
+    "description":"rename the current project ",
+    "arguments":[
+      {
+        "name":"newName",
+        "description":"new name"
+      }
+    ]
+  },
+  "renameProject":{
+    "name":"renameProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"call the OLD_NAME project NEW_NAME instead",
+    "description":"change the name of one of your projects",
+    "arguments":[
+      {
+        "name":"oldName",
+        "description":"project to rename"
+      },
+      {
+        "name":"newName",
+        "description":"new project name"
+      }
+    ]
+  },
+  "editExistingProject":{
+    "name":"editExistingProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"what's inside alarm",
+    "description":"check out what the alarm project is made of",
+    "arguments":[
+      {
+        "name":"project name",
+        "description":"project to explore"
+      }
+    ]
+  },
+  "editProject":{
+    "name":"editProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"what's inside",
+    "description":"edit the current project"
+  },
+  "finishProject":{
+    "name":"finishProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"i'm done",
+    "description":"leave the project"
+  },
+  "playCurrentProject":{
+    "name":"playCurrentProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"play project",
+    "description":"play the current project"
+  },
+  "play":{
+    "name":"play",
+    "trigger":{
+
+    },
+    "idealTrigger":"give me a compliment",
+    "description":"play a project made by tina called give me a compliment.",
+    "arguments":[
+      {
+        "name":"project to play",
+        "description":"name of the project to play"
+      }
+    ]
+  },
+  "return":{
+    "name":"return",
+    "trigger":{
+
+    },
+    "idealTrigger":"go back",
+    "description":"go back to the last state you were in"
+  },
+  "goHome":{
+    "name":"goHome",
+    "trigger":{
+
+    },
+    "idealTrigger":"go home",
+    "description":"go back to the home state"
+  },
+  "getCurrentProject":{
+    "name":"getCurrentProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"what project am i on",
+    "description":"find out what project you are on",
+    "question":true
+  },
+  "getNthProject":{
+    "name":"getNthProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"what's project number one'",
+    "description":"get the first project",
+    "arguments":[
+      {
+        "name":"project number",
+        "description":"project number"
+      }
+    ],
+    "question":true
+  },
+  "getProjectNames":{
+    "name":"getProjectNames",
+    "trigger":{
+
+    },
+    "idealTrigger":"what projects do i have",
+    "description":"hear a list of all the projects",
+    "question":true
+  },
+  "getProjectCount":{
+    "name":"getProjectCount",
+    "trigger":{
+
+    },
+    "idealTrigger":"how many projects do i have'",
+    "description":"hear how many projects there are",
+    "question":true
+  },
+  "stopBackground":{
+    "name":"stopBackground",
+    "trigger":{
+
+    },
+    "idealTrigger":"stop the background music",
+    "description":"stop the background music"
+  },
+  "stopCues":{
+    "name":"stopCues",
+    "trigger":{
+
+    },
+    "idealTrigger":"stop audio cues",
+    "description":"stop the audio cues"
+  },
+  "stopProject":{
+    "name":"stopProject",
+    "trigger":{
+
+    },
+    "idealTrigger":"stop",
+    "description":"stop playing a project"
+  },
+  "startBackground":{
+    "name":"startBackground",
+    "trigger":{
+
+    },
+    "idealTrigger":"start background music",
+    "description":"start the background music"
+  },
+  "startCues":{
+    "name":"startCues",
+    "trigger":{
+
+    },
+    "idealTrigger":"start audio cues",
+    "description":"start the audio cues"
+  },
+  "holdOn":{
+    "name":"holdOn",
+    "trigger":{
+
+    },
+    "idealTrigger":"hold on",
+    "description":"make me ignore you until you say 'listen'"
+  },
+  "listen":{
+    "name":"listen",
+    "trigger":{
+
+    },
+    "idealTrigger":"listen",
+    "description":"get me to start listening until you say 'hold on'"
+  },
+  "getSounds":{
+    "name":"getSounds",
+    "trigger":{
+
+    },
+    "idealTrigger":"what sounds are there",
+    "description":"discover what sounds there are",
+    "question":true
+  },
+  "checkSound":{
+    "name":"checkSound",
+    "trigger":{
+
+    },
+    "idealTrigger":"do you have a boing sound?",
+    "description":"check if there's a boing sound",
+    "arguments":[
+      {
+        "name":"sound name",
+        "description":"name of the sound you want to hear"
+      }
+    ],
+    "question":true
+  },
+  "queryActions":{
+    "name":"queryActions",
+    "trigger":{
+
+    },
+    "idealTrigger":"what can i do",
+    "description":"get a suggestion for what to try next",
+    "question":true
+  },
+  "queryActionTypes":{
+    "name":"queryActionTypes",
+    "trigger":{
+
+    },
+    "idealTrigger":"what kinds of things can i do",
+    "description":"explore different kinds of actions",
+    "question":true
+  },
+  "recordASound":{
+    "name":"recordASound",
+    "trigger":{
+
+    },
+    "idealTrigger":"record a sound called soundName",
+    "description":"start recording a sound to use in projects",
+    "arguments":[
+      {
+        "name":"sound name",
+        "description":"name of the sound"
+      }
+    ]
+  },
+  "stopRecording":{
+    "name":"stopRecording",
+    "trigger":{
+
+    },
+    "idealTrigger":"stop recording",
+    "description":"end the recording of a sound to use in projects"
+  },
+  "getRecordings":{
+    "name":"getRecordings",
+    "trigger":{
+
+    },
+    "idealTrigger":"list recordings",
+    "description":"hear me list all the recordings"
+  },
+  "playARecording":{
+    "name":"playARecording",
+    "trigger":{
+
+    },
+    "idealTrigger":"hear recording",
+    "description":"hear the last recording",
+    "arguments":[
+      {
+        "name":"recording name",
+        "description":"recording"
+      }
+    ]
+  },
+  "renameRecording":{
+    "name":"renameRecording",
+    "trigger":{
+
+    },
+    "idealTrigger":"rename recording",
+    "description":"rename recording",
+    "arguments":[
+      {
+        "name":"recording to rename",
+        "description":"recording"
+      },
+      {
+        "name":"new name",
+        "description":"recording"
+      }
+    ]
+  },
+  "greet":{
+    "name":"greet",
+    "trigger":{
+
+    },
+    "idealTrigger":"hi",
+    "description":"greet me"
+  }
+}

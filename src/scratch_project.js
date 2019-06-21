@@ -33,7 +33,6 @@ var ScratchProject = StateMachine.factory({
       pm: pm,
       ssm: pm.ssm,
       name: null,
-      audio: new ScratchAudio(),
       instructions: [],
       // Use 1-based indexing so step 1 refers to the first step when
       // communicating to the user.
@@ -149,7 +148,7 @@ var ScratchProject = StateMachine.factory({
         var end = start + voicedScratch[0].length + 1;
         var command = utterance.substring(end, utterance.length);
       }
-      var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+      var punctuationless = command.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
       var command = punctuationless.replace(/\s{2,}/g," ");
 
       var parseResult = await ScratchInstruction.parse(command);
@@ -161,12 +160,16 @@ var ScratchProject = StateMachine.factory({
         throw Error(`[project handleUtterance] failed parse to Scratch command: ${command}`);
       } else {
         // Success!
-        DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
-        await project.pm.audio.cueSuccess();
-        var instruction = new ScratchInstruction(command);
-        instruction.parse = parseResult;
-        project.instructions.push(instruction);
-        project.addInstruction();
+
+        // Only add to the project if we are inside the project
+        if (this.ssm.state == 'InsideProject') {
+          DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
+          await project.pm.audio.cueSuccess();
+          var instruction = new ScratchInstruction(command);
+          instruction.parse = parseResult;
+          project.instructions.push(instruction);
+          project.addInstruction();
+        }
         return;
       }
     },
@@ -200,6 +203,10 @@ var ScratchProject = StateMachine.factory({
             delete this.pm.projects['Untitled-'+this.pm.untitledCount];
             await this.pm.audio.cueSuccess();
             this.nameProject();
+            this.pm._updatePlayRegex();
+
+          } else {
+            this.pm.say(`${proposedName} cannot be used as a project name. It conflicts with another project or command`);
           }
           return true;
         case 'named':
