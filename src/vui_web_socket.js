@@ -1,6 +1,7 @@
 const WebSocketAsPromised = require('websocket-as-promised');
 
 var wsUrl = "ws://localhost:8765";
+wsUrl = "ws://scratchnlp.herokuapp.com/"
 const wsp = new WebSocketAsPromised(wsUrl, {
   packMessage: data => JSON.stringify(data),
   unpackMessage: message => JSON.parse(message),
@@ -14,7 +15,7 @@ wsp.open()
  }) // actually sends {foo: 'bar', id: 'xxx'}, because `attachRequestId` defined above
  .then(response => console.log(response))  // waits server message with corresponding requestId: {id: 'xxx', ...}
  .catch(function(err) {
- 	console.log('err');
+ 	console.log(err);
  });
 wsp.onMessage.addListener(message => {
 	console.log('message recieved by vui: ');
