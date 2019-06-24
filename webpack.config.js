@@ -14,7 +14,6 @@ module.exports = {
 			to: '.'
 		}])
 	],
-	watch: true,
   devServer: {
 		contentBase: path.join(__dirname, 'build'),
 		compress: true,
