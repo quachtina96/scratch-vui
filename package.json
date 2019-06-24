@@ -4,7 +4,6 @@
   "description": "voice user interface for scratch",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
     "start": "node index.js",
     "test:lint": "eslint . --ext=js",
     "test:unit": "tap test/unit/*.js",
