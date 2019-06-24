@@ -22,6 +22,7 @@
     "ejs": "^2.6.2",
     "eslint-plugin-promise": "^4.1.1",
     "express": "^4.17.1",
+    "ffi": "^2.3.0",
     "fs": "0.0.1-security",
     "get-float-time-domain-data": "0.1.0",
     "get-user-media-promise": "1.1.4",
