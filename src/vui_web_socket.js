@@ -17,6 +17,11 @@ wsp.open()
  .catch(function(err) {
  	console.log(err);
  });
+
+wsp.ws.onerror(evt) {
+	console.log('ws onerror event:')
+	console.log(evt);
+}
 wsp.onMessage.addListener(message => {
 	console.log('message recieved by vui: ');
 	console.log(message);
