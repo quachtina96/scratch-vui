@@ -1,7 +1,7 @@
 const WebSocketAsPromised = require('websocket-as-promised');
 
-var wsUrl = "ws://localhost:8765";
-wsUrl = "ws://scratchnlp.herokuapp.com/"
+// var wsUrl = "ws://localhost:8765";
+wsUrl = "ws://codi-backend.herokuapp.com:38099"
 const wsp = new WebSocketAsPromised(wsUrl, {
   packMessage: data => JSON.stringify(data),
   unpackMessage: message => JSON.parse(message),
