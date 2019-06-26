@@ -13,8 +13,8 @@ const Utils = require('./utils.js');
 const ScratchGrammar = require('./grammar.js')
 
 // ScratchVM Dependencies
-const VirtualMachine = require("scratch-vm");
-const ScratchStorage = require("scratch-storage");
+const VirtualMachine = require("./../node_modules/scratch-vm/VirtualMachine.js");
+const ScratchStorage = require("./../node_modules/scratch-storage/");
 const ScratchRender = require("scratch-render");
 const SB2BitmapAdapter = require("scratch-svg-renderer").BitmapAdapter;
 const SB2SVGAdapter = require("scratch-svg-renderer").SVGRenderer;
