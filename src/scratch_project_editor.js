@@ -77,12 +77,7 @@ class ScratchProjectEditor {
   _handleAction(action, utterance) {
     var pm = this.project.pm;
 
-    if (pm.triggerAction(action, action.getArgs(), utterance)) {
-
-      // Successfully triggered action.
-      pm.currentAction = null;
-      pm.currentArgument = null;
-    } else {
+    if (!pm.triggerAction(action, action.getArgs(), utterance)) {
       console.log(`You are currently in editor state ${this.project.state} and failed to ${action.name}`);
       return false;
     }
@@ -165,6 +160,7 @@ class ScratchProjectEditor {
   // multiple stacks, and this can get tricky with event-based stuff (which
   // Scratch implements as multiple stacks)
   appendStep(args) {
+    var editor =  this;
     var step = args[1];
     var voicedScratch = Utils.matchRegex(step, /^(?:scratch|search)(?:ed)?/);
     var command = step;
@@ -174,20 +170,27 @@ class ScratchProjectEditor {
       var end = start + voicedScratch[0].length + 1;
       var command = step.substring(end, step.length);
     }
-    var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var punctuationless = command.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
     var command = punctuationless.replace(/\s{2,}/g," ");
     ScratchInstruction.parse(command).then((result) => {
       if (!result) {
         // Failed to parse the command using ScratchNLP. Alert failure.
-        this.audio.cueMistake().then(()=>{
-          this.project.pm.say("I heard you say " + step + ". That's not a Scratch command.");
+        editor.audio.cueMistake().then(()=>{
+          editor.project.pm.say("I heard you say " + step + ". That's not a Scratch command.");
         });
       } else {
         // Success!
         var instruction = new ScratchInstruction(command);
         instruction.parse = result
-        this.instructions.push(instruction);
-        this.addInstruction();
+        try {
+          editor.project.instructions.push(instruction);
+          editor.project.addInstruction();
+        } catch (e) {
+          console.log(`error:`)
+          console.log(e)
+          console.log(`result: ${result}`)
+        }
+
       }
     });
   }
@@ -195,7 +198,7 @@ class ScratchProjectEditor {
   /**
    * In order to support
    */
-  insertStep(options) {
+  _insertStep(options) {
     var direction = options.direction;
     var referenceStepNumber = options.referenceStepNumber;
     var utterance = options.utterance;
@@ -203,7 +206,8 @@ class ScratchProjectEditor {
     var step = new ScratchInstruction(utterance);
     ScratchInstruction.parse(step.no_punctuation).then((parse) => {
       if (parse) {
-        this._insertStep(step, referenceStepNumber);
+        this._insertStepHelper(step, referenceStepNumber);
+        this.project.pm.say(`inserted step ${direction} step ${referenceStepNumber}`);
       }
     });
   }
@@ -211,7 +215,7 @@ class ScratchProjectEditor {
   /**
    * Helper function for inserting.
    */
-  _insertStep(step, location) {
+  _insertStepHelper(step, location) {
     this.project.instructions.splice(location, 0, step);
     this.project.instructionPointer = location;
   }
@@ -233,7 +237,7 @@ class ScratchProjectEditor {
         referenceStepNumber: this._getNumber(args[2])-1
       }
     }
-    this.insertStep(options);
+    this._insertStep(options);
   }
 
   insertStepAfter(args, invertedArguments=false) {
@@ -250,15 +254,24 @@ class ScratchProjectEditor {
         referenceStepNumber: this._getNumber(args[2])
       }
     }
-    this.insertStep(options);
+    this._insertStep(options);
   }
 
   beforeInsertStep(args) {
-    this.insertStepBefore(args, true);
+    this._insertStepBefore(args, true);
   }
 
   afterInsertStep(args) {
-    this.insertStepAfter(args, true);
+    this._insertStepAfter(args, true);
+  }
+
+  insertStep(args) {
+    var options =  {
+        direction: args[3],
+        utterance: args[1],
+        referenceStepNumber: this._getNumber(args[2])
+      }
+    this._insertStep(options);
   }
 
   /**

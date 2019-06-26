@@ -126,12 +126,12 @@ if (!('webkitSpeechRecognition' in window)) {
     if (event.error == 'no-speech') {
       start_img.src = 'assets/mic.gif';
       showInfo('info_no_speech');
-      ignore_onend = true;
+      // ignore_onend = true;
     }
     if (event.error == 'audio-capture') {
       start_img.src = 'assets/mic.gif';
       showInfo('info_no_microphone');
-      ignore_onend = true;
+      // ignore_onend = true;
     }
     if (event.error == 'not-allowed') {
       if (event.timeStamp - start_timestamp < 100) {
@@ -139,7 +139,7 @@ if (!('webkitSpeechRecognition' in window)) {
       } else {
         showInfo('info_denied');
       }
-      ignore_onend = true;
+      // ignore_onend = true;
     }
   };
 
@@ -193,23 +193,52 @@ if (!('webkitSpeechRecognition' in window)) {
     }
   };
 
+  // Handle keypresses!
+  var typeToCodeHandlesSpace = false;
+
   document.onkeydown = function(evt) {
     evt = evt || window.event;
-    if (evt.code == 'Space') {
-      if (scratch.state == "Recording") {
-        scratch.stopRecording();
-        return;
-      }
-      if (recognizing) {
-        recognition.stop();
-        // play sound cue for stopping listening.
-        scratch.pm.audio.cueDoneListening();
-        return;
-      } else {
-        scratch.vm.stopAll();
-        scratch.pm.synth.cancel();
-        recognition.start();
+    if (!typeToCodeHandlesSpace) {
+      if (evt.code == 'Space') {
+        if (scratch.state == "Recording") {
+          scratch.stopRecording();
+          return;
+        }
+        if (recognizing) {
+          recognition.stop();
+          // play sound cue for stopping listening.
+          scratch.pm.audio.cueDoneListening();
+          return;
+        } else {
+          scratch.vm.stopAll();
+          scratch.pm.synth.cancel();
+          recognition.start();
+        }
       }
     }
+
   };
+
+  var typeToCode = document.getElementById("type-to-code");
+  var historyText = document.getElementById("history_text");
+  typeToCode.onkeydown = function(evt) {
+    evt = evt || window.event;
+    // If the user has pressed enter
+    if (evt.code === 'Enter') {
+        var newUtterance = document.getElementById("type-to-code").value;
+        scratch.handleUtterance(newUtterance);
+        document.getElementById("type-to-code").value = "";
+        historyText.innerHTML = historyText.innerHTML + "\n" + newUtterance + "\n";
+    }
+  }
+
+  // When the user leaves the text area for typing to Scratch give the document
+  // permission to handle the spacebar as usual.
+  typeToCode.onblur = function() {
+    typeToCodeHandlesSpace = false;
+  }
+
+  typeToCode.onfocus = function() {
+    typeToCodeHandlesSpace = true;
+  }
 }

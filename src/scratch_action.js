@@ -42,23 +42,31 @@ ScratchAction.Validator.unconflictingProjectName = (ssm, projectName) => {
 	}
 
 	// Should not already be a Scratch command
-	const punctuationless = projectName.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+	const punctuationless = projectName.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 	const instruction = punctuationless.replace(/\s{2,}/g," ");
 
 	// Send request to ScratchNLP via websockets.
-	return wsp.sendRequest({
-		'type': 'translation',
-		'instruction': instruction
-	}).then((result) => {
-		console.log('RESULT OF SEND REQUEST IN SCRATCH ACTION');
-    	console.log(result.response);
-		if (result.response != "I don't understand.") {
-			// The project name maps to an existing scratch command
-			return false;
-		} else {
-			return true;
-		}
-	});
+	var checkProjectName = () => {
+		return wsp.sendRequest({
+			'type': 'translation',
+			'instruction': instruction
+		}).then((result) => {
+			console.log('RESULT OF SEND REQUEST IN SCRATCH ACTION');
+	    	console.log(result.response);
+			if (result.response != "I don't understand.") {
+				// The project name maps to an existing scratch command
+				return false;
+			} else {
+				return true;
+			}
+		});
+	}
+
+	// Websocket must be open before request is made.
+	if (wsp.isClosed) {
+		return wsp.open().then(checkProjectName)
+	}
+	return checkProjectName();
 }
 
 ScratchAction.Validator.existingProject = (ssm, projectName) => {
@@ -84,7 +92,7 @@ ScratchAction.Validator.scratchCommand = (ssm, step) => {
 	if (ScratchAction.Validator.existingProject(ssm, step)) {
 		return true;
 	}
-	var punctuationless = step.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+	var punctuationless = step.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 	var step = punctuationless.replace(/\s{2,}/g," ");
 	return ScratchInstruction.parse(step).then((result) => {
 		if (!result) {
@@ -255,7 +263,7 @@ ScratchAction.General.renameCurrentProject = {
 //renameProject
 ScratchAction.General.renameProject = {
 	"name": "renameProject",
-	"trigger":/change (?:the)? ?name of (?:the)? ?(.*) project to (.*)|rename (?:the)? ?(.*) (?:project)? ?to (?:be)? ?(.*)|call (?:the)? ?(.*) project (.*) instead/,
+	"trigger":/rename project| rename (?:a|the) project|change (?:the)? ?name of (?:the)? ?(.*) project to (.*)|rename (?:the)? ?(.*) (?:project)? ?to (?:be)? ?(.*)|call (?:the)? ?(.*) project (.*) instead/,
 	"idealTrigger":"call the OLD_NAME project NEW_NAME instead",
 	"description":"change the name of one of your projects",
 	"arguments": [
@@ -290,7 +298,7 @@ ScratchAction.General.editExistingProject = {
 //editProject
 ScratchAction.General.editProject = {
 	"name":'editProject',
-	"trigger":/see inside|what's inside|open project|since i said|what inside the project|what is inside/,
+	"trigger":/edit ?:(the)? project|see inside|what's inside|open project|since i said|what inside the project|what is inside/,
 	"idealTrigger":"what's inside",
 	"description":"edit the current project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -299,7 +307,7 @@ ScratchAction.General.editProject = {
 //finishProject
 ScratchAction.General.finishProject = {
 	"name":"finishProject",
-	"trigger":/no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|that's it|end project|finish project/,
+	"trigger":/those are all the steps|exit project|leave project|no next steps|no more steps|i'm done|i'm finished|(?:close|leave) (?:the)? ?project|end project|finish project/,
 	"idealTrigger":"i'm done",
 	"description":"leave the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
@@ -509,7 +517,7 @@ ScratchAction.General.stopRecording = {
 
 ScratchAction.General.getRecordings = {
 	"name":"getRecordings",
-	"trigger":/what recordings do i have|list ?(?:all|the)? recordings|get ?(?:all|the)? recordings|^what recordings (?:are there|do you (?:know|have))|what (?:other)? ?recordings do you (?:know|have)|list all the recordings ?(?:that)? ?(?:i've made)$/,
+	"trigger":/what recordings do you have|what recordings do i have|list ?(?:all|the)? recordings|get ?(?:all|the)? recordings|^what recordings (?:are there|do you (?:know|have))|what (?:other)? ?recordings do you (?:know|have)|list all the recordings ?(?:that)? ?(?:i've made)$/,
 	"idealTrigger": "list recordings",
 	"description": "hear me list all the recordings"
 };
@@ -589,7 +597,7 @@ ScratchAction.Edit.getStepCount = {
 //getAllSteps
 ScratchAction.Edit.getAllSteps = {
 	"name":"getAllSteps",
-	"trigger":/what are (?:all)? ?the steps|what does (?:my|the)? ?project do right now/,
+	"trigger":/what steps are there|what are (?:all)? ?the steps|what does (?:my|the)? ?project do right now/,
 	"idealTrigger":"what are all the steps",
 	"description":"hear me say all the steps in the project",
 	"contextValidator": ScratchAction.Validator.currentProjectDefined,
@@ -614,9 +622,9 @@ ScratchAction.Edit.goToStep = {
 	"description":"jump to and hear step number 2 of the project",
 	"arguments": [
 		{
-			name: 'step number',
-			// skip the validator, because _describeCurrentStep already does validation.
-			description: 'name step to go to'
+			'name': 'step number',
+			'validator': ScratchAction.Validator.currentProjectStepNumber,
+			'description': 'name step to go to'
 		}
 	],
 	"contextValidator": ScratchAction.Validator.currentProjectDefined,
@@ -656,7 +664,7 @@ ScratchAction.Edit.playStep = {
 //appendStep
 ScratchAction.Edit.appendStep = {
 	"name":"appendStep",
-	"trigger":/append (?:a)? ?step|add (?:a)? ?step|add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
+	"trigger":/append (?:a)? ?step|^a stop$|add (?:a|another)? ?step|add (?:the (?:step|steps|stop|stops|stuff|step))? ?(.*)|^next (.*)|(.*) next$|^at the end (.*)|(.*) at the end$|^after (?:all)? ?that (.*)|(.*) after (?:all)? ?that$/,
 	"idealTrigger":"next, play the chomp sound",
 	"description":"to add a new instruction, 'play the chomp sound', to the end of the project",
 	"arguments": [{
@@ -671,7 +679,7 @@ ScratchAction.Edit.appendStep = {
 //insertStepBefore
 ScratchAction.Edit.insertStepBefore = {
 	"name":"insertStepBefore",
-	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (?:number)? ?(.*)|insert (?:step|steps|stop|stops|stuff|step)/,
+	"trigger":/(?:insert)? ?(.*) before (?:step|steps|stop|stops|stuff|step) (?:number)? ?(.*)/,
 	// TODO: what are other commands that would be good to try to insert.
 	// could we design these commands to be more exciting.
 	"idealTrigger":"insert 'play the bark sound' before step number '1'",
@@ -694,7 +702,7 @@ ScratchAction.Edit.insertStepBefore = {
 //insertStepAfter
 ScratchAction.Edit.insertStepAfter = {
 	"name":"insertStepAfter",
-	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|insert (?:step|steps|stop|stops|stuff|step)/,
+	"trigger":/(?:insert)? ?(.*) after (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)/,
 	// TODO: there is so much potential to make these triggers and descriptions
 	// contextual based on the current step.
 	"idealTrigger":"insert 'play the meow sound' after step number '1'",
@@ -758,10 +766,44 @@ ScratchAction.Edit.beforeInsertStep = {
 	"contextValidator": ScratchAction.Validator.currentProjectDefined
 };
 
+//insertStep
+ScratchAction.Edit.insertStep = {
+	"name":"insertStep",
+	"trigger":/insert (?:a)? ?(?:step|steps|stop|stops|stuff|step)/,
+	// TODO: what are other commands that would be good to try to insert.
+	// could we design these commands to be more exciting.
+	"idealTrigger":"insert step",
+	"description":"insert a new command",
+	"arguments": [
+		{
+			'name': 'instruction',
+			'validator': ScratchAction.Validator.scratchCommand,
+			'description':'instruction to insert'
+		},
+		{
+			'name': 'step number',
+			'validator': ScratchAction.Validator.currentProjectStepNumber,
+			'description': 'step number to insert next to'
+		},
+		{
+			'name': 'direction',
+			'validator': (ssm, direction) => {
+				if(['before', 'after'].includes(direction)) {
+					return true;
+				} else {
+					return 'the direction must be before or after'
+				}
+			},
+			'description':'before or after'
+		},
+	],
+	"contextValidator": ScratchAction.Validator.currentProjectDefined
+};
+
 //deleteStep
 ScratchAction.Edit.deleteStep = {
 	"name":"deleteStep",
-	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|delete (?:step|steps|stop|stops|stuff|step)/,
+	"trigger":/delete (?:step|steps|stop|stops|stuff|step|at) (?:number)? ?(.*)|delete ?(?:a)? (?:step|steps|stop|stops|stuff|step)/,
 	"idealTrigger":"delete step 1",
 	"description":"delete the first step",
 	"arguments": [
@@ -821,8 +863,8 @@ ScratchAction.Help.getKnownCommands = {
 
 ScratchAction.Help.getScratchCommands = {
 	"name":"getScratchCommands",
-	"trigger":/what scratch commands do you (?:know|have)|(?:tell me|what are) (?:the|some ?(?:of the)?) scratch commands (?:that you know|you know)?|what (?:(?:kinds|kind) of)? ?scratch commands (?:are there|do you know)|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you (?:have|know))/,
-	"idealTrigger":"what scratch commands are there",
+	"trigger":/what commands do you (?:know|have)|(?:tell me|what are) (?:the|some ?(?:of the)?) commands (?:that you know|you know)?|what (?:(?:kinds|kind) of)? ?commands (?:are there|do you know)|what are the command categories|what (?:(?:kind|kinds) of)? ?categories (?:are there|do you (?:have|know))/,
+	"idealTrigger":"what commands are there",
 	"description":"learn about what commands you can use in your projects",
 	"question": true
 };

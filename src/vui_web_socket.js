@@ -1,6 +1,14 @@
 const WebSocketAsPromised = require('websocket-as-promised');
 
-var wsUrl = "ws://localhost:8765";
+// Support TLS-specific URLs, when appropriate.
+if (typeof window != 'undefined' && window.location.protocol == "https:") {
+  var ws_scheme = "wss://";
+} else {
+  var ws_scheme = "ws://"
+};
+
+wsUrl = `${ws_scheme}codi-backend.herokuapp.com`
+
 const wsp = new WebSocketAsPromised(wsUrl, {
   packMessage: data => JSON.stringify(data),
   unpackMessage: message => JSON.parse(message),
@@ -10,13 +18,21 @@ const wsp = new WebSocketAsPromised(wsUrl, {
 
 wsp.open()
  .then(() => {
- 	wsp.sendRequest({foo: 'bar'})
+  wsp.sendRequest({foo: 'bar'})
  }) // actually sends {foo: 'bar', id: 'xxx'}, because `attachRequestId` defined above
- .then(response => console.log(response));  // waits server message with corresponding requestId: {id: 'xxx', ...}
+ .then(response => console.log(response))  // waits server message with corresponding requestId: {id: 'xxx', ...}
+ .catch(function(err) {
+  console.log(err);
+ });
+
+wsp.onError.addListener = (evt) => {
+  console.log('ws onerror event:')
+  console.log(evt);
+}
 
 wsp.onMessage.addListener(message => {
-	console.log('message recieved by vui: ');
-	console.log(message);
+  console.log('message recieved by vui: ');
+  console.log(message);
 });
 
 module.exports = wsp;

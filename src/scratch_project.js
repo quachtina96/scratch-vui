@@ -33,7 +33,6 @@ var ScratchProject = StateMachine.factory({
       pm: pm,
       ssm: pm.ssm,
       name: null,
-      audio: new ScratchAudio(),
       instructions: [],
       // Use 1-based indexing so step 1 refers to the first step when
       // communicating to the user.
@@ -83,33 +82,41 @@ var ScratchProject = StateMachine.factory({
         let rawInstructions = this.instructions.map(instruction => instruction.no_punctuation);
         var projectJson;
 
-        // Send request to ScratchNLP via websockets.
-        wsp.sendRequest({
-          'type': 'project',
-          'user': this.ssm.user,
-          'projectName':this.name,
-          'instructions': rawInstructions,
-          'useGreenFlag': true,
-          'start': startIndex,
-          'end':endIndex
-        }).then(result => {
-          console.log('RESULT OF SEND REQUEST IN SCRATCH PROGRAM');
-          console.log(result.response);
-          // We must post-process the json by adding in the appropriate
-          // sound recordings.
-          projectJson = JSON.parse(result.response);
-          this.ssm.recordingsManager.addRecordingsToProject(projectJson).then(() => {
-            console.log(`getScratchProgram's result.response`);
-            console.log(projectJson);
-            resolve(projectJson);
-          });
+        var requestProgram = () => {
+          // Send request to ScratchNLP via websockets.
+          wsp.sendRequest({
+            'type': 'project',
+            'user': this.ssm.user,
+            'projectName':this.name,
+            'instructions': rawInstructions,
+            'useGreenFlag': true,
+            'start': startIndex,
+            'end':endIndex
+          }).then(result => {
+            console.log('RESULT OF SEND REQUEST IN SCRATCH PROGRAM');
+            console.log(result.response);
+            // We must post-process the json by adding in the appropriate
+            // sound recordings.
+            projectJson = JSON.parse(result.response);
+            this.ssm.recordingsManager.addRecordingsToProject(projectJson).then(() => {
+              console.log(`getScratchProgram's result.response`);
+              console.log(projectJson);
+              resolve(projectJson);
+            });
 
-        })
-        .catch(error => {
-          console.log('ERROR IN SEND REQUEST IN SCRATCH PROGRAM');
-          console.log(error);
-          reject(error);
-        })
+          })
+          .catch(error => {
+            console.log('ERROR IN SEND REQUEST IN SCRATCH PROGRAM');
+            console.log(error);
+            reject(error);
+          })
+        }
+
+        // Websocket must be open before request is made.
+        if (wsp.isClosed) {
+          return wsp.open().then(requestProgram)
+        }
+        return requestProgram();
       })
     },
     _getName: function(utterance) {
@@ -149,7 +156,7 @@ var ScratchProject = StateMachine.factory({
         var end = start + voicedScratch[0].length + 1;
         var command = utterance.substring(end, utterance.length);
       }
-      var punctuationless = command.replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+      var punctuationless = command.replace(/[',\/#!$%\^&\*;:{}=\-_`~()]/g,"");
       var command = punctuationless.replace(/\s{2,}/g," ");
 
       var parseResult = await ScratchInstruction.parse(command);
@@ -161,12 +168,16 @@ var ScratchProject = StateMachine.factory({
         throw Error(`[project handleUtterance] failed parse to Scratch command: ${command}`);
       } else {
         // Success!
-        DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
-        await project.pm.audio.cueSuccess();
-        var instruction = new ScratchInstruction(command);
-        instruction.parse = parseResult;
-        project.instructions.push(instruction);
-        project.addInstruction();
+
+        // Only add to the project if we are inside the project
+        if (project.ssm.state == 'InsideProject') {
+          DEBUG && console.log(`[project handleUtterance] parsed to Scratch command`);
+          await project.pm.audio.cueSuccess();
+          var instruction = new ScratchInstruction(command);
+          instruction.parse = parseResult;
+          project.instructions.push(instruction);
+          project.addInstruction();
+        }
         return;
       }
     },
@@ -175,46 +186,51 @@ var ScratchProject = StateMachine.factory({
      * project, or false if failed.
      */
     handleUtterance: async function(utterance, opt_scratchVoiced) {
+      var scratchProject = this;
       DEBUG && console.log(`[project handle utterance]`)
 
       // Preprocess utterance
       utterance = Utils.removeFillerWords(utterance.toLowerCase()).trim();
       DEBUG && console.log(`[project handleUtterance] ${this}`)
       DEBUG && console.log(`[project handleUtterance] ${this.state}`)
-      switch(this.state) {
+      switch(scratchProject.state) {
         case 'create':
           // Request project name from user
-          if (this.name) {
-            this.goto('named');
+          if (scratchProject.name) {
+            scratchProject.goto('named');
           } else {
-            await this.pm.audio.cueSuccess();
-            this.startProjectCreation();
+            await scratchProject.pm.audio.cueSuccess();
+            scratchProject.startProjectCreation();
           }
           return true;
         case 'empty':
           // Expect the utterance to be the name of the project.
-          var proposedName = this._getName(utterance);
-          if (this._isValid(proposedName)) {
-            this.name = this._getName(utterance);
-            this.pm.projects[this.name] = this.pm.currentProject;
-            delete this.pm.projects['Untitled-'+this.pm.untitledCount];
-            await this.pm.audio.cueSuccess();
-            this.nameProject();
+          var proposedName = scratchProject._getName(utterance);
+          if (scratchProject._isValid(proposedName)) {
+            scratchProject.name = scratchProject._getName(utterance);
+            scratchProject.pm.projects[scratchProject.name] = scratchProject.pm.currentProject;
+            delete scratchProject.pm.projects['Untitled-'+scratchProject.pm.untitledCount];
+            await scratchProject.pm.audio.cueSuccess();
+            scratchProject.nameProject();
+            scratchProject.pm._updatePlayRegex();
+
+          } else {
+            scratchProject.pm.say(`${proposedName} cannot be used as a project name. It conflicts with another project or command`);
           }
           return true;
         case 'named':
         case 'nonempty':
           // Detect and handle explicit edit commands.
           try {
-            var editorResult = await this.editor.handleUtterance(utterance, this);
+            var editorResult = await scratchProject.editor.handleUtterance(utterance, scratchProject);
             if (editorResult == 'exit') {
-              return this._finishProjectIfNeeded();
+              return scratchProject._finishProjectIfNeeded();
             } else {
               return true;
             }
           } catch (e) {
             try {
-              await this._matchToScratchCommand(utterance, this);
+              await scratchProject._matchToScratchCommand(utterance, scratchProject);
               return true;
             } catch (e) {
               return false;

@@ -1,0 +1,212 @@
+{
+  "getStepCount":{
+    "name":"getStepCount",
+    "trigger":{
+
+    },
+    "idealTrigger":"how many steps are there",
+    "description":"get the number of steps in the project",
+    "question":true
+  },
+  "getAllSteps":{
+    "name":"getAllSteps",
+    "trigger":{
+
+    },
+    "idealTrigger":"what are all the steps",
+    "description":"hear me say all the steps in the project",
+    "question":true
+  },
+  "getCurrentStep":{
+    "name":"getCurrentStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"what step am i on",
+    "description":"get the number and description of the current step",
+    "question":true
+  },
+  "goToStep":{
+    "name":"goToStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"go to step number 2",
+    "description":"jump to and hear step number 2 of the project",
+    "arguments":[
+      {
+        "name":"step number",
+        "description":"name step to go to"
+      }
+    ]
+  },
+  "nextStep":{
+    "name":"nextStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"next step",
+    "description":"go to the next step",
+    "question":true
+  },
+  "previousStep":{
+    "name":"previousStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"previous step",
+    "description":"go to the step before",
+    "question":true
+  },
+  "playStep":{
+    "name":"playStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"try it",
+    "description":"play the current step",
+    "arguments":[
+
+    ]
+  },
+  "appendStep":{
+    "name":"appendStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"next, play the chomp sound",
+    "description":"to add a new instruction, 'play the chomp sound', to the end of the project",
+    "arguments":[
+      {
+        "name":"instruction",
+        "description":"instruction you want to add to the end of the project"
+      }
+    ]
+  },
+  "insertStepBefore":{
+    "name":"insertStepBefore",
+    "trigger":{
+
+    },
+    "idealTrigger":"insert 'play the bark sound' before step number '1'",
+    "description":"insert a new command before step number 1",
+    "arguments":[
+      {
+        "name":"instruction",
+        "description":"instruction to insert"
+      },
+      {
+        "name":"step number",
+        "description":"step number to insert before"
+      }
+    ]
+  },
+  "insertStepAfter":{
+    "name":"insertStepAfter",
+    "trigger":{
+
+    },
+    "idealTrigger":"insert 'play the meow sound' after step number '1'",
+    "description":"insert a new command after step number 1",
+    "arguments":[
+      {
+        "name":"instruction",
+        "description":"instruction to insert"
+      },
+      {
+        "name":"step number",
+        "description":"step number to insert after"
+      }
+    ]
+  },
+  "afterInsertStep":{
+    "name":"afterInsertStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"after step number '1' insert 'play the meow sound'",
+    "description":"insert a new command after step number 1",
+    "arguments":[
+      {
+        "name":"step number",
+        "description":"step number to insert after"
+      },
+      {
+        "name":"instruction",
+        "description":"instruction to insert"
+      }
+    ]
+  },
+  "beforeInsertStep":{
+    "name":"beforeInsertStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"before step number '1'insert 'play the bark sound'",
+    "description":"insert a new command before step number 1",
+    "arguments":[
+      {
+        "name":"step number",
+        "description":"step number to insert before"
+      },
+      {
+        "name":"instruction",
+        "description":"instruction to insert"
+      }
+    ]
+  },
+  "insertStep":{
+    "name":"insertStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"insert step",
+    "description":"insert a new command",
+    "arguments":[
+      {
+        "name":"instruction",
+        "description":"instruction to insert"
+      },
+      {
+        "name":"step number",
+        "description":"step number to insert next to"
+      },
+      {
+        "name":"direction",
+        "description":"before or after"
+      }
+    ]
+  },
+  "deleteStep":{
+    "name":"deleteStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"delete step 1",
+    "description":"delete the first step",
+    "arguments":[
+      {
+        "name":"step number",
+        "description":"number of the step to delete"
+      }
+    ]
+  },
+  "replaceStep":{
+    "name":"replaceStep",
+    "trigger":{
+
+    },
+    "idealTrigger":"replace step 1 with say hello",
+    "description":"change step to say hello",
+    "arguments":[
+      {
+        "name":"step number",
+        "description":"number of the step to replace"
+      },
+      {
+        "name":"instruction",
+        "description":"new instruction"
+      }
+    ]
+  }
+}

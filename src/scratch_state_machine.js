@@ -5,6 +5,8 @@
  */
 const StateMachine = require('javascript-state-machine');
 const StateMachineHistory = require('javascript-state-machine/lib/history')
+const ListNavigator = require('./list_navigator.js');
+
 const ScratchVUIStorage = require('./storage.js');
 const ScratchProjectManager = require('./scratch_project_manager.js');
 const Utils = require('./utils.js');
@@ -61,12 +63,10 @@ var ScratchStateMachine = new StateMachine.factory({
     { name: 'renameCurrentProject', from: '*', to: function() { return this.state} },
     { name: 'renameProject', from: '*', to: function() { return this.state} },
     { name: 'deleteProject', from: '*', to: function() { return this.state} },
-    { name: 'editExistingProject', from: 'PlayProject',  to: 'InsideProject' },
-    { name: 'editExistingProject', from: 'Home',  to: 'InsideProject' },
-    { name: 'createANewProject', from: 'Home',  to: 'InsideProject' },
-    { name: 'createANewProject', from: 'PlayProject',  to: 'InsideProject' },
-    { name: 'createANewProjectCalled', from: 'Home',  to: 'InsideProject' },
-    { name: 'createANewProjectCalled', from: 'PlayProject',  to: 'InsideProject' },
+    // TODO: disable inside to inside project
+    { name: 'editExistingProject', from: ['PlayProject', 'Home','NavigatingAList', 'InsideProject'],  to: 'InsideProject' },
+    { name: 'createANewProject', from: ['Home', 'PlayProject', 'NavigatingAList'],  to: 'InsideProject' },
+    { name: 'createANewProjectCalled', from: ['Home', 'PlayProject', 'NavigatingAList'],  to: 'InsideProject' },
     // Return should take you back to the last state
     { name: 'return',   from: '*', to: function() {
         return this.history[this.history.length - 2];
@@ -74,13 +74,11 @@ var ScratchStateMachine = new StateMachine.factory({
     },
     { name: 'goHome', from: '*', to: 'Home'},
     { name: 'finishProject', from: 'InsideProject', to: 'Home'},
-    { name: 'play', from: 'Home', to: 'PlayProject'},
-    { name: 'play', from: 'InsideProject', to: 'PlayProject'},
-    { name: 'play', from: 'PlayProject', to: 'PlayProject'},
-    { name: 'playCurrentProject', from: 'PlayProject', to: 'PlayProject'},
-    { name: 'playCurrentProject', from: 'InsideProject', to: 'PlayProject'},
-    { name: 'editProject', from: 'PlayProject', to: 'InsideProject' },
-    // Support this.goto(STATE_NAME);
+    { name: 'play', from: ['Home', 'NavigatingAList','PlayProject'], to: 'PlayProject'},
+    { name: 'editProjectWithoutIntro', from: 'PlayProject', to: 'InsideProject'},
+    { name: 'editProject', from: ['PlayProject', 'Home', 'NavigatingAList'], to: 'InsideProject'},
+    // { name: 'play', from: 'InsideProject', to: 'PlayProject'}, // disable ability to play a project when inside project to prevent conflicts between commands
+    { name: 'playCurrentProject', from: ['PlayProject', 'InsideProject'], to: 'PlayProject'},
     { name: 'goto', from: '*', to: function(s) { return s } },
     { name: 'stay', from: '*', to: function() { return this.state} },
     { name: 'getCurrentProject', from: '*', to: function() { return this.state} },
@@ -147,12 +145,12 @@ var ScratchStateMachine = new StateMachine.factory({
       this.setMethods();
       this.pm._updatePlayRegex();
 
-      // Only introduce if the browser has never interacted with Scratch before.
-      if (!window.localStorage.scratchVuiInteractedBefore) {
-        this.introduceSelf();
-        console.log('window.localStorage.scratchVuiInteractedBefore is true')
-        window.localStorage.scratchVuiInteractedBefore = true;
-      }
+      // // Only introduce if the browser has never interacted with Scratch before.
+      // if (window.localStorage.scratchVuiInteractedBefore == "false") {
+      //   this.introduceSelf();
+      //   console.log('window.localStorage.scratchVuiInteractedBefore is true')
+      //   window.localStorage.scratchVuiInteractedBefore = "true";
+      // }
       this.introduceSelf();
 
       this.recordingsManager.vm = this.vm;
@@ -326,7 +324,14 @@ var ScratchStateMachine = new StateMachine.factory({
         },
         onGetRecordings: async () => {
           var recordingNames = await this.recordingsManager.getAllRecordings();
-          this.pm.say(`${recordingNames}`)
+          var namesUnwrapper = (nameList, ssm) => {
+            var whatToSay = nameList;
+            whatToSay.splice(whatToSay.length-1, 0, 'and');
+            whatToSay.join(',')
+            ssm.pm.say(whatToSay);
+          };
+          this.pm.listNavigator = new ListNavigator(recordingNames, 3, this, namesUnwrapper);
+          this.pm.listNavigator.navigate();
         },
         onPlayARecording: async (lifecycle, args) => {
           var soundName = args[1];
@@ -358,6 +363,9 @@ var ScratchStateMachine = new StateMachine.factory({
         questions you have. To start, why don't you say 'alarm' to play the alarm project");
       this.pm.recognition.start();
     },
+    onLeaveNavigatingAList: function() {
+      this.pm.listNavigator = null;
+    }
   }
 });
 
