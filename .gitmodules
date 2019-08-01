@@ -2,7 +2,7 @@
 	path = src/modules/scratch-storage
 	url = https://github.com/quachtina96/scratch-storage.git
 	branch = develop
-[submodule "node_modules/scratch-vm"]
-	path = node_modules/scratch-vm
+[submodule "src/modules/scratch-vm"]
+	path = src/modules/scratch-vm
 	url = https://github.com/quachtina96/scratch-vm.git
 	branch = speech_sb2
