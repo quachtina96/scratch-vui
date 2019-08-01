@@ -67,3 +67,5 @@ typings/
 
 build/bundle.js
 node_modules
+build/04d514e01fa1da20c92b.worker.js
+build/extension-worker.js
