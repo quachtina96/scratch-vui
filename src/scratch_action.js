@@ -537,7 +537,7 @@ ScratchAction.General.playARecording = {
 
 ScratchAction.General.renameRecording = {
 	"name":"renameRecording",
-	"trigger": /rename recording/,
+	"trigger": /rename ?(?:a)? recording/,
 	"idealTrigger": "rename recording",
 	"description": "rename recording",
 	"arguments": [

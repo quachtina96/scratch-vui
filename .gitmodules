@@ -1,0 +1,4 @@
+[submodule "src/modules/scratch-storage"]
+	path = src/modules/scratch-storage
+	url = https://github.com/quachtina96/scratch-storage.git
+	branch = develop
