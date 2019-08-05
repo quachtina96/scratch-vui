@@ -16,6 +16,8 @@
     "base64-js": "^1.3.0",
     "bowser": "^2.4.0",
     "cmu-pronouncing-dictionary": "^1.0.3",
+    "codi-storage": "0.0.0-development",
+    "codi-vm": "0.0.0-development",
     "cryptiles": "^4.1.3",
     "diff-match-patch": "1.0.0",
     "ejs": "^2.6.2",
