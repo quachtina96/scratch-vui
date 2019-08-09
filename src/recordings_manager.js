@@ -134,6 +134,10 @@ class RecordingsManager {
 				sampleRate: sampleRate,
 				channelData: [clippedSamples]
 		}).then(wavBuffer => {
+			    console.log(`wavBuffer for ${recordingName}:`);
+			    console.log(wavBuffer);
+
+			    // Create the sound object.
 				const vmSound = {
 						format: '',
 						dataFormat: 'wav',
@@ -157,30 +161,20 @@ class RecordingsManager {
 
 				// The VM will update the sound name to a fresh name
 				// if the following is already taken
-				// TODO(quacht): prompt the user for the recording name.
 				vmSound.name = Utils.titlecase(recordingName);
 
-				// Create and use and AudioBufferPlayer
-				// The thing about the audio buffer player is that it uses the clipped samples and not the web encoded.
-				// var player = new AudioBufferPlayer(clippedSamples, sampleRate);
-				// player.play(trimStart, trimEnd, () => {console.log('audiobufferplayerUPDATE')}, () => {console.log('audiobufferplayerEND')});
-
 				// Store the sound in Scratch Storage.
-
-				// Pass an empty string as the assetId in order to force the
-				// store to create a new sound asset for the recording.
-				// TODO: not sure if the wav buffer is supposed to be converted to a uint array before storing..
+				// TODO: not sure if the wav buffer is supposed to be converted to a uint array before storing.
 				storage.store(storage.AssetType.Sound, vmSound.dataFormat, new Uint8Array(wavBuffer), vmSound.assetId, vmSound).then((assetMetadata) => {
-
+				// storage.store(storage.AssetType.Sound, vmSound.dataFormat, wavBuffer, vmSound.assetId, vmSound).then((assetMetadata) => {
 					console.log(assetMetadata);
 					// Get target on which to attach the sound and set it on the
 					// virtual machine.
 					var target = this.vm.runtime.targets[1];
 					this.vm.editingTarget = target;
 
+					// TODO(quacht): verify that the vmSound object is correct?
 					this.vm.addSound(vmSound).then(() => {
-							console.log('vm has added sound')
-							console.log('now playing sound via recordings manager');
 							this.playRecording(vmSound)
 					});
 				});
