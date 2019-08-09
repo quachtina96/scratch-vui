@@ -8,7 +8,10 @@ import bowser from 'bowser';
 
 let AUDIO_CONTEXT;
 if (!bowser.msie) {
-    AUDIO_CONTEXT = new (window.AudioContext || window.webkitAudioContext)();
+    AUDIO_CONTEXT = new (window.AudioContext || window.webkitAudioContext)({
+    	// Sample rate equal to that of the pop sound in Scratch sound library
+  		sampleRate: 11025
+    });
 
     StartAudioContext(AUDIO_CONTEXT);
 }
