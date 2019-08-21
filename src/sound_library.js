@@ -239,6 +239,10 @@ class SoundLibrary {
                 this.playingSoundPromise.isPlaying = true;
             }
             return soundPlayer;
+        }).catch((e) => {
+          console.log(e)
+          console.log(e.message)
+          console.log(e.name)
         });
   }
 }

@@ -11,7 +11,6 @@ const Utils = require('./utils.js');
 var ListNavigator = StateMachine.factory({
 	init: 'start',
 	transitions: [
-		// Support linear  creation process: create, empty, named, nonempty
 		{ name: 'next', from: 'start', to: function() {
 			var nextChunk = this.successor(this.list, this.currentPageIndex);
 			if (nextChunk) {
@@ -186,9 +185,17 @@ var ListNavigator = StateMachine.factory({
 	  	if (this.chunksize == 1) {
 			this.ssm.pm.say(`Here is the first item in the list.`)
 	  	} else {
-	  		this.ssm.pm.say(`Here are the first ${this.chunksize} items in the list.`)
+	  		var length = this.list.length;
+	  		if (length <= this.chunksize) {
+	  			// An incomplete "page" of items
+	  			this.ssm.pm.say(`The list has ${this.list.length} items.`)
+	  		} else {
+	  			// Indicate multiple pages of items to explore
+	  			this.ssm.pm.say(`Here are the first ${this.chunksize} items in the list.`)
+	  			// TODO(quacht): Is it right to indicate the first set of items in the list??
+	  		}
 	  	}
-		this.getCurrent();
+			this.getCurrent();
 	  },
 	  // TODO: utilize getPart so that we can index into specific pages of the
 	  // list.

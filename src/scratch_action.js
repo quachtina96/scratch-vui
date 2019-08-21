@@ -381,7 +381,7 @@ ScratchAction.General.getNthProject = {
 //getProjectNames
 ScratchAction.General.getProjectNames = {
 	"name":"getProjectNames",
-	"trigger":/do you have any (?:other)? ?projects|what (?:other)? ?projects are there|what (?:other)? ?(?:projects|project) do (?:i|you) have|what have i made so far|what are (?:my|the) (?:other)? ?projects called|what are (?:the names of)? ?my (?:other)? ?projects/,
+	"trigger":/what projects do we have|do you have any (?:other)? ?projects|what (?:other)? ?projects are there|what (?:other)? ?(?:projects|project) do (?:i|you) have|what have i made so far|what are (?:my|the) (?:other)? ?projects called|what are (?:the names of)? ?my (?:other)? ?projects/,
 	"idealTrigger":"what projects do i have",
 	"description":"hear a list of all the projects",
 	"question": true
@@ -455,7 +455,7 @@ ScratchAction.General.listen = {
 //getSounds
 ScratchAction.General.getSounds = {
 	"name": "getSounds",
-	"trigger":/^what sounds (?:are there|do you (?:know|have))|what (?:other)? ?sounds do you (?:know|have)|more sounds|other sounds$/,
+	"trigger":/^what sounds do we have|^what sounds do i have|^what sounds (?:are there|do you (?:know|have))|what (?:other)? ?sounds do you (?:know|have)|more sounds|other sounds$/,
 	"idealTrigger":"what sounds are there",
 	"description":"discover what sounds there are",
 	"question": true
@@ -576,6 +576,13 @@ ScratchAction.ListNavigator.getPreviousPart = {
 	"trigger":  /previous|before/,
 	"idealTrigger": "go back",
 	"description": "to get the previous part of the list",
+};
+
+ScratchAction.ListNavigator.getCurrent = {
+	"name":"getCurrent",
+	"trigger":  /current chunk|what did you say|repeat|again/,
+	"idealTrigger": "what did you say",
+	"description": "to hear the current chunk of the list",
 };
 
 //////// EDIT PROJECT COMMANDS

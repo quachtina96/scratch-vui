@@ -508,9 +508,6 @@ class ScratchProjectManager {
       this.say('The current project is now called ' + this.currentProject.name);
     } else {
       this.say('You are not currently on a project');
-      // TODO(quacht): support an interaction where instead of the above,
-      // scratch also says and responds to
-      // What project would you like to rename?
     }
   }
   renameSpecifiedProject(lifecycle, args) {
@@ -528,9 +525,6 @@ class ScratchProjectManager {
 
       this.say('The current project is ' + this.currentProject.name);
       this.say('You are not currently on a project');
-      // TODO(quacht): support an interaction where instead of the above,
-      // scratch also says and responds to
-      // What project would you like to rename?
   }
   deleteProject(lifecycle, args, utterance) {
     var pm = this;
@@ -565,8 +559,10 @@ class ScratchProjectManager {
       } else if (names.length) {
         var projectNamesUnwrapper = (nameList, ssm) => {
           var whatToSay = nameList;
-          whatToSay.splice(whatToSay.length-1, 0, 'and');
-          whatToSay.join(',')
+          if (whatToSay.length > 1){
+            whatToSay.splice(whatToSay.length-1, 0, 'and');
+            whatToSay.join(',')
+          }
           ssm.pm.say(whatToSay);
         };
         pm.listNavigator = new ListNavigator(Object.keys(pm.projects), 3, pm.ssm, projectNamesUnwrapper);

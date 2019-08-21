@@ -326,8 +326,10 @@ var ScratchStateMachine = new StateMachine.factory({
           var recordingNames = await this.recordingsManager.getAllRecordings();
           var namesUnwrapper = (nameList, ssm) => {
             var whatToSay = nameList;
-            whatToSay.splice(whatToSay.length-1, 0, 'and');
-            whatToSay.join(',')
+            if (whatToSay.length > 1) {
+              whatToSay.splice(whatToSay.length-1, 0, 'and');
+              whatToSay.join(',')
+            }
             ssm.pm.say(whatToSay);
           };
           this.pm.listNavigator = new ListNavigator(recordingNames, 3, this, namesUnwrapper);
