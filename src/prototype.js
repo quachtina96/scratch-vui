@@ -220,15 +220,16 @@ if (!('webkitSpeechRecognition' in window)) {
   };
 
   var typeToCode = document.getElementById("type-to-code");
-  var historyText = document.getElementById("history_text");
+  var history = document.getElementById("history");
   typeToCode.onkeydown = function(evt) {
     evt = evt || window.event;
     // If the user has pressed enter
     if (evt.code === 'Enter') {
-        var newUtterance = document.getElementById("type-to-code").value;
+        var newUtterance = typeToCode.value.trim();
         scratch.handleUtterance(newUtterance);
-        document.getElementById("type-to-code").value = "";
-        historyText.innerHTML = historyText.innerHTML + "\n" + newUtterance + "\n";
+        typeToCode.value = "";
+        typeToCode.value = typeToCode.value.trim();
+        history.value = history.value + "\n" + "You: "+ newUtterance;
     }
   }
 

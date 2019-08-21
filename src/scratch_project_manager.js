@@ -105,6 +105,11 @@ class ScratchProjectManager {
     var scratch = this;
     whatToSay.onstart = function(event) {
       scratch.recognition.stop();
+      var history = document.getElementById("history")
+      if (history) {
+        // Add system's verbal response to chat history.
+        history.value = history.value + "\n" + "Codi: "+ whatToSay.text;
+      }
     }
     whatToSay.onend = function(event) {
       if (opt_on_end) {
