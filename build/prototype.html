@@ -72,7 +72,10 @@
     border: 1px solid #ddd;
     padding: 15px;
     text-align: left;
-    min-height: 150px;
+    min-height: 50px;
+  }
+  textarea {
+    font-size: 12px;
   }
   #start_button {
     border: 0;
@@ -133,12 +136,8 @@
 </div>
 <!-- <button id="type_to_code_button">Toggle Type to Code</button>
  -->
- <textarea id="type-to-code" rows="1" cols="100">
-  Type instead of using your voice here! Press enter to send to Scratch!
-</textarea>
-<textarea id="history" rows="10" cols="100">
-  Chat History:
-</textarea>
+ <textarea id="type-to-code" rows="1" cols="100">Type instead of using your voice here! Press enter to send a message to Codi!</textarea>
+<textarea id="history" rows="10" cols="100" readOnly="true">Chat History:</textarea>
 <!-- <div id="history">
   <span id="history_text"></span>
 </div> -->
