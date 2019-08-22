@@ -80,7 +80,7 @@ class ScratchProjectManager {
    * Delete project.
    */
   removeProject(projName) {
-    this.storage.removeProject(projName)
+    things.storage.removeProject(projName)
   }
 
   /**
@@ -534,11 +534,19 @@ class ScratchProjectManager {
   deleteProject(lifecycle, args, utterance) {
     var pm = this;
     return new Promise(((resolve, reject) => {
-      var projectToPlayName = args[1].trim();
+      var projectToDelete = args[1].trim();
+
+      if (['give me a compliment', 'are you a cat'].indexOf(projectToDelete) != -1) {
+        // The project to delete is a default project that comes from Codi.
+        // Cannot delete.
+        this.say(`Sorry, you cannot delete example projects.`)
+        resolve();
+        return;
+      }
 
       // play the project that matches!
       for (var projectName in pm.projects) {
-        if (Utils.removeFillerWords(projectName) == projectToPlayName) {
+        if (Utils.removeFillerWords(projectName) == projectToDelete) {
           pm.say(projectName + ' project deleted.')
           delete pm.projects[projectName];
           this.storage.removeProject(projectName);

@@ -11,8 +11,9 @@ class ScratchVUIStorage {
    *    belongs.
    */
   constructor() {
-    this.saveToServer = true;
+    this.saveToServer = false;
     this.useLocalStorage = true;
+    this.loadDefaultProjects = true;
   }
 
   getProjects() {
@@ -24,17 +25,27 @@ class ScratchVUIStorage {
       locallySavedProjects = JSON.parse(window.localStorage.scratchProjects);
     }
     if (this.saveToServer) {
-      var projectsSavedToServer = {}
+      // var projectsSavedToServer = {}
       // TODO: send http request to the URL hosting the server side to get all
       // projects belonging to the particular user.
       // /user/<user_name>/allprojects
       // Process the result to ensure that the format is correct for the
       // ScratchProjectManager
+    } else {
+      var projectsSavedToServer = {}
     }
 
     // If the two project dictionaries share the same keys (same project names),
     // the locally saved projects take precedent.
-    return Object.assign({}, projectsSavedToServer, locallySavedProjects);
+    var defaultProjects;
+    if (this.loadDefaultProjects) {
+      var stringifiedDefaults = `{"give me a compliment":[{"no_punctuation":"say youre amazing","raw":"say youre amazing","parse":"{'variables': {}, 'sounds': set([]), 'lists': {}, 'scripts': [['speakAndWait:', 'youre amazing']]}"}],"are you a cat":[{"no_punctuation":"say no but i can","raw":"say no but i can","parse":"{'variables': {}, 'sounds': set([]), 'lists': {}, 'scripts': [['speakAndWait:', 'no but i can']]}"},{"no_punctuation":"play the meow sound","raw":"play the meow sound","parse":"{'variables': {}, 'sounds': set(['Meow']), 'lists': {}, 'scripts': [['doPlaySoundAndWait', 'Meow']]}"}]}`
+      defaultProjects = JSON.parse(stringifiedDefaults);
+    } else {
+      defaultProjects = {};
+    }
+
+    return Object.assign({}, projectsSavedToServer, locallySavedProjects, defaultProjects);
   }
 
   removeProject(projectName) {

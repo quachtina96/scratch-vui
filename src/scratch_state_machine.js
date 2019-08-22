@@ -362,7 +362,7 @@ var ScratchStateMachine = new StateMachine.factory({
       this.pm.say("Hi, I’m Codi! I'm a tool you can use to program and interact with\
         audio projects. Any time you need help or don't know what to do, you can say\
         'Codi, help' or ask 'what can i do?'. I will try to answer any\
-        questions you have. To start, why don't you say 'alarm' to play the alarm project");
+        questions you have. To start, why don't you say 'give me a compliment' to play the 'give me a compliment' project");
       this.pm.recognition.start();
     },
     onLeaveNavigatingAList: function() {
