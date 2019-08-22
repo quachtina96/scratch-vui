@@ -897,7 +897,7 @@ ScratchAction.Help.getWhatYouSaid = {
 
 ScratchAction.General.greet = {
 	"name":"greet",
-	"trigger":/^hello$|^what's up$|^hey$|^hi$|^yo$|^sup$/,
+	"trigger":/^(?:codi|codie|cody)? ?(?:hello|what's up|hey|hi|yo|sup) ?(?:codi|codie|cody)?$/,
 	"idealTrigger":"hi",
 	"description":"greet me",
 };

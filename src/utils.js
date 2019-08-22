@@ -25,9 +25,20 @@ Utils.matchesScratch = (utterance) => {
   return Utils.matchRegex(utterance, /^(?:scratch|search|trash|crunch|french)(?:ed)?$/);
 }
 
-// TODO: utilize this function to provide more flexibility.
 Utils.containsScratch = (utterance) => {
   return Utils.matchRegex(utterance, /(?:scratch|search|trash|crunch|french)(?:ed)?/)
+}
+
+Utils.startsWithCodi = (utterance) => {
+  return Utils.matchRegex(utterance, /^(?:codie|cody|codi)/);
+}
+
+Utils.matchesCodi = (utterance) => {
+  return Utils.matchRegex(utterance, /^(?:codie|cody|codi)$/);
+}
+
+Utils.containsCodi = (utterance) => {
+  return Utils.matchRegex(utterance, /(?:codie|cody|codi)?/);
 }
 
 /**
@@ -49,7 +60,7 @@ Utils.matchRegex = (utterance, pattern) => {
 Utils.match = (utterance, pattern) => {
   // Be flexible in how you recognize Scratch at the beginning of an utterance.
   // Allow the user to say "hey" or "okay" and "please".
-  var voicedScratch = Utils.matchRegex(utterance, /^(?:okay|hey|please)? ?(?:scratch|search)?(?:ed)? ?(?:please)?/);
+  var voicedScratch = Utils.matchRegex(utterance, /^(?:okay|hey|please)? ?(?:codie|cody|codi) ?(?:please)?/);
   if (voicedScratch) {
     // Only match the triggers to the utterance without the voiced scratch.
     var start = utterance.indexOf(voicedScratch[0]);

@@ -38,7 +38,7 @@ class ScratchProjectManager {
     // Whether currently listening for a yes or no answer.
     this.yesOrNo = false;
     // Whether the user already said "Scratch".
-    this.scratchVoiced = false;
+    this.codiVoiced = false;
     this.listening = true;
     this.audio = new ScratchAudio();
     this.soundLibrary = new SoundLibrary(this.ssm.vm);
@@ -184,7 +184,7 @@ class ScratchProjectManager {
     // Current project
     DEBUG && console.log(`[handle utterance][_finishUtterance] current project handling utterance`)
 
-    var result = await this.currentProject.handleUtterance(utterance, this.scratchVoiced);
+    var result = await this.currentProject.handleUtterance(utterance, this.codiVoiced);
     if (result == 'exit') {
         DEBUG && console.log(`[pm handle utterance][_finishUtterance] finish project`)
         this.ssm.finishProject();
@@ -275,7 +275,7 @@ class ScratchProjectManager {
    */
   _isInterrupt(utterance) {
     var interruptTrigger = ScratchAction.Interrupt.cancel.trigger
-    var args = this.scratchVoiced ? Utils.matchRegex(utterance, interruptTrigger) : Utils.match(utterance, interruptTrigger);
+    var args = this.codiVoiced ? Utils.matchRegex(utterance, interruptTrigger) : Utils.match(utterance, interruptTrigger);
 
     // If trigger was matched, attempt to execute associated command.
     return (args && args.length > 0)
@@ -297,7 +297,7 @@ class ScratchProjectManager {
     // Handle the question if there is a match to the utterance.
     for (var action of questionActions) {
       var trigger = action.trigger;
-      var args = this.scratchVoiced ? Utils.matchRegex(utterance, trigger) : Utils.match(utterance, trigger);
+      var args = this.codiVoiced ? Utils.matchRegex(utterance, trigger) : Utils.match(utterance, trigger);
       // If trigger was matched, attempt to execute associated command.
       if (args && args.length > 0) {
         var actionToExecute = new Action(action);
@@ -329,11 +329,11 @@ class ScratchProjectManager {
     }
 
     // Handle interrupt of speech.
-    if (Utils.matchesScratch(utterance)) {
+    if (Utils.matchesCodi(utterance)) {
       this.synth.cancel();
       // Remember that the user said "Scratch" and give them a cue so they know
       // they've been heard.
-      this.scratchVoiced = true;
+      this.codiVoiced = true;
       this.say("I'm listening.")
       return;
     }
@@ -343,7 +343,7 @@ class ScratchProjectManager {
 
       // If the user already said Scratch at the end of the previous utterance,
       // do not require the user to say it again.
-      var args = this.scratchVoiced ? Utils.matchRegex(utterance, this.actions[triggerType].trigger) : Utils.match(utterance, this.actions[triggerType].trigger);
+      var args = this.codiVoiced ? Utils.matchRegex(utterance, this.actions[triggerType].trigger) : Utils.match(utterance, this.actions[triggerType].trigger);
 
       // If trigger was matched, attempt to execute associated command.
       if (args && args.length > 0) {
@@ -365,9 +365,9 @@ class ScratchProjectManager {
 
     // Pass the utterance to the project to handle.
     if (this.ssm.state == 'PlayProject') {
-        this.currentProject.handleUtteranceDuringExecution(utterance, this.scratchVoiced);
+        this.currentProject.handleUtteranceDuringExecution(utterance, this.codiVoiced);
     }
-    else if (Utils.containsScratch(utterance)) {
+    else if (Utils.containsCodi(utterance)) {
       this.say("I heard you say " + utterance);
 
       // Suggest a close match if there exists one via fuzzy matching.
@@ -400,7 +400,7 @@ class ScratchProjectManager {
 
     // TODO: rip out this state variable, because we are no longer requiring
     // scratch to always be voiced.
-    this.scratchVoiced = false;
+    this.codiVoiced = false;
   }
 
   /**
