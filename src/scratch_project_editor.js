@@ -184,6 +184,8 @@ class ScratchProjectEditor {
         instruction.parse = result
         try {
           editor.project.instructions.push(instruction);
+          // Set the instruction pointer to the newly added instruction.
+          this.project.instructionPointer = editor.project.instructions.length - 1
           editor.project.addInstruction();
         } catch (e) {
           console.log(`error:`)
@@ -297,6 +299,11 @@ class ScratchProjectEditor {
       if (Utils.checkBounds(index, this.project.instructions)) {
         var removedScratchInstruction = this.project.instructions.splice(index, 1);
         this.project.pm.say('Removed step ' + (index+1));
+        // Now that the step is deleted, set the instruction pointer to the step
+        // before if there was no step after the deleted step.
+        if (this.project.instructions.length < index + 1) {
+          this.project.instructionPointer = index - 1;
+        }
       }
     }
     console.log(this.project.instructions);
@@ -315,6 +322,7 @@ class ScratchProjectEditor {
       } else {
         this.project.instructions.splice(index, 1, step);
         this.project.pm.say('replaced step ' + (index+1));
+        this.project.instructionPointer = index;
       }
     console.log(this.project.instructions);
     });

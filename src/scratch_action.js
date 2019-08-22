@@ -497,7 +497,7 @@ ScratchAction.General.queryActionTypes = {
 
 ScratchAction.General.recordASound = {
 	"name":"recordASound",
-	"trigger": /start ?a? recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
+	"trigger": /new recording|start ?a? recording|start recording me|(?:make|record) (?:a|the) sound|make a recording|record (?:a|the) (.*) sound|record (?:a|the) sound called (.*)|(?:start|make) ?a? (?:new)? (?:sound|recording) called (.*)|start recording ?a? ?(?:new)? sound called (.*)/,
 	"idealTrigger": "record a sound called soundName",
 	"description": "start recording a sound to use in projects",
 	"arguments": [
