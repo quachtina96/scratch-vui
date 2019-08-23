@@ -179,7 +179,10 @@ if (!('webkitSpeechRecognition' in window)) {
         console.log(`[RECOGNITION] result: ${event.results[i][0].transcript}`)
         scratch.pm.audio.cueListening();
         // Analyze utterance.
+        var history = document.getElementById("history");
+        history.value = history.value + "\n" + "You: "+ event.results[i][0].transcript;
         scratch.handleUtterance(event.results[i][0].transcript)
+
       } else {
         interim_transcript += event.results[i][0].transcript;
       }
