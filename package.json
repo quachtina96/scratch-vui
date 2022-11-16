@@ -43,7 +43,7 @@
     "copy-webpack-plugin": "4.5.1",
     "eslint": "4.19.1",
     "scratch-audio": "0.1.0-prerelease.20190114210212",
-    "scratch-blocks": "0.1.0-prerelease.1561032983",
+    "scratch-blocks": "0.1.0-prerelease.20221024060953",
     "scratch-render": "0.1.0-prerelease.20190605151415",
     "scratch-svg-renderer": "^0.2.0-prerelease.20190523193400",
     "tap": "11.1.3",
